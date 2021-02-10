@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using pro.savel.KafkaRestProxy.Services;
 
 namespace pro.savel.KafkaRestProxy
 {
@@ -24,6 +25,8 @@ namespace pro.savel.KafkaRestProxy
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "KafkaRestProxy", Version = "v1"});
             });
+
+            services.AddScoped<AdminClientService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
