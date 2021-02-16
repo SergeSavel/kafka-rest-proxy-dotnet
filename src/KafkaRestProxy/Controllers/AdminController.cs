@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using pro.savel.KafkaRestProxy.Entities;
 using pro.savel.KafkaRestProxy.Services;
 
 namespace pro.savel.KafkaRestProxy.Controllers

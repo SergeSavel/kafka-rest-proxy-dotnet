@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace pro.savel.KafkaRestProxy
+namespace pro.savel.KafkaRestProxy.Entities
 {
     public class TopicInfo
     {

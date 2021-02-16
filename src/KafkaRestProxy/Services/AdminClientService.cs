@@ -2,6 +2,7 @@
 using System.Linq;
 using Confluent.Kafka;
 using Microsoft.Extensions.Configuration;
+using pro.savel.KafkaRestProxy.Entities;
 
 namespace pro.savel.KafkaRestProxy.Services
 {
