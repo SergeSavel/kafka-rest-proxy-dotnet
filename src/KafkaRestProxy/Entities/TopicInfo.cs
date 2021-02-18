@@ -10,7 +10,7 @@ namespace pro.savel.KafkaRestProxy.Entities
 
         public class PartitionInfo
         {
-            public int Name { get; init; }
+            public int Id { get; init; }
 
             public long BeginningOffset { get; init; }
 
