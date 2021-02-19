@@ -21,11 +21,11 @@ namespace pro.savel.KafkaRestProxy.Producer
 
         public async Task<DeliveryResult> PostMessage(string topic, Message message)
         {
-            var producerMessage = ProducerMapper.MapMessage(message);
+            var producerMessage = ProducerMapper.Map(message);
 
             var producerDeliveryResult = await _producer.ProduceAsync(topic, producerMessage);
 
-            var deliveryResult = ProducerMapper.MapDeliveryResult(producerDeliveryResult);
+            var deliveryResult = ProducerMapper.Map(producerDeliveryResult);
 
             return deliveryResult;
         }

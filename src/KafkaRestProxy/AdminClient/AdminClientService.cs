@@ -22,43 +22,22 @@ namespace pro.savel.KafkaRestProxy.AdminClient
 
         public Metadata GetMetadata()
         {
-            var metadata = _adminClient.GetMetadata(Timeout);
-            return new Metadata(metadata);
-        }
+            var adminClientMetadata = _adminClient.GetMetadata(Timeout);
+            var metadata = AdminClientMapper.Map(adminClientMetadata);
 
+            return metadata;
+        }
 
         public TopicMetadata GetTopicMetadata(string topic)
         {
-            var metadata = _adminClient.GetMetadata(topic, Timeout);
+            var adminClientMetadata = _adminClient.GetMetadata(topic, Timeout);
 
-            if (metadata.Topics.Count == 0) return null;
+            if (adminClientMetadata.Topics.Count == 0) return null;
 
-            var topicMetadata = metadata.Topics[0];
+            var adminClientTopicMetadata = adminClientMetadata.Topics[0];
+            var topicMetadata = AdminClientMapper.Map(adminClientTopicMetadata);
 
-            return new TopicMetadata(topicMetadata);
-
-            // using var consumer = new ConsumerBuilder<string, string>(_consumerConfig).Build();
-            //
-            // var partitionInfos = topicMetadata.Partitions
-            //     .Select(partitionMetadata => new TopicPartition(topic, partitionMetadata.PartitionId))
-            //     .Select(topicPartition => new
-            //     {
-            //         Partition = topicPartition,
-            //         Offsets = consumer.GetWatermarkOffsets(topicPartition)
-            //     })
-            //     .Select(partitionWithOffsets => new TopicInfo.PartitionInfo
-            //     {
-            //         Id = partitionWithOffsets.Partition.Partition.Value,
-            //         BeginningOffset = partitionWithOffsets.Offsets.Low,
-            //         EndOffset = partitionWithOffsets.Offsets.High
-            //     })
-            //     .ToList();
-            //
-            // return new TopicInfo
-            // {
-            //     Name = topicMetadata.Topic,
-            //     Partitions = partitionInfos
-            // };
+            return topicMetadata;
         }
     }
 }
