@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using Confluent.Kafka;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using pro.savel.KafkaRestProxy.Entities;
 using pro.savel.KafkaRestProxy.Services;
 
@@ -22,11 +20,15 @@ namespace pro.savel.KafkaRestProxy.Controllers
         {
             return _adminClientService.GetMetadata();
         }
-        
+
         [HttpGet("metadata/{topic}")]
-        public TopicMetadata GetTopicMetadata(string topic)
+        public ActionResult<TopicMetadata> GetTopicMetadata(string topic)
         {
-            return _adminClientService.GetTopicMetadata(topic);
+            var result = _adminClientService.GetTopicMetadata(topic);
+
+            if (result == null) return NotFound("Topic not found.");
+
+            return result;
         }
     }
 }

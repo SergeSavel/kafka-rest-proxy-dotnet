@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Linq;
 using Confluent.Kafka;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using pro.savel.KafkaRestProxy.Entities;
+using Metadata = pro.savel.KafkaRestProxy.Entities.Metadata;
+using TopicMetadata = pro.savel.KafkaRestProxy.Entities.TopicMetadata;
 
 namespace pro.savel.KafkaRestProxy.Services
 {
@@ -26,17 +24,20 @@ namespace pro.savel.KafkaRestProxy.Services
 
         public Metadata GetMetadata()
         {
-            return _adminClient.GetMetadata(Timeout);
+            var metadata = _adminClient.GetMetadata(Timeout);
+            return new Metadata(metadata);
         }
-        
-        
-        
+
+
         public TopicMetadata GetTopicMetadata(string topic)
         {
             var metadata = _adminClient.GetMetadata(topic, Timeout);
+
             if (metadata.Topics.Count == 0) return null;
 
-            return metadata.Topics[0];
+            var topicMetadata = metadata.Topics[0];
+
+            return new TopicMetadata(topicMetadata);
 
             // using var consumer = new ConsumerBuilder<string, string>(_consumerConfig).Build();
             //
