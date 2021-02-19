@@ -33,6 +33,7 @@ namespace pro.savel.KafkaRestProxy
             services.AddSingleton(KafkaConfigProvider.GetConsumerConfig(Configuration));
 
             services.AddScoped<AdminClientService>();
+            services.AddSingleton<ProducerService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

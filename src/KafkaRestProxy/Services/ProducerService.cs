@@ -1,0 +1,28 @@
+﻿using System.Threading.Tasks;
+using Confluent.Kafka;
+using pro.savel.KafkaRestProxy.Entities;
+using pro.savel.KafkaRestProxy.Mappers;
+
+namespace pro.savel.KafkaRestProxy.Services
+{
+    public class ProducerService
+    {
+        private readonly IProducer<string, string> _producer;
+
+        public ProducerService(ProducerConfig config)
+        {
+            _producer = new ProducerBuilder<string, string>(config).Build();
+        }
+
+        public async Task<DeliveryResult> PostMessage(string topic, Message message)
+        {
+            var producerMessage = ProducerMapper.MapMessage(message);
+
+            var producerDeliveryResult = await _producer.ProduceAsync(topic, producerMessage);
+
+            var deliveryResult = ProducerMapper.MapDeliveryResult(producerDeliveryResult);
+
+            return deliveryResult;
+        }
+    }
+}
