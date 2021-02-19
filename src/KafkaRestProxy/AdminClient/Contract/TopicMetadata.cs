@@ -1,16 +1,22 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace pro.savel.KafkaRestProxy.AdminClient.Contract
 {
     public class TopicMetadata
     {
-        public string Name { get; init; }
-        public PartitionMetadata[] Partitions { get; init; }
+        [Required] public string Name { get; init; }
+
+        [Required] public PartitionMetadata[] Partitions { get; init; }
 
         public class PartitionMetadata
         {
-            public int Id { get; init; }
-            public int Leader { get; init; }
-            public int[] Replicas { get; init; }
-            public int[] InSyncReplicas { get; init; }
+            [Required] public int Id { get; init; }
+
+            [Required] public int Leader { get; init; }
+
+            [Required] public int[] Replicas { get; init; }
+
+            [Required] public int[] InSyncReplicas { get; init; }
         }
     }
 }

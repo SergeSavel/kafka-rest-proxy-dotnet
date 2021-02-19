@@ -1,4 +1,6 @@
-﻿namespace pro.savel.KafkaRestProxy.Producer.Contract
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace pro.savel.KafkaRestProxy.Producer.Contract
 {
     public class DeliveryResult
     {
@@ -9,9 +11,12 @@
             PossiblyPersisted
         }
 
-        public PersistenceStatus Status { get; init; }
-        public int PartitionId { get; init; }
-        public long Offset { get; init; }
-        public long Timestamp { get; init; }
+        [Required] public PersistenceStatus Status { get; init; }
+
+        [Required] public int PartitionId { get; init; }
+
+        [Required] public long Offset { get; init; }
+
+        [Required] public long Timestamp { get; init; }
     }
 }

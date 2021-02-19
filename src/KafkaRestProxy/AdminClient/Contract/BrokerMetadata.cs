@@ -1,9 +1,13 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace pro.savel.KafkaRestProxy.AdminClient.Contract
 {
     public class BrokerMetadata
     {
-        public int Id { get; init; }
-        public string Host { get; init; }
-        public int Port { get; init; }
+        [Required] public int Id { get; init; }
+
+        [Required] public string Host { get; init; }
+
+        [Required] public int Port { get; init; }
     }
 }
