@@ -1,17 +1,23 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Confluent.Kafka;
 using pro.savel.KafkaRestProxy.Entities;
 using pro.savel.KafkaRestProxy.Mappers;
 
 namespace pro.savel.KafkaRestProxy.Services
 {
-    public class ProducerService
+    public class ProducerService : IDisposable
     {
         private readonly IProducer<string, string> _producer;
 
         public ProducerService(ProducerConfig config)
         {
             _producer = new ProducerBuilder<string, string>(config).Build();
+        }
+
+        public void Dispose()
+        {
+            _producer.Dispose();
         }
 
         public async Task<DeliveryResult> PostMessage(string topic, Message message)
