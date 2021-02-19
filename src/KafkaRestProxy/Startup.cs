@@ -21,7 +21,9 @@ namespace pro.savel.KafkaRestProxy
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers()
+                .AddXmlSerializerFormatters();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "KafkaRestProxy", Version = "v1"});
@@ -31,17 +33,17 @@ namespace pro.savel.KafkaRestProxy
             Configuration.GetSection("Kafka").Bind(adminClientConfig);
             Configuration.GetSection("KafkaAdminClient").Bind(adminClientConfig);
             services.AddSingleton(adminClientConfig);
-            
+
             var producerConfig = new ProducerConfig();
             Configuration.GetSection("Kafka").Bind(producerConfig);
             Configuration.GetSection("KafkaProducer").Bind(producerConfig);
             services.AddSingleton(producerConfig);
-            
+
             var consumerConfig = new ConsumerConfig();
             Configuration.GetSection("Kafka").Bind(consumerConfig);
             Configuration.GetSection("KafkaConsumer").Bind(consumerConfig);
             services.AddSingleton(consumerConfig);
-            
+
             services.AddScoped<AdminClientService>();
         }
 
