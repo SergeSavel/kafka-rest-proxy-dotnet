@@ -35,7 +35,8 @@ namespace pro.savel.KafkaRestProxy
 
             var result = new ProducerConfig(clientConfig)
             {
-                Partitioner = Partitioner.ConsistentRandom
+                Partitioner = Partitioner.ConsistentRandom,
+                CompressionType = CompressionType.Snappy
             };
 
             configuration?.Bind("Kafka:Producer", result);
