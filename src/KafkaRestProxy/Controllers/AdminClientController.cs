@@ -6,11 +6,11 @@ namespace pro.savel.KafkaRestProxy.Controllers
 {
     [ApiController]
     [Route("admin")]
-    public class AdminController : ControllerBase
+    public class AdminClientController : ControllerBase
     {
         private readonly AdminClientService _adminClientService;
 
-        public AdminController(AdminClientService adminClientService)
+        public AdminClientController(AdminClientService adminClientService)
         {
             _adminClientService = adminClientService;
         }
