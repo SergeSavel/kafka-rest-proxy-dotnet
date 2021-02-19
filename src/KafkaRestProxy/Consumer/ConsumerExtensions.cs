@@ -1,0 +1,13 @@
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace pro.savel.KafkaRestProxy.Consumer
+{
+    public static class ConsumerExtensions
+    {
+        public static void AddConsumer(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddSingleton(ConsumerConfigProvider.GetConfig(configuration));
+        }
+    }
+}
