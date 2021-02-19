@@ -9,12 +9,10 @@ namespace pro.savel.KafkaRestProxy.Services
     {
         private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(10);
         private readonly IAdminClient _adminClient;
-        private readonly ConsumerConfig _consumerConfig;
 
-        public AdminClientService(AdminClientConfig adminClientConfig, ConsumerConfig consumerConfig)
+        public AdminClientService(AdminClientConfig adminClientConfig)
         {
             _adminClient = new AdminClientBuilder(adminClientConfig).Build();
-            _consumerConfig = consumerConfig;
         }
 
         public void Dispose()
