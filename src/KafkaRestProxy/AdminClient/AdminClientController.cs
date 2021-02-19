@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using pro.savel.KafkaRestProxy.Entities;
-using pro.savel.KafkaRestProxy.Services;
+using pro.savel.KafkaRestProxy.AdminClient.Contract;
 
-namespace pro.savel.KafkaRestProxy.Controllers
+namespace pro.savel.KafkaRestProxy.AdminClient
 {
     [ApiController]
     [Route("admin")]

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace pro.savel.KafkaRestProxy.Entities
+namespace pro.savel.KafkaRestProxy.Consumer.Contract
 {
     public class Record
     {

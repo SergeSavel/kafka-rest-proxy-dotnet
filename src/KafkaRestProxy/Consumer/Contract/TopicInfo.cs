@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace pro.savel.KafkaRestProxy.Entities
+namespace pro.savel.KafkaRestProxy.Consumer.Contract
 {
     public class TopicInfo
     {

@@ -4,7 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using pro.savel.KafkaRestProxy.Services;
+using pro.savel.KafkaRestProxy.AdminClient;
+using pro.savel.KafkaRestProxy.Producer;
 
 namespace pro.savel.KafkaRestProxy
 {

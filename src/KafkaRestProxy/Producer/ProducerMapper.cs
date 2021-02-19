@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Text;
 using Confluent.Kafka;
-using pro.savel.KafkaRestProxy.Entities;
+using pro.savel.KafkaRestProxy.Producer.Contract;
 
-namespace pro.savel.KafkaRestProxy.Mappers
+namespace pro.savel.KafkaRestProxy.Producer
 {
     public static class ProducerMapper
     {

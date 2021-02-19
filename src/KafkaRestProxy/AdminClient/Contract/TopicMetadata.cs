@@ -1,6 +1,6 @@
 using System.Linq;
 
-namespace pro.savel.KafkaRestProxy.Entities
+namespace pro.savel.KafkaRestProxy.AdminClient.Contract
 {
     public class TopicMetadata
     {

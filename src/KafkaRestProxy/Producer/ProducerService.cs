@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Confluent.Kafka;
-using pro.savel.KafkaRestProxy.Entities;
-using pro.savel.KafkaRestProxy.Mappers;
+using pro.savel.KafkaRestProxy.Producer.Contract;
 
-namespace pro.savel.KafkaRestProxy.Services
+namespace pro.savel.KafkaRestProxy.Producer
 {
     public class ProducerService : IDisposable
     {

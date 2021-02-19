@@ -1,9 +1,8 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using pro.savel.KafkaRestProxy.Entities;
-using pro.savel.KafkaRestProxy.Services;
+using pro.savel.KafkaRestProxy.Producer.Contract;
 
-namespace pro.savel.KafkaRestProxy.Controllers
+namespace pro.savel.KafkaRestProxy.Producer
 {
     [ApiController]
     [Route("producer")]

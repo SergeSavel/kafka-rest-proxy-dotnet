@@ -1,4 +1,4 @@
-namespace pro.savel.KafkaRestProxy.Entities
+namespace pro.savel.KafkaRestProxy.AdminClient.Contract
 {
     public class BrokerMetadata
     {

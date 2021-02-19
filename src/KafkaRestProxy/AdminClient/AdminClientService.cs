@@ -1,9 +1,9 @@
 ﻿using System;
 using Confluent.Kafka;
-using Metadata = pro.savel.KafkaRestProxy.Entities.Metadata;
-using TopicMetadata = pro.savel.KafkaRestProxy.Entities.TopicMetadata;
+using Metadata = pro.savel.KafkaRestProxy.AdminClient.Contract.Metadata;
+using TopicMetadata = pro.savel.KafkaRestProxy.AdminClient.Contract.TopicMetadata;
 
-namespace pro.savel.KafkaRestProxy.Services
+namespace pro.savel.KafkaRestProxy.AdminClient
 {
     public class AdminClientService : IDisposable
     {
