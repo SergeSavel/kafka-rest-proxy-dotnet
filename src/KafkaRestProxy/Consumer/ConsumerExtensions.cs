@@ -8,6 +8,8 @@ namespace pro.savel.KafkaRestProxy.Consumer
         public static void AddConsumer(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddSingleton(ConsumerConfigProvider.GetConfig(configuration));
+            services.AddSingleton<ConsumerService>();
+            services.AddHostedService<ConsumerRemover>();
         }
     }
 }
