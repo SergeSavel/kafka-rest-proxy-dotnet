@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace pro.savel.KafkaRestProxy.Producer.Contract
 {
-    public class Message
+    public class ProducerMessage
     {
         public string Key { get; init; }
 

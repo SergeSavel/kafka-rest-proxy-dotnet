@@ -19,7 +19,7 @@ namespace pro.savel.KafkaRestProxy.Producer
             _producer.Dispose();
         }
 
-        public async Task<DeliveryResult> PostMessage(string topic, Message message)
+        public async Task<DeliveryResult> PostMessage(string topic, ProducerMessage message)
         {
             var producerMessage = ProducerMapper.Map(message);
 

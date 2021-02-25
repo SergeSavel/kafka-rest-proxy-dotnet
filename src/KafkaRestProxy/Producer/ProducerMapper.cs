@@ -7,7 +7,7 @@ namespace pro.savel.KafkaRestProxy.Producer
 {
     public static class ProducerMapper
     {
-        public static Message<string, string> Map(Message source)
+        public static Message<string, string> Map(ProducerMessage source)
         {
             var result = new Message<string, string>
             {

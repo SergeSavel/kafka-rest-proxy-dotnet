@@ -16,7 +16,7 @@ namespace pro.savel.KafkaRestProxy.Producer
         }
 
         [HttpPost("{topic}")]
-        public async Task<ActionResult<DeliveryResult>> PostMessage(string topic, Message message)
+        public async Task<ActionResult<DeliveryResult>> PostMessage(string topic, ProducerMessage message)
         {
             var result = await _producerService.PostMessage(topic, message);
 
