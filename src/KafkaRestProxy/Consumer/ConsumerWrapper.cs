@@ -45,6 +45,8 @@ namespace pro.savel.KafkaRestProxy.Consumer
 
         public void Seek(long offset)
         {
+            UpdateExpiration();
+
             if (TopicPartition == null)
                 throw new InvalidOperationException("The consumer is not assigned to topic/partition.");
             _consumer.Seek(new TopicPartitionOffset(TopicPartition, offset));
