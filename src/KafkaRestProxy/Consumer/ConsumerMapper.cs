@@ -15,6 +15,8 @@ namespace pro.savel.KafkaRestProxy.Consumer
                 Topic = source.TopicPartition.Topic,
                 Partition = source.TopicPartition.Partition,
                 Position = source.Position,
+                BeginningOffset = source.WatermarkOffsets.Low,
+                EndOffset = source.WatermarkOffsets.High,
                 ExpiresAt = source.ExpiresAt
             };
         }
@@ -23,7 +25,7 @@ namespace pro.savel.KafkaRestProxy.Consumer
         {
             if (source == null) return new ConsumerMessage();
 
-            return new ConsumerMessage()
+            return new ConsumerMessage
             {
                 Timestamp = source.Message.Timestamp.UnixTimestampMs,
                 Offset = source.Offset,

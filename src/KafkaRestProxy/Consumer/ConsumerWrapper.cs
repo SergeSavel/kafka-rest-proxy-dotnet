@@ -24,6 +24,8 @@ namespace pro.savel.KafkaRestProxy.Consumer
 
         public long Position => _consumer.Position(TopicPartition);
 
+        public WatermarkOffsets WatermarkOffsets => _consumer.GetWatermarkOffsets(TopicPartition);
+
         public Guid Id { get; } = Guid.NewGuid();
 
         public DateTime ExpiresAt { get; private set; }
