@@ -1,5 +1,8 @@
 ﻿using System.Linq;
-using pro.savel.KafkaRestProxy.AdminClient.Contract;
+using Confluent.Kafka;
+using BrokerMetadata = pro.savel.KafkaRestProxy.AdminClient.Responses.BrokerMetadata;
+using Metadata = pro.savel.KafkaRestProxy.AdminClient.Responses.Metadata;
+using TopicMetadata = pro.savel.KafkaRestProxy.AdminClient.Responses.TopicMetadata;
 
 namespace pro.savel.KafkaRestProxy.AdminClient
 {
@@ -35,7 +38,7 @@ namespace pro.savel.KafkaRestProxy.AdminClient
             };
         }
 
-        private static TopicMetadata.PartitionMetadata Map(Confluent.Kafka.PartitionMetadata source)
+        private static TopicMetadata.PartitionMetadata Map(PartitionMetadata source)
         {
             return new()
             {

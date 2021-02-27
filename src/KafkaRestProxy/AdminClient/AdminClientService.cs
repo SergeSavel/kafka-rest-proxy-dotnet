@@ -2,8 +2,8 @@
 using System.Threading.Tasks;
 using Confluent.Kafka;
 using Confluent.Kafka.Admin;
-using Metadata = pro.savel.KafkaRestProxy.AdminClient.Contract.Metadata;
-using TopicMetadata = pro.savel.KafkaRestProxy.AdminClient.Contract.TopicMetadata;
+using Metadata = pro.savel.KafkaRestProxy.AdminClient.Responses.Metadata;
+using TopicMetadata = pro.savel.KafkaRestProxy.AdminClient.Responses.TopicMetadata;
 
 namespace pro.savel.KafkaRestProxy.AdminClient
 {
