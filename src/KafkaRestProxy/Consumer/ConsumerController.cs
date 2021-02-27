@@ -7,7 +7,7 @@ using pro.savel.KafkaRestProxy.Consumer.Contract;
 namespace pro.savel.KafkaRestProxy.Consumer
 {
     [ApiController]
-    [Route("consumer")]
+    [Route("consumers")]
     public class ConsumerController : ControllerBase
     {
         private readonly ConsumerService _consumerService;
