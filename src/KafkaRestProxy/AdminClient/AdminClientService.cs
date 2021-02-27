@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Confluent.Kafka;
+using Confluent.Kafka.Admin;
 using Metadata = pro.savel.KafkaRestProxy.AdminClient.Contract.Metadata;
 using TopicMetadata = pro.savel.KafkaRestProxy.AdminClient.Contract.TopicMetadata;
 
@@ -38,6 +40,18 @@ namespace pro.savel.KafkaRestProxy.AdminClient
             var topicMetadata = AdminClientMapper.Map(adminClientTopicMetadata);
 
             return topicMetadata;
+        }
+
+        public async Task CreateTopic(string topic, int? numPartitions = null, short? replicationFactor = null)
+        {
+            var topicSpecification = new TopicSpecification
+            {
+                Name = topic,
+                NumPartitions = numPartitions ?? -1,
+                ReplicationFactor = replicationFactor ?? -1
+            };
+
+            await _adminClient.CreateTopicsAsync(new[] {topicSpecification});
         }
     }
 }
