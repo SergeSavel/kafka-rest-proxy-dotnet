@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using pro.savel.KafkaRestProxy.Consumer.Contract;
+using pro.savel.KafkaRestProxy.Consumer.Requests;
 
 namespace pro.savel.KafkaRestProxy.Consumer
 {
@@ -24,14 +25,15 @@ namespace pro.savel.KafkaRestProxy.Consumer
         }
 
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Contract.Consumer))]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(Contract.Consumer))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult CreateConsumer(string topic, int partition, long? offset, int expirationTimeout,
-            string groupId)
+        public IActionResult CreateConsumer(CreateConsumerRequest request)
         {
-            var consumer = _consumerService.CreateConsumer(topic, partition, offset, expirationTimeout, groupId);
+            var consumer = _consumerService.CreateConsumer(request.Topic, request.Partition, request.Position,
+                request.ExpirationTimeoutMs, request.GroupId);
+
             if (consumer == null) return BadRequest();
-            return Ok(consumer);
+            return CreatedAtAction(nameof(GetConsumer), new {consumerId = consumer.Id}, consumer);
         }
 
         [HttpGet("{consumerId}")]
