@@ -36,4 +36,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{A1158313-F5D8-45A6-AEDF-730B96DEA060} = {B9AF3C88-ADBE-4322-A472-45546C09A35D}
 	EndGlobalSection
+	GlobalSection(RiderSharedRunConfigurations) = postSolution
+		File = .silent.run\KafkaRestProxy@silent.run.xml
+	EndGlobalSection
 EndGlobal
