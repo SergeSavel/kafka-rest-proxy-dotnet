@@ -48,11 +48,11 @@ namespace pro.savel.KafkaRestProxy.Consumer
         }
 
         [HttpDelete("{consumerId}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult RemoveConsumer(Guid consumerId)
         {
-            return _consumerService.RemoveConsumer(consumerId) ? Ok() : NotFound();
+            return _consumerService.RemoveConsumer(consumerId) ? NoContent() : NotFound();
         }
 
         [HttpGet("{consumerId}/consume")]
