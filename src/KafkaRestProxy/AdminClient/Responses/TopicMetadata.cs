@@ -7,7 +7,7 @@ namespace pro.savel.KafkaRestProxy.AdminClient.Responses
     {
         [Required] public string Name { get; init; }
 
-        [Required] public IEnumerable<PartitionMetadata> Partitions { get; init; }
+        [Required] public ICollection<PartitionMetadata> Partitions { get; init; }
 
         public int? OriginatingBrokerId { get; init; }
 
@@ -16,8 +16,11 @@ namespace pro.savel.KafkaRestProxy.AdminClient.Responses
         public class PartitionMetadata
         {
             [Required] public int Id { get; init; }
+
             [Required] public int Leader { get; init; }
+
             [Required] public IEnumerable<int> Replicas { get; init; }
+
             [Required] public IEnumerable<int> InSyncReplicas { get; init; }
         }
     }

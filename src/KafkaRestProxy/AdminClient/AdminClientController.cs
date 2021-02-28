@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using pro.savel.KafkaRestProxy.AdminClient.Requests;
 using pro.savel.KafkaRestProxy.AdminClient.Responses;
@@ -24,7 +23,7 @@ namespace pro.savel.KafkaRestProxy.AdminClient
         }
 
         [HttpGet("metadata/topics")]
-        public IEnumerable<TopicMetadata> GetTopicsMetadata()
+        public TopicsMetadata GetTopicsMetadata()
         {
             var result = _adminClientService.GetTopicsMetadata();
 
@@ -50,7 +49,7 @@ namespace pro.savel.KafkaRestProxy.AdminClient
         }
 
         [HttpGet("metadata/brokers")]
-        public IEnumerable<BrokerMetadata> GetBrokersMetadata()
+        public BrokersMetadata GetBrokersMetadata()
         {
             var result = _adminClientService.GetBrokersMetadata();
 

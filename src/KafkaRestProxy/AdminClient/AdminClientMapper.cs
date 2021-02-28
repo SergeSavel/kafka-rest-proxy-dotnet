@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Confluent.Kafka;
+using pro.savel.KafkaRestProxy.AdminClient.Responses;
 using BrokerMetadata = pro.savel.KafkaRestProxy.AdminClient.Responses.BrokerMetadata;
 using Metadata = pro.savel.KafkaRestProxy.AdminClient.Responses.Metadata;
 using TopicMetadata = pro.savel.KafkaRestProxy.AdminClient.Responses.TopicMetadata;
@@ -12,8 +13,8 @@ namespace pro.savel.KafkaRestProxy.AdminClient
         {
             return new()
             {
-                Brokers = source.Brokers.Select(Map).ToArray(),
-                Topics = source.Topics.Select(Map).ToArray(),
+                Brokers = source.Brokers.Select(Map).ToList(),
+                Topics = source.Topics.Select(Map).ToList(),
                 OriginatingBrokerId = source.OriginatingBrokerId,
                 OriginatingBrokerName = source.OriginatingBrokerName
             };
@@ -46,7 +47,7 @@ namespace pro.savel.KafkaRestProxy.AdminClient
             return new()
             {
                 Name = source.Topic,
-                Partitions = source.Partitions.Select(Map).ToArray(),
+                Partitions = source.Partitions.Select(Map).ToList(),
                 OriginatingBrokerId = metadata?.OriginatingBrokerId,
                 OriginatingBrokerName = metadata?.OriginatingBrokerName
             };
@@ -60,6 +61,26 @@ namespace pro.savel.KafkaRestProxy.AdminClient
                 Leader = source.Leader,
                 Replicas = source.Replicas,
                 InSyncReplicas = source.InSyncReplicas
+            };
+        }
+
+        public static TopicsMetadata MapTopics(Confluent.Kafka.Metadata source)
+        {
+            return new()
+            {
+                Topics = source.Topics.Select(Map).ToList(),
+                OriginatingBrokerId = source.OriginatingBrokerId,
+                OriginatingBrokerName = source.OriginatingBrokerName
+            };
+        }
+
+        public static BrokersMetadata MapBrokers(Confluent.Kafka.Metadata source)
+        {
+            return new()
+            {
+                Brokers = source.Brokers.Select(Map).ToList(),
+                OriginatingBrokerId = source.OriginatingBrokerId,
+                OriginatingBrokerName = source.OriginatingBrokerName
             };
         }
     }
