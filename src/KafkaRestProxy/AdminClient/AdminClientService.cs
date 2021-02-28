@@ -3,10 +3,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Confluent.Kafka;
 using Confluent.Kafka.Admin;
-using pro.savel.KafkaRestProxy.AdminClient.Responses;
-using BrokerMetadata = pro.savel.KafkaRestProxy.AdminClient.Responses.BrokerMetadata;
-using Metadata = pro.savel.KafkaRestProxy.AdminClient.Responses.Metadata;
-using TopicMetadata = pro.savel.KafkaRestProxy.AdminClient.Responses.TopicMetadata;
+using pro.savel.KafkaRestProxy.AdminClient.Contract;
+using BrokerMetadata = pro.savel.KafkaRestProxy.AdminClient.Contract.BrokerMetadata;
+using Metadata = pro.savel.KafkaRestProxy.AdminClient.Contract.Metadata;
+using TopicMetadata = pro.savel.KafkaRestProxy.AdminClient.Contract.TopicMetadata;
 
 namespace pro.savel.KafkaRestProxy.AdminClient
 {

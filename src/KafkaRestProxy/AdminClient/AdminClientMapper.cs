@@ -1,9 +1,9 @@
 ﻿using System.Linq;
 using Confluent.Kafka;
-using pro.savel.KafkaRestProxy.AdminClient.Responses;
-using BrokerMetadata = pro.savel.KafkaRestProxy.AdminClient.Responses.BrokerMetadata;
-using Metadata = pro.savel.KafkaRestProxy.AdminClient.Responses.Metadata;
-using TopicMetadata = pro.savel.KafkaRestProxy.AdminClient.Responses.TopicMetadata;
+using pro.savel.KafkaRestProxy.AdminClient.Contract;
+using BrokerMetadata = pro.savel.KafkaRestProxy.AdminClient.Contract.BrokerMetadata;
+using Metadata = pro.savel.KafkaRestProxy.AdminClient.Contract.Metadata;
+using TopicMetadata = pro.savel.KafkaRestProxy.AdminClient.Contract.TopicMetadata;
 
 namespace pro.savel.KafkaRestProxy.AdminClient
 {
@@ -13,8 +13,8 @@ namespace pro.savel.KafkaRestProxy.AdminClient
         {
             return new()
             {
-                Brokers = source.Brokers.Select(Map).ToList(),
-                Topics = source.Topics.Select(Map).ToList(),
+                Brokers = source.Brokers.Select(Map).ToArray(),
+                Topics = source.Topics.Select(Map).ToArray(),
                 OriginatingBrokerId = source.OriginatingBrokerId,
                 OriginatingBrokerName = source.OriginatingBrokerName
             };
@@ -47,7 +47,7 @@ namespace pro.savel.KafkaRestProxy.AdminClient
             return new()
             {
                 Name = source.Topic,
-                Partitions = source.Partitions.Select(Map).ToList(),
+                Partitions = source.Partitions.Select(Map).ToArray(),
                 OriginatingBrokerId = metadata?.OriginatingBrokerId,
                 OriginatingBrokerName = metadata?.OriginatingBrokerName
             };
@@ -68,7 +68,7 @@ namespace pro.savel.KafkaRestProxy.AdminClient
         {
             return new()
             {
-                Topics = source.Topics.Select(Map).ToList(),
+                Topics = source.Topics.Select(Map).ToArray(),
                 OriginatingBrokerId = source.OriginatingBrokerId,
                 OriginatingBrokerName = source.OriginatingBrokerName
             };
@@ -78,7 +78,7 @@ namespace pro.savel.KafkaRestProxy.AdminClient
         {
             return new()
             {
-                Brokers = source.Brokers.Select(Map).ToList(),
+                Brokers = source.Brokers.Select(Map).ToArray(),
                 OriginatingBrokerId = source.OriginatingBrokerId,
                 OriginatingBrokerName = source.OriginatingBrokerName
             };

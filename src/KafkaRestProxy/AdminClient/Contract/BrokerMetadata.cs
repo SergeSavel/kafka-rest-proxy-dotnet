@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace pro.savel.KafkaRestProxy.AdminClient.Responses
+namespace pro.savel.KafkaRestProxy.AdminClient.Contract
 {
     public class BrokerMetadata
     {

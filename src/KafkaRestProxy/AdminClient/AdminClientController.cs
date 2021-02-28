@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using pro.savel.KafkaRestProxy.AdminClient.Contract;
 using pro.savel.KafkaRestProxy.AdminClient.Requests;
-using pro.savel.KafkaRestProxy.AdminClient.Responses;
 
 namespace pro.savel.KafkaRestProxy.AdminClient
 {

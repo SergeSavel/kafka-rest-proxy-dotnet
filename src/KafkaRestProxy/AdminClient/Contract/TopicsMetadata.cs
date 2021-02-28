@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace pro.savel.KafkaRestProxy.AdminClient.Responses
+namespace pro.savel.KafkaRestProxy.AdminClient.Contract
 {
     public class TopicsMetadata
     {

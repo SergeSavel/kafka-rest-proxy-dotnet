@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace pro.savel.KafkaRestProxy.AdminClient.Responses
+namespace pro.savel.KafkaRestProxy.AdminClient.Contract
 {
     public class TopicMetadata
     {
@@ -19,9 +19,9 @@ namespace pro.savel.KafkaRestProxy.AdminClient.Responses
 
             [Required] public int Leader { get; init; }
 
-            [Required] public IEnumerable<int> Replicas { get; init; }
+            [Required] public ICollection<int> Replicas { get; init; }
 
-            [Required] public IEnumerable<int> InSyncReplicas { get; init; }
+            [Required] public ICollection<int> InSyncReplicas { get; init; }
         }
     }
 }
