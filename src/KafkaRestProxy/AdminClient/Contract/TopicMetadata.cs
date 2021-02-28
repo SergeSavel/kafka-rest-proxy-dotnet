@@ -9,6 +9,8 @@ namespace pro.savel.KafkaRestProxy.AdminClient.Contract
 
         [Required] public ICollection<PartitionMetadata> Partitions { get; init; }
 
+        public Error Error { get; init; }
+
         public int? OriginatingBrokerId { get; init; }
 
         public string OriginatingBrokerName { get; init; }
@@ -22,6 +24,8 @@ namespace pro.savel.KafkaRestProxy.AdminClient.Contract
             [Required] public ICollection<int> Replicas { get; init; }
 
             [Required] public ICollection<int> InSyncReplicas { get; init; }
+
+            public Error Error { get; init; }
         }
     }
 }
