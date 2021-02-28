@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Confluent.Kafka;
 using Confluent.Kafka.Admin;
 using pro.savel.KafkaRestProxy.AdminClient.Contract;
+using pro.savel.KafkaRestProxy.AdminClient.Exceptions;
 using BrokerMetadata = pro.savel.KafkaRestProxy.AdminClient.Contract.BrokerMetadata;
 using Metadata = pro.savel.KafkaRestProxy.AdminClient.Contract.Metadata;
 using TopicMetadata = pro.savel.KafkaRestProxy.AdminClient.Contract.TopicMetadata;
@@ -58,7 +59,16 @@ namespace pro.savel.KafkaRestProxy.AdminClient
                 ReplicationFactor = replicationFactor ?? -1
             };
 
-            await _adminClient.CreateTopicsAsync(new[] {topicSpecification});
+            try
+            {
+                await _adminClient.CreateTopicsAsync(new[] {topicSpecification});
+            }
+            catch (CreateTopicsException e)
+            {
+                if (e.Results.Any(result => result.Error.Code == ErrorCode.TopicAlreadyExists))
+                    throw new TopicAlreadyExistsException(topic);
+                throw;
+            }
         }
 
         public BrokersMetadata GetBrokersMetadata()
