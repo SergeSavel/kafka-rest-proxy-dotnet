@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using pro.savel.KafkaRestProxy.AdminClient.Requests;
 using pro.savel.KafkaRestProxy.AdminClient.Responses;
@@ -22,7 +23,15 @@ namespace pro.savel.KafkaRestProxy.AdminClient
             return _adminClientService.GetMetadata();
         }
 
-        [HttpGet("metadata/{topic}")]
+        [HttpGet("metadata/topics")]
+        public IEnumerable<TopicMetadata> GetTopicsMetadata()
+        {
+            var result = _adminClientService.GetTopicsMetadata();
+
+            return result;
+        }
+
+        [HttpGet("metadata/topics/{topic}")]
         public ActionResult<TopicMetadata> GetTopicMetadata(string topic)
         {
             var result = _adminClientService.GetTopicMetadata(topic);
@@ -32,12 +41,30 @@ namespace pro.savel.KafkaRestProxy.AdminClient
             return result;
         }
 
-        [HttpPost("topics")]
+        [HttpPost("metadata/topics")]
         public async Task<IActionResult> CreateTopic(CreateTopicRequest request)
         {
             await _adminClientService.CreateTopic(request.Name, request.NumPartitions, request.ReplicationFactor);
 
-            return CreatedAtAction(nameof(GetMetadata), new {topic = request.Name}, null);
+            return CreatedAtAction(nameof(GetTopicMetadata), new {topic = request.Name}, null);
+        }
+
+        [HttpGet("metadata/brokers")]
+        public IEnumerable<BrokerMetadata> GetBrokersMetadata()
+        {
+            var result = _adminClientService.GetBrokersMetadata();
+
+            return result;
+        }
+
+        [HttpGet("metadata/brokers/{brokerId}")]
+        public ActionResult<BrokerMetadata> GetBrokerMetadata(int brokerId)
+        {
+            var result = _adminClientService.GetBrokerMetadata(brokerId);
+
+            if (result == null) return NotFound("Broker not found.");
+
+            return result;
         }
     }
 }

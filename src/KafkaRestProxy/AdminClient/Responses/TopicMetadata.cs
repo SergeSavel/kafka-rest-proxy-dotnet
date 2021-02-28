@@ -6,7 +6,12 @@ namespace pro.savel.KafkaRestProxy.AdminClient.Responses
     public class TopicMetadata
     {
         [Required] public string Name { get; init; }
+
         [Required] public IEnumerable<PartitionMetadata> Partitions { get; init; }
+
+        public int? OriginatingBrokerId { get; init; }
+
+        public string OriginatingBrokerName { get; init; }
 
         public class PartitionMetadata
         {

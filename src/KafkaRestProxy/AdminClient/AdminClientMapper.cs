@@ -21,20 +21,34 @@ namespace pro.savel.KafkaRestProxy.AdminClient
 
         public static BrokerMetadata Map(Confluent.Kafka.BrokerMetadata source)
         {
+            return Map(source, null);
+        }
+
+        public static BrokerMetadata Map(Confluent.Kafka.BrokerMetadata source, Confluent.Kafka.Metadata metadata)
+        {
             return new()
             {
                 Id = source.BrokerId,
                 Host = source.Host,
-                Port = source.Port
+                Port = source.Port,
+                OriginatingBrokerId = metadata?.OriginatingBrokerId,
+                OriginatingBrokerName = metadata?.OriginatingBrokerName
             };
         }
 
         public static TopicMetadata Map(Confluent.Kafka.TopicMetadata source)
         {
+            return Map(source, null);
+        }
+
+        public static TopicMetadata Map(Confluent.Kafka.TopicMetadata source, Confluent.Kafka.Metadata metadata)
+        {
             return new()
             {
                 Name = source.Topic,
-                Partitions = source.Partitions.Select(Map).ToArray()
+                Partitions = source.Partitions.Select(Map).ToArray(),
+                OriginatingBrokerId = metadata?.OriginatingBrokerId,
+                OriginatingBrokerName = metadata?.OriginatingBrokerName
             };
         }
 

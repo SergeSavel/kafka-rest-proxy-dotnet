@@ -9,5 +9,9 @@ namespace pro.savel.KafkaRestProxy.AdminClient.Responses
         [Required] public string Host { get; init; }
 
         [Required] public int Port { get; init; }
+
+        public int? OriginatingBrokerId { get; init; }
+
+        public string OriginatingBrokerName { get; init; }
     }
 }

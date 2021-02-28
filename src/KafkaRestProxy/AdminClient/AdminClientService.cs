@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Confluent.Kafka;
 using Confluent.Kafka.Admin;
+using BrokerMetadata = pro.savel.KafkaRestProxy.AdminClient.Responses.BrokerMetadata;
 using Metadata = pro.savel.KafkaRestProxy.AdminClient.Responses.Metadata;
 using TopicMetadata = pro.savel.KafkaRestProxy.AdminClient.Responses.TopicMetadata;
 
@@ -30,6 +33,14 @@ namespace pro.savel.KafkaRestProxy.AdminClient
             return metadata;
         }
 
+        public IEnumerable<TopicMetadata> GetTopicsMetadata()
+        {
+            var adminClientMetadata = _adminClient.GetMetadata(Timeout);
+
+            return adminClientMetadata.Topics
+                .Select(AdminClientMapper.Map);
+        }
+
         public TopicMetadata GetTopicMetadata(string topic)
         {
             var adminClientMetadata = _adminClient.GetMetadata(topic, Timeout);
@@ -52,6 +63,24 @@ namespace pro.savel.KafkaRestProxy.AdminClient
             };
 
             await _adminClient.CreateTopicsAsync(new[] {topicSpecification});
+        }
+
+        public IEnumerable<BrokerMetadata> GetBrokersMetadata()
+        {
+            var adminClientMetadata = _adminClient.GetMetadata(Timeout);
+
+            return adminClientMetadata.Brokers
+                .Select(AdminClientMapper.Map);
+        }
+
+        public BrokerMetadata GetBrokerMetadata(int brokerId)
+        {
+            var adminClientMetadata = _adminClient.GetMetadata(Timeout);
+
+            return adminClientMetadata.Brokers
+                .Where(brokerMetadata => brokerMetadata.BrokerId == brokerId)
+                .Select(AdminClientMapper.Map)
+                .FirstOrDefault();
         }
     }
 }
