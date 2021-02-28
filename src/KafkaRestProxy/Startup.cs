@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using pro.savel.KafkaRestProxy.AdminClient;
+using pro.savel.KafkaRestProxy.Common;
 using pro.savel.KafkaRestProxy.Consumer;
 using pro.savel.KafkaRestProxy.Producer;
 
@@ -24,13 +25,14 @@ namespace pro.savel.KafkaRestProxy
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers()
+            services.AddControllers(options => options.Filters.Add(new HttpResponseExceptionFilter()))
                 .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.WriteIndented = true;
                     options.JsonSerializerOptions.IgnoreNullValues = true;
                     //options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
-                });
+                })
+                ;
 
             services.AddSwaggerGen(c =>
             {
