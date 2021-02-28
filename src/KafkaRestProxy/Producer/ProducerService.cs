@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Confluent.Kafka;
 using pro.savel.KafkaRestProxy.Producer.Contract;
+using pro.savel.KafkaRestProxy.Producer.Requests;
 
 namespace pro.savel.KafkaRestProxy.Producer
 {
@@ -19,9 +20,9 @@ namespace pro.savel.KafkaRestProxy.Producer
             _producer.Dispose();
         }
 
-        public async Task<DeliveryResult> PostMessage(string topic, ProducerMessage message)
+        public async Task<DeliveryResult> PostMessage(string topic, PostMessageRequest request)
         {
-            var producerMessage = ProducerMapper.Map(message);
+            var producerMessage = ProducerMapper.Map(request);
 
             var producerDeliveryResult = await _producer.ProduceAsync(topic, producerMessage);
 

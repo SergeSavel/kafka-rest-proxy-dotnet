@@ -2,12 +2,13 @@
 using System.Text;
 using Confluent.Kafka;
 using pro.savel.KafkaRestProxy.Producer.Contract;
+using pro.savel.KafkaRestProxy.Producer.Requests;
 
 namespace pro.savel.KafkaRestProxy.Producer
 {
     public static class ProducerMapper
     {
-        public static Message<string, string> Map(ProducerMessage source)
+        public static Message<string, string> Map(PostMessageRequest source)
         {
             var result = new Message<string, string>
             {

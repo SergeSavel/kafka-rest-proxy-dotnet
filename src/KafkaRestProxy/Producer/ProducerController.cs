@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using pro.savel.KafkaRestProxy.Producer.Contract;
+using pro.savel.KafkaRestProxy.Producer.Requests;
 
 namespace pro.savel.KafkaRestProxy.Producer
 {
@@ -16,9 +17,9 @@ namespace pro.savel.KafkaRestProxy.Producer
         }
 
         [HttpPost("{topic}")]
-        public async Task<ActionResult<DeliveryResult>> PostMessage(string topic, ProducerMessage message)
+        public async Task<ActionResult<DeliveryResult>> PostMessage(string topic, PostMessageRequest request)
         {
-            var result = await _producerService.PostMessage(topic, message);
+            var result = await _producerService.PostMessage(topic, request);
 
             return Ok(result);
         }

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace pro.savel.KafkaRestProxy.Producer.Contract
+namespace pro.savel.KafkaRestProxy.Producer.Requests
 {
-    public class ProducerMessage
+    public class PostMessageRequest
     {
         public string Key { get; init; }
 
