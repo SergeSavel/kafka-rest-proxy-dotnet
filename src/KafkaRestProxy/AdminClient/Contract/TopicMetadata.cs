@@ -5,7 +5,7 @@ namespace pro.savel.KafkaRestProxy.AdminClient.Contract
 {
     public class TopicMetadata
     {
-        [Required] public string Name { get; init; }
+        [Required] public string Topic { get; init; }
 
         [Required] public ICollection<PartitionMetadata> Partitions { get; init; }
 

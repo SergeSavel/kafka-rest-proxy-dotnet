@@ -47,7 +47,7 @@ namespace pro.savel.KafkaRestProxy.AdminClient
         {
             return new()
             {
-                Name = source.Topic,
+                Topic = source.Topic,
                 Partitions = source.Partitions.Select(Map).ToArray(),
                 Error = source.Error.Code == ErrorCode.NoError ? null : Map(source.Error),
                 OriginatingBrokerId = metadata?.OriginatingBrokerId,
