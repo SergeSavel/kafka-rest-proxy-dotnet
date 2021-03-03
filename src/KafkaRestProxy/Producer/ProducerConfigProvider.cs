@@ -12,6 +12,7 @@ namespace pro.savel.KafkaRestProxy.Producer
 
             var result = new ProducerConfig(clientConfig)
             {
+                Acks = Acks.All,
                 Partitioner = Partitioner.ConsistentRandom,
                 CompressionType = CompressionType.Snappy
             };

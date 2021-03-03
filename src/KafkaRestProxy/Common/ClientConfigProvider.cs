@@ -9,8 +9,7 @@ namespace pro.savel.KafkaRestProxy.Common
         {
             var result = new ClientConfig
             {
-                ClientId = "kafka-rest-proxy-dotnet",
-                Acks = Acks.All
+                ClientId = "kafka-rest-proxy-dotnet"
             };
 
             configuration?.Bind("Kafka", result);
