@@ -88,13 +88,13 @@ namespace pro.savel.KafkaRestProxy.Consumer
         }
 
         [HttpGet("{consumerId}/offsets")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IDictionary<int, WatermarkOffsets>))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult GetWatermarkOffsets(Guid consumerId, int timeout)
+        public ICollection<WatermarkOffsets> GetWatermarkOffsets(Guid consumerId, int timeout)
         {
             var result = _consumerService.QueryWatermarkOffsets(consumerId, timeout);
 
-            return Ok(result);
+            return result;
         }
     }
 }
