@@ -15,7 +15,7 @@ namespace pro.savel.KafkaRestProxy.Common
             {
                 context.Result = new ObjectResult(exception.Value)
                 {
-                    StatusCode = exception.Status
+                    StatusCode = exception.StatusCode
                 };
                 context.ExceptionHandled = true;
             }

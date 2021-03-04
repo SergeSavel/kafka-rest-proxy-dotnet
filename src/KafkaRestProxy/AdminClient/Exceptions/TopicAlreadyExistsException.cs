@@ -7,7 +7,7 @@ namespace pro.savel.KafkaRestProxy.AdminClient.Exceptions
     {
         public TopicAlreadyExistsException(string topic)
         {
-            Status = StatusCodes.Status400BadRequest;
+            StatusCode = StatusCodes.Status400BadRequest;
             Value = $"Topic '{topic}' already exists.";
         }
     }
