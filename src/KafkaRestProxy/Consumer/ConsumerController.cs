@@ -55,6 +55,7 @@ namespace pro.savel.KafkaRestProxy.Consumer
         }
 
         [HttpPost("{consumerId}/assignment")]
+        [HttpPut("{consumerId}/assignment")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
