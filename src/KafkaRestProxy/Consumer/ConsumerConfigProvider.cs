@@ -13,7 +13,8 @@ namespace pro.savel.KafkaRestProxy.Consumer
             var result = new ConsumerConfig(clientConfig)
             {
                 EnableAutoCommit = false,
-                AutoOffsetReset = AutoOffsetReset.Earliest
+                AutoOffsetReset = AutoOffsetReset.Earliest,
+                GroupId = "kafka-rest-proxy-dotnet"
             };
 
             configuration?.Bind("Kafka:Consumer", result);

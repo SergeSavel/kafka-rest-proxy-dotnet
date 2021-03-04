@@ -1,30 +1,30 @@
 ﻿using System;
+using System.Collections.Generic;
 using Confluent.Kafka;
 
 namespace pro.savel.KafkaRestProxy.Consumer
 {
-    public class ConsumerWrapper<TKey, TValue> : IDisposable
+    public class ConsumerWrapper : IDisposable
     {
-        private readonly IConsumer<TKey, TValue> _consumer;
+        private static readonly IDeserializer<string> KeyDeserializer = Deserializers.Utf8;
+
+        private static readonly IDeserializer<string> ValueDeserializer = Deserializers.Utf8;
+
         private readonly TimeSpan _expirationTimeout;
 
-        public ConsumerWrapper(ConsumerConfig consumerConfig, TimeSpan expirationTimeout,
-            IDeserializer<TKey> keyDeserializer = null, IDeserializer<TValue> valueDeserializer = null)
+        public ConsumerWrapper(IDictionary<string, string> consumerConfig, TimeSpan expirationTimeout)
         {
             _expirationTimeout = expirationTimeout;
+
             UpdateExpiration();
 
-            _consumer = new ConsumerBuilder<TKey, TValue>(consumerConfig)
-                .SetKeyDeserializer(keyDeserializer)
-                .SetValueDeserializer(valueDeserializer)
+            Consumer = new ConsumerBuilder<string, string>(consumerConfig)
+                .SetKeyDeserializer(KeyDeserializer)
+                .SetValueDeserializer(ValueDeserializer)
                 .Build();
         }
 
-        public TopicPartition TopicPartition { get; private set; }
-
-        public long Position => _consumer.Position(TopicPartition);
-
-        public WatermarkOffsets WatermarkOffsets => _consumer.GetWatermarkOffsets(TopicPartition);
+        public IConsumer<string, string> Consumer { get; }
 
         public Guid Id { get; } = Guid.NewGuid();
 
@@ -32,38 +32,11 @@ namespace pro.savel.KafkaRestProxy.Consumer
 
         public TimeSpan ExpiresAfter => ExpiresAt - DateTime.Now;
 
+        public bool IsExpired => DateTime.Now >= ExpiresAt;
+
         public void Dispose()
         {
-            _consumer.Dispose();
-        }
-
-        public void Assign(string topic, int partition)
-        {
-            UpdateExpiration();
-
-            TopicPartition = new TopicPartition(topic, partition);
-            _consumer.Assign(TopicPartition);
-        }
-
-        public void Seek(long offset)
-        {
-            UpdateExpiration();
-
-            if (TopicPartition == null)
-                throw new InvalidOperationException("The consumer is not assigned to topic/partition.");
-            _consumer.Seek(new TopicPartitionOffset(TopicPartition, offset));
-        }
-
-        public ConsumeResult<TKey, TValue> Consume(int millisecondsTimeout)
-        {
-            UpdateExpiration();
-
-            return _consumer.Consume(millisecondsTimeout);
-        }
-
-        public ConsumeResult<TKey, TValue> Consume(TimeSpan timeout)
-        {
-            return Consume(timeout.Milliseconds);
+            Consumer.Dispose();
         }
 
         public void UpdateExpiration()

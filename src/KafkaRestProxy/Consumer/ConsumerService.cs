@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Confluent.Kafka;
 using pro.savel.KafkaRestProxy.Consumer.Contract;
+using pro.savel.KafkaRestProxy.Consumer.Exceptions;
+using pro.savel.KafkaRestProxy.Consumer.Requests;
+using TopicPartition = pro.savel.KafkaRestProxy.Consumer.Contract.TopicPartition;
+using WatermarkOffsets = pro.savel.KafkaRestProxy.Consumer.Contract.WatermarkOffsets;
 
 namespace pro.savel.KafkaRestProxy.Consumer
 {
@@ -15,41 +19,39 @@ namespace pro.savel.KafkaRestProxy.Consumer
             _consumerConfig = consumerConfig;
         }
 
-        public ConsumerProvider<string, string> ConsumerProvider { get; } = new(Deserializers.Utf8, Deserializers.Utf8);
+        public ConsumerProvider ConsumerProvider { get; } = new();
 
-        public ICollection<Contract.Consumer> ListConsumers()
+        public List<Contract.Consumer> ListConsumers()
         {
             return ConsumerProvider.ListConsumers()
                 .Select(ConsumerMapper.Map)
                 .ToList();
         }
 
-        public Contract.Consumer CreateConsumer(string topic, int partition, long? offset, int expirationTimeout,
-            string groupId)
+        public Contract.Consumer CreateConsumer(CreateConsumerRequest request)
         {
             var consumerConfig = _consumerConfig;
-            if (groupId != null)
+            if (request.GroupId != null)
                 consumerConfig = new ConsumerConfig(consumerConfig)
                 {
-                    GroupId = groupId
+                    GroupId = request.GroupId
                 };
 
-            var consumerWrapper =
-                ConsumerProvider.CreateConsumer(consumerConfig, TimeSpan.FromMilliseconds(expirationTimeout));
+            var wrapper =
+                ConsumerProvider.CreateConsumer(
+                    consumerConfig.ToDictionary(kv => kv.Key, kv => kv.Value),
+                    TimeSpan.FromMilliseconds(request.ExpirationTimeoutMs));
 
-            if (consumerWrapper == null) return null;
+            //consumerWrapper.Assign(request.Topic, request.Partitions.Select(ConsumerMapper.Map).ToList());
 
-            consumerWrapper.Assign(topic, partition);
-            if (offset.HasValue) consumerWrapper.Seek(offset.Value);
-
-            return ConsumerMapper.Map(consumerWrapper);
+            return ConsumerMapper.Map(wrapper);
         }
 
         public Contract.Consumer GetConsumer(Guid consumerId)
         {
-            var consumerWrapper = ConsumerProvider.GetConsumer(consumerId);
-            if (consumerWrapper == null) return null;
-            return ConsumerMapper.Map(consumerWrapper);
+            var wrapper = ConsumerProvider.GetConsumer(consumerId);
+            if (wrapper == null) throw new ConsumerNotFoundException(consumerId);
+            return ConsumerMapper.Map(wrapper);
         }
 
         public bool RemoveConsumer(Guid consumerId)
@@ -57,15 +59,69 @@ namespace pro.savel.KafkaRestProxy.Consumer
             return ConsumerProvider.RemoveConsumer(consumerId);
         }
 
-        public ConsumerMessage Consume(Guid consumerId, int timeout)
+        public List<TopicPartition> AssignConsumer(AssignConsumerRequest request)
         {
-            var consumerWrapper = ConsumerProvider.GetConsumer(consumerId);
+            var wrapper = ConsumerProvider.GetConsumer(request.ConsumerId);
+            if (wrapper == null) throw new ConsumerNotFoundException(request.ConsumerId);
 
-            if (consumerWrapper == null) return null;
+            wrapper.UpdateExpiration();
 
-            var consumeResult = consumerWrapper.Consume(timeout);
+            wrapper.Consumer
+                .Assign(request.Partitions.Select(p => new TopicPartitionOffset(p.Topic, p.Partition, p.Offset)));
 
-            return ConsumerMapper.Map(consumeResult);
+            return GetConsumerAssignment(request.ConsumerId);
+        }
+
+        public List<TopicPartition> GetConsumerAssignment(Guid consumerId)
+        {
+            var wrapper = ConsumerProvider.GetConsumer(consumerId);
+            if (wrapper == null) throw new ConsumerNotFoundException(consumerId);
+
+            var result = wrapper.Consumer.Assignment
+                .Select(ConsumerMapper.Map)
+                .ToList();
+
+            return result;
+        }
+
+        public IEnumerable<ConsumerMessage> Consume(Guid consumerId, int? timeout)
+        {
+            var wrapper = ConsumerProvider.GetConsumer(consumerId);
+            if (wrapper == null) throw new ConsumerNotFoundException(consumerId);
+
+            wrapper.UpdateExpiration();
+
+            var consumeResult = timeout.HasValue
+                ? wrapper.Consumer.Consume(timeout.Value)
+                : wrapper.Consumer.Consume();
+
+            if (consumeResult == null)
+                return Array.Empty<ConsumerMessage>();
+
+            return new[] {ConsumerMapper.Map(consumeResult)};
+        }
+
+        public List<WatermarkOffsets> QueryWatermarkOffsets(Guid consumerId, int timeout)
+        {
+            var wrapper = ConsumerProvider.GetConsumer(consumerId);
+            if (wrapper == null) throw new ConsumerNotFoundException(consumerId);
+
+            var result = wrapper.Consumer.Assignment
+                .Select(tp => new
+                {
+                    TopicPartition = tp,
+                    WatermarkOffsets = wrapper.Consumer.QueryWatermarkOffsets(tp, TimeSpan.FromMilliseconds(timeout))
+                })
+                .Select(o => new WatermarkOffsets
+                {
+                    Topic = o.TopicPartition.Topic,
+                    Partition = o.TopicPartition.Partition,
+                    Low = o.WatermarkOffsets.Low,
+                    High = o.WatermarkOffsets.High
+                })
+                .ToList();
+
+            return result;
         }
     }
 }

@@ -1,44 +1,35 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using Confluent.Kafka;
+using System.Linq;
 
 namespace pro.savel.KafkaRestProxy.Consumer
 {
-    public class ConsumerProvider<TKey, TValue>
+    public class ConsumerProvider
     {
-        private readonly ConcurrentDictionary<Guid, ConsumerWrapper<TKey, TValue>> _consumers = new();
-        private readonly IDeserializer<TKey> _keyDeserializer;
-        private readonly IDeserializer<TValue> _valueDeserializer;
+        private readonly ConcurrentDictionary<Guid, ConsumerWrapper> _consumers = new();
 
-        public ConsumerProvider(IDeserializer<TKey> keyDeserializer, IDeserializer<TValue> valueDeserializer)
+        public ConsumerWrapper CreateConsumer(IDictionary<string, string> consumerConfig, TimeSpan expirationTimeout)
         {
-            _keyDeserializer = keyDeserializer;
-            _valueDeserializer = valueDeserializer;
-        }
-
-        public ConsumerWrapper<TKey, TValue> CreateConsumer(ConsumerConfig consumerConfig, TimeSpan expirationTimeout)
-        {
-            var consumerWrapper = new ConsumerWrapper<TKey, TValue>(consumerConfig, expirationTimeout,
-                _keyDeserializer, _valueDeserializer);
+            var consumerWrapper = new ConsumerWrapper(consumerConfig, expirationTimeout);
 
             if (!_consumers.TryAdd(consumerWrapper.Id, consumerWrapper))
             {
                 consumerWrapper.Dispose();
-                return null;
+                throw new Exception("Unable to register consumer.");
             }
 
             return consumerWrapper;
         }
 
-        public ConsumerWrapper<TKey, TValue> GetConsumer(Guid id)
+        public ConsumerWrapper GetConsumer(Guid id)
         {
             return _consumers.TryGetValue(id, out var consumerWrapper) ? consumerWrapper : null;
         }
 
-        public ICollection<ConsumerWrapper<TKey, TValue>> ListConsumers()
+        public ICollection<ConsumerWrapper> ListConsumers()
         {
-            return _consumers.Values;
+            return _consumers.Values.ToList();
         }
 
         public bool RemoveConsumer(Guid id)
@@ -51,7 +42,7 @@ namespace pro.savel.KafkaRestProxy.Consumer
         public void RemoveExpiredConsumers()
         {
             foreach (var consumerWrapper in _consumers.Values)
-                if (consumerWrapper.ExpiresAfter <= TimeSpan.Zero)
+                if (consumerWrapper.IsExpired)
                     RemoveConsumer(consumerWrapper.Id);
         }
     }

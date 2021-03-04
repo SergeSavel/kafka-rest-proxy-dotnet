@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using pro.savel.KafkaRestProxy.Consumer.Contract;
@@ -19,7 +20,7 @@ namespace pro.savel.KafkaRestProxy.Consumer
         }
 
         [HttpGet]
-        public IEnumerable<Contract.Consumer> ListConsumers()
+        public ICollection<Contract.Consumer> ListConsumers()
         {
             return _consumerService.ListConsumers();
         }
@@ -27,24 +28,20 @@ namespace pro.savel.KafkaRestProxy.Consumer
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(Contract.Consumer))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult CreateConsumer(CreateConsumerRequest request)
+        public IActionResult CreateConsumer([Required] CreateConsumerRequest request)
         {
-            var consumer = _consumerService.CreateConsumer(request.Topic, request.Partition, request.Position,
-                request.ExpirationTimeoutMs, request.GroupId);
+            var consumer = _consumerService.CreateConsumer(request);
 
             if (consumer == null) return BadRequest();
             return CreatedAtAction(nameof(GetConsumer), new {consumerId = consumer.Id}, consumer);
         }
 
         [HttpGet("{consumerId}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Contract.Consumer))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult GetConsumer(Guid consumerId)
+        public Contract.Consumer GetConsumer(Guid consumerId)
         {
-            var consumer = _consumerService.GetConsumer(consumerId);
-
-            if (consumer == null) return NotFound();
-            return Ok(consumer);
+            return _consumerService.GetConsumer(consumerId);
         }
 
         [HttpDelete("{consumerId}")]
@@ -52,19 +49,52 @@ namespace pro.savel.KafkaRestProxy.Consumer
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult RemoveConsumer(Guid consumerId)
         {
-            return _consumerService.RemoveConsumer(consumerId) ? NoContent() : NotFound();
+            _consumerService.RemoveConsumer(consumerId);
+
+            return NoContent();
         }
 
-        [HttpGet("{consumerId}/consume")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ConsumerMessage))]
+        [HttpPost("{consumerId}/assignment")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult Consume(Guid consumerId, int timeout = 0)
+        public ActionResult<IEnumerable<TopicPartition>> AssignConsumer(Guid consumerId,
+            [Required] AssignConsumerRequest request)
         {
-            var consumerMessage = _consumerService.Consume(consumerId, timeout);
+            if (consumerId != request.ConsumerId)
+                return BadRequest("Consumer Id does not match provided data.");
 
-            if (consumerMessage == null) return NotFound();
+            var result = _consumerService.AssignConsumer(request);
 
-            return Ok(consumerMessage);
+            return Ok(result);
+        }
+
+        [HttpGet("{consumerId}/assignment")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public IEnumerable<TopicPartition> GetConsumerAssignment(Guid consumerId)
+        {
+            return _consumerService.GetConsumerAssignment(consumerId);
+        }
+
+        [HttpGet("{consumerId}/messages")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ConsumerMessage>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public IEnumerable<ConsumerMessage> Consume(Guid consumerId, int? timeout)
+        {
+            var result = _consumerService.Consume(consumerId, timeout);
+
+            return result;
+        }
+
+        [HttpGet("{consumerId}/offsets")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IDictionary<int, WatermarkOffsets>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public IActionResult GetWatermarkOffsets(Guid consumerId, int timeout)
+        {
+            var result = _consumerService.QueryWatermarkOffsets(consumerId, timeout);
+
+            return Ok(result);
         }
     }
 }
