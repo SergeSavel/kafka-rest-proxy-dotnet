@@ -5,9 +5,22 @@ using System.Linq;
 
 namespace pro.savel.KafkaRestProxy.Consumer
 {
-    public class ConsumerProvider
+    public class ConsumerProvider : IDisposable
     {
         private readonly ConcurrentDictionary<Guid, ConsumerWrapper> _consumers = new();
+
+        public void Dispose()
+        {
+            var wrappers = ListConsumers();
+            foreach (var wrapper in wrappers)
+                try
+                {
+                    wrapper.Dispose();
+                }
+                catch (ObjectDisposedException)
+                {
+                }
+        }
 
         public ConsumerWrapper CreateConsumer(IDictionary<string, string> consumerConfig, TimeSpan expirationTimeout)
         {

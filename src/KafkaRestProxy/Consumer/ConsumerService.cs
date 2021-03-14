@@ -10,7 +10,7 @@ using WatermarkOffsets = pro.savel.KafkaRestProxy.Consumer.Contract.WatermarkOff
 
 namespace pro.savel.KafkaRestProxy.Consumer
 {
-    public class ConsumerService
+    public class ConsumerService : IDisposable
     {
         private readonly ConsumerConfig _consumerConfig;
 
@@ -20,6 +20,11 @@ namespace pro.savel.KafkaRestProxy.Consumer
         }
 
         public ConsumerProvider ConsumerProvider { get; } = new();
+
+        public void Dispose()
+        {
+            ConsumerProvider.Dispose();
+        }
 
         public List<Contract.Consumer> ListConsumers()
         {
