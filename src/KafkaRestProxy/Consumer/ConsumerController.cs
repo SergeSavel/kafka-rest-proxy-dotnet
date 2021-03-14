@@ -66,7 +66,6 @@ namespace pro.savel.KafkaRestProxy.Consumer
                 return BadRequest("Consumer Id does not match provided data.");
 
             var result = _consumerService.AssignConsumer(request);
-
             return Ok(result);
         }
 
@@ -83,9 +82,7 @@ namespace pro.savel.KafkaRestProxy.Consumer
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IEnumerable<ConsumerMessage> Consume(Guid consumerId, [Range(0, int.MaxValue)] int? timeout)
         {
-            var result = _consumerService.Consume(consumerId, timeout);
-
-            return result;
+            return _consumerService.Consume(consumerId, timeout);
         }
 
         [HttpGet("{consumerId}/offsets")]
@@ -93,9 +90,7 @@ namespace pro.savel.KafkaRestProxy.Consumer
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ICollection<WatermarkOffsets> GetWatermarkOffsets(Guid consumerId, [Range(0, int.MaxValue)] int timeout)
         {
-            var result = _consumerService.GetWatermarkOffsets(consumerId, timeout);
-
-            return result;
+            return _consumerService.GetWatermarkOffsets(consumerId, timeout);
         }
     }
 }
