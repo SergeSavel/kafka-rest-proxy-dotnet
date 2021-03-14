@@ -14,8 +14,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-      <PackageReference Include="Confluent.Kafka" Version="1.6.2"/>
-      <PackageReference Include="Swashbuckle.AspNetCore" Version="6.0.7"/>
+    <PackageReference Include="Confluent.Kafka" Version="1.6.2"/>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.0"/>
   </ItemGroup>
   
 </Project>
