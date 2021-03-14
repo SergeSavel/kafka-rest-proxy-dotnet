@@ -30,19 +30,14 @@ namespace pro.savel.KafkaRestProxy.Consumer
 
         public Contract.Consumer CreateConsumer(CreateConsumerRequest request)
         {
-            var consumerConfig = _consumerConfig;
+            var config = _consumerConfig.ToDictionary(kv => kv.Key, kv => kv.Value);
 
             if (request.Config != null)
-            {
-                consumerConfig = new ConsumerConfig(consumerConfig);
-                foreach (var (key, value) in consumerConfig)
-                    consumerConfig.Set(key, value);
-            }
+                foreach (var (key, value) in request.Config)
+                    config[key] = value;
 
             var wrapper =
-                ConsumerProvider.CreateConsumer(
-                    consumerConfig.ToDictionary(kv => kv.Key, kv => kv.Value),
-                    TimeSpan.FromMilliseconds(request.ExpirationTimeoutMs));
+                ConsumerProvider.CreateConsumer(config, TimeSpan.FromMilliseconds(request.ExpirationTimeoutMs));
 
             return ConsumerMapper.Map(wrapper);
         }
