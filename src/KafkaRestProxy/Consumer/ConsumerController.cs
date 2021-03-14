@@ -81,7 +81,7 @@ namespace pro.savel.KafkaRestProxy.Consumer
         [HttpGet("{consumerId}/messages")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ConsumerMessage>))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IEnumerable<ConsumerMessage> Consume(Guid consumerId, [Range(0, 1000000)] int? timeout)
+        public IEnumerable<ConsumerMessage> Consume(Guid consumerId, [Range(0, int.MaxValue)] int? timeout)
         {
             var result = _consumerService.Consume(consumerId, timeout);
 
@@ -91,7 +91,7 @@ namespace pro.savel.KafkaRestProxy.Consumer
         [HttpGet("{consumerId}/offsets")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ICollection<WatermarkOffsets> GetWatermarkOffsets(Guid consumerId, int timeout)
+        public ICollection<WatermarkOffsets> GetWatermarkOffsets(Guid consumerId, [Range(0, int.MaxValue)] int timeout)
         {
             var result = _consumerService.QueryWatermarkOffsets(consumerId, timeout);
 
