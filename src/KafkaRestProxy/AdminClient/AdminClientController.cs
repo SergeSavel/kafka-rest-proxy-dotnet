@@ -25,9 +25,7 @@ namespace pro.savel.KafkaRestProxy.AdminClient
         [HttpGet("metadata/topics")]
         public TopicsMetadata GetTopicsMetadata()
         {
-            var result = _adminClientService.GetTopicsMetadata();
-
-            return result;
+            return _adminClientService.GetTopicsMetadata();
         }
 
         [HttpGet("metadata/topics/{topic}")]
@@ -52,9 +50,7 @@ namespace pro.savel.KafkaRestProxy.AdminClient
         [HttpGet("metadata/brokers")]
         public BrokersMetadata GetBrokersMetadata()
         {
-            var result = _adminClientService.GetBrokersMetadata();
-
-            return result;
+            return _adminClientService.GetBrokersMetadata();
         }
 
         [HttpGet("metadata/brokers/{brokerId}")]
