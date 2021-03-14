@@ -93,7 +93,7 @@ namespace pro.savel.KafkaRestProxy.Consumer
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ICollection<WatermarkOffsets> GetWatermarkOffsets(Guid consumerId, [Range(0, int.MaxValue)] int timeout)
         {
-            var result = _consumerService.QueryWatermarkOffsets(consumerId, timeout);
+            var result = _consumerService.GetWatermarkOffsets(consumerId, timeout);
 
             return result;
         }
