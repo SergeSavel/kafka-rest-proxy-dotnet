@@ -45,9 +45,12 @@ namespace pro.savel.KafkaRestProxy.AdminClient
         {
             var adminClientMetadata = _adminClient.GetMetadata(topic, Timeout);
 
-            return adminClientMetadata.Topics
-                .Select(topicMetadata => AdminClientMapper.Map(topicMetadata, adminClientMetadata))
-                .FirstOrDefault();
+            var topicMetadata = adminClientMetadata.Topics[0];
+
+            if (topicMetadata != null && topicMetadata.Error.Code == ErrorCode.UnknownTopicOrPart)
+                throw new TopicNotFoundException(topic);
+
+            return AdminClientMapper.Map(topicMetadata, adminClientMetadata);
         }
 
         public async Task<TopicMetadata> CreateTopic(string topic, int? numPartitions = null,
@@ -85,10 +88,15 @@ namespace pro.savel.KafkaRestProxy.AdminClient
         {
             var adminClientMetadata = _adminClient.GetMetadata(Timeout);
 
-            return adminClientMetadata.Brokers
+            var result = adminClientMetadata.Brokers
                 .Where(brokerMetadata => brokerMetadata.BrokerId == brokerId)
                 .Select(brokerMetadata => AdminClientMapper.Map(brokerMetadata, adminClientMetadata))
                 .FirstOrDefault();
+
+            if (result == null)
+                throw new BrokerNotFoundException(brokerId);
+
+            return result;
         }
     }
 }

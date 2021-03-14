@@ -31,11 +31,7 @@ namespace pro.savel.KafkaRestProxy.AdminClient
         [HttpGet("metadata/topics/{topic}")]
         public ActionResult<TopicMetadata> GetTopicMetadata(string topic)
         {
-            var result = _adminClientService.GetTopicMetadata(topic);
-
-            if (result == null) return NotFound("Topic not found.");
-
-            return result;
+            return _adminClientService.GetTopicMetadata(topic);
         }
 
         [HttpPost("metadata/topics")]
@@ -56,11 +52,7 @@ namespace pro.savel.KafkaRestProxy.AdminClient
         [HttpGet("metadata/brokers/{brokerId}")]
         public ActionResult<BrokerMetadata> GetBrokerMetadata(int brokerId)
         {
-            var result = _adminClientService.GetBrokerMetadata(brokerId);
-
-            if (result == null) return NotFound("Broker not found.");
-
-            return result;
+            return _adminClientService.GetBrokerMetadata(brokerId);
         }
     }
 }
