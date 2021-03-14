@@ -4,7 +4,7 @@ namespace pro.savel.KafkaRestProxy.Consumer.Requests
 {
     public class CreateConsumerRequest
     {
-        [Required] [Range(0, 86400000)] public int ExpirationTimeoutMs { get; init; }
+        [Required] [Range(1000, 86400000)] public int ExpirationTimeoutMs { get; init; }
 
         public string GroupId { get; init; }
     }
