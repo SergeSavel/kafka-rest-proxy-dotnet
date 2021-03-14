@@ -47,7 +47,7 @@ namespace pro.savel.KafkaRestProxy.AdminClient
 
             var topicMetadata = adminClientMetadata.Topics[0];
 
-            if (topicMetadata != null && topicMetadata.Error.Code == ErrorCode.UnknownTopicOrPart)
+            if (topicMetadata.Error.Code == ErrorCode.UnknownTopicOrPart)
                 throw new TopicNotFoundException(topic);
 
             return AdminClientMapper.Map(topicMetadata, adminClientMetadata);
