@@ -79,7 +79,7 @@ namespace pro.savel.KafkaRestProxy.Consumer
         }
 
         [HttpGet("{consumerId}/messages")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<ConsumerMessage>))]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IEnumerable<ConsumerMessage> Consume(Guid consumerId, [Range(0, int.MaxValue)] int? timeout)
         {
