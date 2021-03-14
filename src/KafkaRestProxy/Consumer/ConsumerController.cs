@@ -26,9 +26,9 @@ namespace pro.savel.KafkaRestProxy.Consumer
         }
 
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(Contract.Consumer))]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public IActionResult CreateConsumer([Required] CreateConsumerRequest request)
+        public ActionResult<Contract.Consumer> CreateConsumer([Required] CreateConsumerRequest request)
         {
             var consumer = _consumerService.CreateConsumer(request);
             if (consumer == null) return BadRequest();
