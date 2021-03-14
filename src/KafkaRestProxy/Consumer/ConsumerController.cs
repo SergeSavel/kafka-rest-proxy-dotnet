@@ -36,14 +36,6 @@ namespace pro.savel.KafkaRestProxy.Consumer
             return CreatedAtAction(nameof(GetConsumer), new {consumerId = consumer.Id}, consumer);
         }
 
-        [HttpGet("{consumerId}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public Contract.Consumer GetConsumer(Guid consumerId)
-        {
-            return _consumerService.GetConsumer(consumerId);
-        }
-
         [HttpDelete("{consumerId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -52,6 +44,14 @@ namespace pro.savel.KafkaRestProxy.Consumer
             _consumerService.RemoveConsumer(consumerId);
 
             return NoContent();
+        }
+
+        [HttpGet("{consumerId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public Contract.Consumer GetConsumer(Guid consumerId)
+        {
+            return _consumerService.GetConsumer(consumerId);
         }
 
         [HttpPost("{consumerId}/assignment")]
