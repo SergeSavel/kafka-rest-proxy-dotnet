@@ -41,11 +41,12 @@ namespace pro.savel.KafkaRestProxy.AdminClient
         }
 
         [HttpPost("metadata/topics")]
-        public async Task<IActionResult> CreateTopic(CreateTopicRequest request)
+        public async Task<ActionResult<TopicMetadata>> CreateTopic(CreateTopicRequest request)
         {
-            await _adminClientService.CreateTopic(request.Name, request.NumPartitions, request.ReplicationFactor);
+            var result =
+                await _adminClientService.CreateTopic(request.Name, request.NumPartitions, request.ReplicationFactor);
 
-            return CreatedAtAction(nameof(GetTopicMetadata), new {topic = request.Name}, null);
+            return CreatedAtAction(nameof(GetTopicMetadata), new {topic = result.Topic}, result);
         }
 
         [HttpGet("metadata/brokers")]

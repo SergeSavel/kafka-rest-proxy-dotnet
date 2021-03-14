@@ -50,7 +50,8 @@ namespace pro.savel.KafkaRestProxy.AdminClient
                 .FirstOrDefault();
         }
 
-        public async Task CreateTopic(string topic, int? numPartitions = null, short? replicationFactor = null)
+        public async Task<TopicMetadata> CreateTopic(string topic, int? numPartitions = null,
+            short? replicationFactor = null)
         {
             var topicSpecification = new TopicSpecification
             {
@@ -69,6 +70,8 @@ namespace pro.savel.KafkaRestProxy.AdminClient
                     throw new TopicAlreadyExistsException(topic);
                 throw;
             }
+
+            return GetTopicMetadata(topic);
         }
 
         public BrokersMetadata GetBrokersMetadata()
