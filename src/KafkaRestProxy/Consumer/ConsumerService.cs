@@ -84,24 +84,28 @@ namespace pro.savel.KafkaRestProxy.Consumer
             return result;
         }
 
-        public IEnumerable<ConsumerMessage> Consume(Guid consumerId, int? timeout)
+        public IEnumerable<ConsumerMessage> Consume(Guid consumerId, int? timeout, int? limit)
         {
             var wrapper = ConsumerProvider.GetConsumer(consumerId);
             if (wrapper == null) throw new ConsumerNotFoundException(consumerId);
 
             wrapper.UpdateExpiration();
 
-            var consumeResult = timeout.HasValue
-                ? wrapper.Consumer.Consume(timeout.Value)
-                : wrapper.Consumer.Consume();
+            var result = new List<ConsumerMessage>(limit ?? 1);
 
-            if (consumeResult == null)
-                return Array.Empty<ConsumerMessage>();
+            do
+            {
+                var consumeResult = timeout.HasValue
+                    ? wrapper.Consumer.Consume(timeout.Value)
+                    : wrapper.Consumer.Consume();
+                if (consumeResult == null) break;
+                result.Add(ConsumerMapper.Map(consumeResult));
+            } while (--limit > 0);
 
-            return new[] {ConsumerMapper.Map(consumeResult)};
+            return result;
         }
 
-        public List<WatermarkOffsets> GetWatermarkOffsets(Guid consumerId, int? timeout)
+        public ICollection<WatermarkOffsets> GetWatermarkOffsets(Guid consumerId, int? timeout)
         {
             var wrapper = ConsumerProvider.GetConsumer(consumerId);
             if (wrapper == null) throw new ConsumerNotFoundException(consumerId);
