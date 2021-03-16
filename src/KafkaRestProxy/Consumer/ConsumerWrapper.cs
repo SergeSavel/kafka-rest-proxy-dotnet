@@ -30,8 +30,6 @@ namespace pro.savel.KafkaRestProxy.Consumer
 
         public DateTime ExpiresAt { get; private set; }
 
-        public TimeSpan ExpiresAfter => ExpiresAt - DateTime.Now;
-
         public bool IsExpired => DateTime.Now >= ExpiresAt;
 
         public void Dispose()
