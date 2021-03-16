@@ -5,6 +5,7 @@ using Confluent.Kafka;
 using pro.savel.KafkaRestProxy.Consumer.Contract;
 using pro.savel.KafkaRestProxy.Consumer.Exceptions;
 using pro.savel.KafkaRestProxy.Consumer.Requests;
+using ConsumeException = Confluent.Kafka.ConsumeException;
 using TopicPartition = pro.savel.KafkaRestProxy.Consumer.Contract.TopicPartition;
 using WatermarkOffsets = pro.savel.KafkaRestProxy.Consumer.Contract.WatermarkOffsets;
 
@@ -95,11 +96,21 @@ namespace pro.savel.KafkaRestProxy.Consumer
 
             do
             {
-                var consumeResult = timeout.HasValue
-                    ? wrapper.Consumer.Consume(timeout.Value)
-                    : wrapper.Consumer.Consume();
-                if (consumeResult == null) break;
-                result.Add(ConsumerMapper.Map(consumeResult));
+                try
+                {
+                    var consumeResult = timeout.HasValue
+                        ? wrapper.Consumer.Consume(timeout.Value)
+                        : wrapper.Consumer.Consume();
+                    if (consumeResult == null) break;
+                    result.Add(ConsumerMapper.Map(consumeResult));
+                }
+                catch (ConsumeException e)
+                {
+                    throw new Exceptions.ConsumeException(e)
+                    {
+                        Value = e.Error
+                    };
+                }
             } while (--limit > 0);
 
             return result;
