@@ -31,8 +31,6 @@ namespace pro.savel.KafkaRestProxy.Consumer
         public ActionResult<Contract.Consumer> CreateConsumer([Required] CreateConsumerRequest request)
         {
             var consumer = _consumerService.CreateConsumer(request);
-            if (consumer == null) return BadRequest();
-
             return CreatedAtAction(nameof(GetConsumer), new {consumerId = consumer.Id}, consumer);
         }
 
