@@ -101,7 +101,7 @@ namespace pro.savel.KafkaRestProxy.Consumer
             return new[] {ConsumerMapper.Map(consumeResult)};
         }
 
-        public List<WatermarkOffsets> GetWatermarkOffsets(Guid consumerId, int timeout)
+        public List<WatermarkOffsets> GetWatermarkOffsets(Guid consumerId, int? timeout)
         {
             var wrapper = ConsumerProvider.GetConsumer(consumerId);
             if (wrapper == null) throw new ConsumerNotFoundException(consumerId);
@@ -110,9 +110,9 @@ namespace pro.savel.KafkaRestProxy.Consumer
                 .Select(tp => new
                 {
                     TopicPartition = tp,
-                    WatermarkOffsets = timeout == 0
-                        ? wrapper.Consumer.GetWatermarkOffsets(tp)
-                        : wrapper.Consumer.QueryWatermarkOffsets(tp, TimeSpan.FromMilliseconds(timeout))
+                    WatermarkOffsets = timeout.HasValue
+                        ? wrapper.Consumer.QueryWatermarkOffsets(tp, TimeSpan.FromMilliseconds(timeout.Value))
+                        : wrapper.Consumer.GetWatermarkOffsets(tp)
                 })
                 .Select(o => new WatermarkOffsets
                 {
