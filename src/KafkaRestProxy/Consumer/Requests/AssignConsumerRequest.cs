@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Confluent.Kafka;
 
 namespace pro.savel.KafkaRestProxy.Consumer.Requests
 {
@@ -17,7 +16,7 @@ namespace pro.savel.KafkaRestProxy.Consumer.Requests
 
             [Required] public int Partition { get; init; }
 
-            public Offset Offset { get; init; }
+            public long Offset { get; init; }
         }
     }
 }
