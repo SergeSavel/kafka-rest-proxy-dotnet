@@ -34,19 +34,10 @@ namespace pro.savel.KafkaRestProxy.Producer
 
         public static DeliveryResult Map<TKey, TValue>(DeliveryResult<TKey, TValue> source)
         {
-            var status =
-                source.Status switch
-                {
-                    PersistenceStatus.NotPersisted => DeliveryResult.PersistenceStatus.NotPersisted,
-                    PersistenceStatus.Persisted => DeliveryResult.PersistenceStatus.Persisted,
-                    PersistenceStatus.PossiblyPersisted => DeliveryResult.PersistenceStatus.PossiblyPersisted,
-                    _ => throw new ArgumentException(nameof(source.Status))
-                };
-
-            return new DeliveryResult
+            return new()
             {
-                Status = status,
-                PartitionId = source.Partition.Value,
+                Status = Enum.GetName(source.Status),
+                Partition = source.Partition.Value,
                 Offset = source.Offset,
                 Timestamp = source.Timestamp.UnixTimestampMs
             };

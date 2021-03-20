@@ -4,16 +4,11 @@ namespace pro.savel.KafkaRestProxy.Producer.Contract
 {
     public class DeliveryResult
     {
-        public enum PersistenceStatus
-        {
-            NotPersisted,
-            Persisted,
-            PossiblyPersisted
-        }
+        [Required] public string Status { get; init; }
 
-        [Required] public PersistenceStatus Status { get; init; }
+        [Required] public int Topic { get; init; }
 
-        [Required] public int PartitionId { get; init; }
+        [Required] public int Partition { get; init; }
 
         [Required] public long Offset { get; init; }
 
