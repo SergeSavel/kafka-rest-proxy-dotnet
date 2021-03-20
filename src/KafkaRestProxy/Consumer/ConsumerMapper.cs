@@ -21,7 +21,7 @@ namespace pro.savel.KafkaRestProxy.Consumer
         {
             if (source == null) return null;
 
-            return new ConsumerMessage()
+            return new ConsumerMessage
             {
                 Timestamp = source.Message.Timestamp.UnixTimestampMs,
                 Topic = source.Topic,
@@ -42,14 +42,5 @@ namespace pro.savel.KafkaRestProxy.Consumer
                 Partition = source.Partition
             };
         }
-
-        // public static PartitionOffset Map(Requests.CreateConsumerRequest.PartitionOffset sourse)
-        // {
-        //     return new()
-        //     {
-        //         Partition = sourse.Partition,
-        //         Offset = sourse.Offset
-        //     };
-        // }
     }
 }
