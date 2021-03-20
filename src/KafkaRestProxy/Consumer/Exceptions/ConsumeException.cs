@@ -1,5 +1,5 @@
 ﻿using System;
-using pro.savel.KafkaRestProxy.Common;
+using pro.savel.KafkaRestProxy.Common.Exceptions;
 
 namespace pro.savel.KafkaRestProxy.Consumer.Exceptions
 {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace pro.savel.KafkaRestProxy.Common
+namespace pro.savel.KafkaRestProxy.Common.Exceptions
 {
     public class HttpResponseExceptionFilter : IActionFilter, IOrderedFilter
     {

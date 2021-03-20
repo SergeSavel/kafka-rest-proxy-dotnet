@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.AspNetCore.Http;
-using pro.savel.KafkaRestProxy.Common;
+using pro.savel.KafkaRestProxy.Common.Exceptions;
 
 namespace pro.savel.KafkaRestProxy.Consumer.Exceptions
 {
