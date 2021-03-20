@@ -29,9 +29,15 @@ namespace pro.savel.KafkaRestProxy.Consumer
                 Offset = source.Offset,
                 Key = source.Message.Key,
                 Headers = source.Message.Headers
-                    .ToDictionary(h => h.Key, h => Encoding.UTF8.GetString(h.GetValueBytes())),
+                    .ToDictionary(h => h.Key, h => MapHeaderBytes(h.GetValueBytes())),
                 Value = source.Message.Value
             };
+        }
+
+        private static string MapHeaderBytes(byte[] bytes)
+        {
+            if (bytes == null) return null;
+            return Encoding.UTF8.GetString(bytes);
         }
 
         public static TopicPartition Map(Confluent.Kafka.TopicPartition source)
