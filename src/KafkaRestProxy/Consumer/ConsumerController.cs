@@ -75,7 +75,7 @@ namespace pro.savel.KafkaRestProxy.Consumer
             return _consumerService.GetConsumerAssignment(consumerId);
         }
 
-        [HttpGet("{consumerId}/message")]
+        [HttpGet("{consumerId}/consume")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public ConsumerMessage Consume(Guid consumerId, [Range(0, int.MaxValue)] int? timeout)
