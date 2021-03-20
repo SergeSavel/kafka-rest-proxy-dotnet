@@ -1,14 +1,13 @@
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using pro.savel.KafkaRestProxy.Common.Contract;
 
 namespace pro.savel.KafkaRestProxy.AdminClient.Contract
 {
     public class TopicMetadata
     {
-        [Required] public string Topic { get; init; }
+        public string Topic { get; init; }
 
-        [Required] public ICollection<PartitionMetadata> Partitions { get; init; }
+        public ICollection<PartitionMetadata> Partitions { get; init; }
 
         public Error Error { get; init; }
 
@@ -18,13 +17,13 @@ namespace pro.savel.KafkaRestProxy.AdminClient.Contract
 
         public class PartitionMetadata
         {
-            [Required] public int Id { get; init; }
+            public int Id { get; init; }
 
-            [Required] public int Leader { get; init; }
+            public int Leader { get; init; }
 
-            [Required] public ICollection<int> Replicas { get; init; }
+            public ICollection<int> Replicas { get; init; }
 
-            [Required] public ICollection<int> InSyncReplicas { get; init; }
+            public ICollection<int> InSyncReplicas { get; init; }
 
             public Error Error { get; init; }
         }
