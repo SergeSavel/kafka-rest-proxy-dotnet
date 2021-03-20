@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Confluent.Kafka;
 using pro.savel.KafkaRestProxy.Producer.Contract;
+using pro.savel.KafkaRestProxy.Producer.Exceptions;
 using pro.savel.KafkaRestProxy.Producer.Requests;
 
 namespace pro.savel.KafkaRestProxy.Producer
@@ -24,7 +25,15 @@ namespace pro.savel.KafkaRestProxy.Producer
         {
             var producerMessage = ProducerMapper.Map(request);
 
-            var producerDeliveryResult = await _producer.ProduceAsync(topic, producerMessage);
+            DeliveryResult<string, string> producerDeliveryResult;
+            try
+            {
+                producerDeliveryResult = await _producer.ProduceAsync(topic, producerMessage);
+            }
+            catch (KafkaException e)
+            {
+                throw new ProduceException(e);
+            }
 
             var deliveryResult = ProducerMapper.Map(producerDeliveryResult);
 
