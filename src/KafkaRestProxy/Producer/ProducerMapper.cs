@@ -17,15 +17,17 @@ namespace pro.savel.KafkaRestProxy.Producer
             };
 
             if (source.Headers != null)
+            {
                 result.Headers = new Headers();
-            foreach (var (key, stringValue) in source.Headers)
-                if (key != null)
-                {
-                    byte[] value = null;
-                    if (stringValue != null)
-                        value = Encoding.UTF8.GetBytes(stringValue);
-                    result.Headers.Add(key, value);
-                }
+                foreach (var (key, stringValue) in source.Headers)
+                    if (key != null)
+                    {
+                        byte[] value = null;
+                        if (stringValue != null)
+                            value = Encoding.UTF8.GetBytes(stringValue);
+                        result.Headers.Add(key, value);
+                    }
+            }
 
             return result;
         }
