@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -30,7 +32,8 @@ namespace pro.savel.KafkaRestProxy
                 {
                     options.JsonSerializerOptions.WriteIndented = Environment.IsDevelopment();
                     options.JsonSerializerOptions.IgnoreNullValues = true;
-                    //options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+                    options.JsonSerializerOptions.Converters.Add(
+                        new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
                 })
                 ;
 
