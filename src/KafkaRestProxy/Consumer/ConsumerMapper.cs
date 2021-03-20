@@ -19,7 +19,9 @@ namespace pro.savel.KafkaRestProxy.Consumer
 
         public static ConsumerMessage Map(ConsumeResult<string, string> source)
         {
-            return new()
+            if (source == null) return null;
+
+            return new ConsumerMessage()
             {
                 Timestamp = source.Message.Timestamp.UnixTimestampMs,
                 Topic = source.Topic,
