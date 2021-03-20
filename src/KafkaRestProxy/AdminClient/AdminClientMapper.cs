@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 using Confluent.Kafka;
 using pro.savel.KafkaRestProxy.AdminClient.Contract;
+using pro.savel.KafkaRestProxy.Common.Mappers;
 using BrokerMetadata = pro.savel.KafkaRestProxy.AdminClient.Contract.BrokerMetadata;
-using Error = pro.savel.KafkaRestProxy.AdminClient.Contract.Error;
 using Metadata = pro.savel.KafkaRestProxy.AdminClient.Contract.Metadata;
 using TopicMetadata = pro.savel.KafkaRestProxy.AdminClient.Contract.TopicMetadata;
 
@@ -49,18 +49,9 @@ namespace pro.savel.KafkaRestProxy.AdminClient
             {
                 Topic = source.Topic,
                 Partitions = source.Partitions.Select(Map).ToArray(),
-                Error = source.Error.Code == ErrorCode.NoError ? null : Map(source.Error),
+                Error = CommonMapper.Map(source.Error),
                 OriginatingBrokerId = metadata?.OriginatingBrokerId,
                 OriginatingBrokerName = metadata?.OriginatingBrokerName
-            };
-        }
-
-        private static Error Map(Confluent.Kafka.Error source)
-        {
-            return new()
-            {
-                Code = (int) source.Code,
-                Reason = source.Reason
             };
         }
 
@@ -72,7 +63,7 @@ namespace pro.savel.KafkaRestProxy.AdminClient
                 Leader = source.Leader,
                 Replicas = source.Replicas,
                 InSyncReplicas = source.InSyncReplicas,
-                Error = source.Error.Code == ErrorCode.NoError ? null : Map(source.Error)
+                Error = CommonMapper.Map(source.Error)
             };
         }
 

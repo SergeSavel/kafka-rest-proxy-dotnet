@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using pro.savel.KafkaRestProxy.Common.Contract;
 
 namespace pro.savel.KafkaRestProxy.AdminClient.Contract
 {
