@@ -75,13 +75,22 @@ namespace pro.savel.KafkaRestProxy.Consumer
             return _consumerService.GetConsumerAssignment(consumerId);
         }
 
+        [HttpGet("{consumerId}/message")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ConsumerMessage Consume(Guid consumerId, [Range(0, int.MaxValue)] int? timeout)
+        {
+            return _consumerService.Consume(consumerId, timeout);
+        }
+
+        [Obsolete]
         [HttpGet("{consumerId}/messages")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IEnumerable<ConsumerMessage> Consume(Guid consumerId, [Range(0, int.MaxValue)] int? timeout,
+        public IEnumerable<ConsumerMessage> ConsumeMultiple(Guid consumerId, [Range(0, int.MaxValue)] int? timeout,
             [Range(1, int.MaxValue)] int? limit)
         {
-            return _consumerService.Consume(consumerId, timeout, limit);
+            return _consumerService.ConsumeMultiple(consumerId, timeout, limit);
         }
 
         [HttpGet("{consumerId}/offsets")]

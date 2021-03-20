@@ -85,7 +85,22 @@ namespace pro.savel.KafkaRestProxy.Consumer
             return result;
         }
 
-        public IEnumerable<ConsumerMessage> Consume(Guid consumerId, int? timeout, int? limit)
+        public ConsumerMessage Consume(Guid consumerId, int? timeout)
+        {
+            var wrapper = ConsumerProvider.GetConsumer(consumerId);
+            if (wrapper == null) throw new ConsumerNotFoundException(consumerId);
+
+            wrapper.UpdateExpiration();
+
+            var consumeResult = timeout.HasValue
+                ? wrapper.Consumer.Consume(timeout.Value)
+                : wrapper.Consumer.Consume();
+
+            return ConsumerMapper.Map(consumeResult);
+        }
+
+        [Obsolete]
+        public IEnumerable<ConsumerMessage> ConsumeMultiple(Guid consumerId, int? timeout, int? limit)
         {
             var wrapper = ConsumerProvider.GetConsumer(consumerId);
             if (wrapper == null) throw new ConsumerNotFoundException(consumerId);
