@@ -12,7 +12,6 @@
     <PublishTrimmed>true</PublishTrimmed>
     <TrimMode>link</TrimMode>
     <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
-    <Nullable>disable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
