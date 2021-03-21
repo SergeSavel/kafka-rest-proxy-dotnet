@@ -1,12 +1,12 @@
 ﻿using System.Linq;
 using Confluent.Kafka;
-using pro.savel.KafkaRestProxy.AdminClient.Contract;
-using pro.savel.KafkaRestProxy.Common.Mappers;
-using BrokerMetadata = pro.savel.KafkaRestProxy.AdminClient.Contract.BrokerMetadata;
-using Metadata = pro.savel.KafkaRestProxy.AdminClient.Contract.Metadata;
-using TopicMetadata = pro.savel.KafkaRestProxy.AdminClient.Contract.TopicMetadata;
+using SergeSavel.KafkaRestProxy.AdminClient.Contract;
+using SergeSavel.KafkaRestProxy.Common.Mappers;
+using BrokerMetadata = SergeSavel.KafkaRestProxy.AdminClient.Contract.BrokerMetadata;
+using Metadata = SergeSavel.KafkaRestProxy.AdminClient.Contract.Metadata;
+using TopicMetadata = SergeSavel.KafkaRestProxy.AdminClient.Contract.TopicMetadata;
 
-namespace pro.savel.KafkaRestProxy.AdminClient
+namespace SergeSavel.KafkaRestProxy.AdminClient
 {
     public static class AdminClientMapper
     {

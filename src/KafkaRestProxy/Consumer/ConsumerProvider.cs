@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace pro.savel.KafkaRestProxy.Consumer
+namespace SergeSavel.KafkaRestProxy.Consumer
 {
     public class ConsumerProvider : IDisposable
     {

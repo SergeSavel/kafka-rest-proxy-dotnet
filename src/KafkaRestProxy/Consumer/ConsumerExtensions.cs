@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace pro.savel.KafkaRestProxy.Consumer
+namespace SergeSavel.KafkaRestProxy.Consumer
 {
     public static class ConsumerExtensions
     {

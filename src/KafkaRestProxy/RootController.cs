@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace pro.savel.KafkaRestProxy
+namespace SergeSavel.KafkaRestProxy
 {
     [ApiController]
     [Route("")]

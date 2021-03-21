@@ -1,10 +1,10 @@
 ﻿using System.Linq;
 using System.Text;
 using Confluent.Kafka;
-using pro.savel.KafkaRestProxy.Consumer.Contract;
-using TopicPartition = pro.savel.KafkaRestProxy.Consumer.Contract.TopicPartition;
+using SergeSavel.KafkaRestProxy.Consumer.Contract;
+using TopicPartition = SergeSavel.KafkaRestProxy.Consumer.Contract.TopicPartition;
 
-namespace pro.savel.KafkaRestProxy.Consumer
+namespace SergeSavel.KafkaRestProxy.Consumer
 {
     public static class ConsumerMapper
     {

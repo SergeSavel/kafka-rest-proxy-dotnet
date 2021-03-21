@@ -1,8 +1,8 @@
 ﻿using Confluent.Kafka;
 using Microsoft.Extensions.Configuration;
-using pro.savel.KafkaRestProxy.Common;
+using SergeSavel.KafkaRestProxy.Common;
 
-namespace pro.savel.KafkaRestProxy.AdminClient
+namespace SergeSavel.KafkaRestProxy.AdminClient
 {
     public static class AdminClientConfigProvider
     {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
-using pro.savel.KafkaRestProxy.Common.Exceptions;
+using SergeSavel.KafkaRestProxy.Common.Exceptions;
 
-namespace pro.savel.KafkaRestProxy.AdminClient.Exceptions
+namespace SergeSavel.KafkaRestProxy.AdminClient.Exceptions
 {
     public class TopicNotFoundException : HttpResponseException
     {

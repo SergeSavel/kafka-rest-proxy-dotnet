@@ -1,6 +1,6 @@
-﻿using pro.savel.KafkaRestProxy.Common.Exceptions;
+﻿using SergeSavel.KafkaRestProxy.Common.Exceptions;
 
-namespace pro.savel.KafkaRestProxy.Consumer.Exceptions
+namespace SergeSavel.KafkaRestProxy.Consumer.Exceptions
 {
     public class ConsumeException : KafkaException
     {

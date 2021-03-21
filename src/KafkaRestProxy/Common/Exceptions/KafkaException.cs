@@ -1,6 +1,6 @@
-﻿using pro.savel.KafkaRestProxy.Common.Mappers;
+﻿using SergeSavel.KafkaRestProxy.Common.Mappers;
 
-namespace pro.savel.KafkaRestProxy.Common.Exceptions
+namespace SergeSavel.KafkaRestProxy.Common.Exceptions
 {
     public class KafkaException : HttpResponseException
     {

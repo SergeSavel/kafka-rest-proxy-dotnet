@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace pro.savel.KafkaRestProxy.AdminClient
+namespace SergeSavel.KafkaRestProxy.AdminClient
 {
     public static class AdminClientExtensions
     {

@@ -1,7 +1,7 @@
 ﻿using Confluent.Kafka;
 using Microsoft.Extensions.Configuration;
 
-namespace pro.savel.KafkaRestProxy.Common
+namespace SergeSavel.KafkaRestProxy.Common
 {
     public static class ClientConfigProvider
     {

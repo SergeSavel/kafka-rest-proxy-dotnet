@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace pro.savel.KafkaRestProxy.Common.Exceptions
+namespace SergeSavel.KafkaRestProxy.Common.Exceptions
 {
     public class HttpResponseException : Exception
     {

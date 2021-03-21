@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace pro.savel.KafkaRestProxy
+namespace SergeSavel.KafkaRestProxy
 {
     public class Program
     {

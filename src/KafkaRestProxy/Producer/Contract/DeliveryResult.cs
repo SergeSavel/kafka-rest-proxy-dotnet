@@ -1,4 +1,4 @@
-﻿namespace pro.savel.KafkaRestProxy.Producer.Contract
+﻿namespace SergeSavel.KafkaRestProxy.Producer.Contract
 {
     public class DeliveryResult
     {

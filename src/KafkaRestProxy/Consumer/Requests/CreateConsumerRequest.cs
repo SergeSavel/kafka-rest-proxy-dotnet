@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace pro.savel.KafkaRestProxy.Consumer.Requests
+namespace SergeSavel.KafkaRestProxy.Consumer.Requests
 {
     public class CreateConsumerRequest
     {

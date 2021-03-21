@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace pro.savel.KafkaRestProxy.Producer.Requests
+namespace SergeSavel.KafkaRestProxy.Producer.Requests
 {
     public class PostMessageRequest
     {

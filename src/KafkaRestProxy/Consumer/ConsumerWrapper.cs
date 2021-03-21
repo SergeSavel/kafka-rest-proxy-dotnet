@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Confluent.Kafka;
 
-namespace pro.savel.KafkaRestProxy.Consumer
+namespace SergeSavel.KafkaRestProxy.Consumer
 {
     public class ConsumerWrapper : IDisposable
     {

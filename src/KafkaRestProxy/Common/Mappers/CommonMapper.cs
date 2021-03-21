@@ -1,7 +1,7 @@
 ﻿using Confluent.Kafka;
-using Error = pro.savel.KafkaRestProxy.Common.Contract.Error;
+using Error = SergeSavel.KafkaRestProxy.Common.Contract.Error;
 
-namespace pro.savel.KafkaRestProxy.Common.Mappers
+namespace SergeSavel.KafkaRestProxy.Common.Mappers
 {
     public static class CommonMapper
     {
@@ -10,7 +10,7 @@ namespace pro.savel.KafkaRestProxy.Common.Mappers
             if (source.Code == ErrorCode.NoError)
                 return null;
 
-            return new Error()
+            return new Error
             {
                 Code = (int) source.Code,
                 Reason = source.Reason

@@ -1,4 +1,4 @@
-﻿namespace pro.savel.KafkaRestProxy.Common.Contract
+﻿namespace SergeSavel.KafkaRestProxy.Common.Contract
 {
     public class Error
     {

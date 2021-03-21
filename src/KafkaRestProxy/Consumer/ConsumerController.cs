@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using pro.savel.KafkaRestProxy.Consumer.Contract;
-using pro.savel.KafkaRestProxy.Consumer.Requests;
+using SergeSavel.KafkaRestProxy.Consumer.Contract;
+using SergeSavel.KafkaRestProxy.Consumer.Requests;
 
-namespace pro.savel.KafkaRestProxy.Consumer
+namespace SergeSavel.KafkaRestProxy.Consumer
 {
     [ApiController]
     [Route("consumers")]

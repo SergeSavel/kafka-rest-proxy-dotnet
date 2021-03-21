@@ -1,8 +1,8 @@
 ﻿using Confluent.Kafka;
 using Microsoft.AspNetCore.Http;
-using KafkaException = pro.savel.KafkaRestProxy.Common.Exceptions.KafkaException;
+using KafkaException = SergeSavel.KafkaRestProxy.Common.Exceptions.KafkaException;
 
-namespace pro.savel.KafkaRestProxy.Producer.Exceptions
+namespace SergeSavel.KafkaRestProxy.Producer.Exceptions
 {
     public class ProduceException : KafkaException
     {

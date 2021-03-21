@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using Confluent.Kafka;
-using pro.savel.KafkaRestProxy.Consumer.Contract;
-using pro.savel.KafkaRestProxy.Consumer.Exceptions;
-using pro.savel.KafkaRestProxy.Consumer.Requests;
-using ConsumeException = pro.savel.KafkaRestProxy.Consumer.Exceptions.ConsumeException;
-using TopicPartition = pro.savel.KafkaRestProxy.Consumer.Contract.TopicPartition;
-using WatermarkOffsets = pro.savel.KafkaRestProxy.Consumer.Contract.WatermarkOffsets;
+using SergeSavel.KafkaRestProxy.Consumer.Contract;
+using SergeSavel.KafkaRestProxy.Consumer.Exceptions;
+using SergeSavel.KafkaRestProxy.Consumer.Requests;
+using ConsumeException = SergeSavel.KafkaRestProxy.Consumer.Exceptions.ConsumeException;
+using TopicPartition = SergeSavel.KafkaRestProxy.Consumer.Contract.TopicPartition;
+using WatermarkOffsets = SergeSavel.KafkaRestProxy.Consumer.Contract.WatermarkOffsets;
 
-namespace pro.savel.KafkaRestProxy.Consumer
+namespace SergeSavel.KafkaRestProxy.Consumer
 {
     public class ConsumerService : IDisposable
     {

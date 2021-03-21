@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace pro.savel.KafkaRestProxy.AdminClient.Contract
+namespace SergeSavel.KafkaRestProxy.AdminClient.Contract
 {
     public class Metadata
     {

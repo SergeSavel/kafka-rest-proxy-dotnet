@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using pro.savel.KafkaRestProxy.Producer.Contract;
-using pro.savel.KafkaRestProxy.Producer.Requests;
+using SergeSavel.KafkaRestProxy.Producer.Contract;
+using SergeSavel.KafkaRestProxy.Producer.Requests;
 
-namespace pro.savel.KafkaRestProxy.Producer
+namespace SergeSavel.KafkaRestProxy.Producer
 {
     [ApiController]
     [Route("producer")]

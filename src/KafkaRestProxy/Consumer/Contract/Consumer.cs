@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace pro.savel.KafkaRestProxy.Consumer.Contract
+namespace SergeSavel.KafkaRestProxy.Consumer.Contract
 {
     public class Consumer
     {

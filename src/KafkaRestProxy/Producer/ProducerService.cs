@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Confluent.Kafka;
-using pro.savel.KafkaRestProxy.Producer.Contract;
-using pro.savel.KafkaRestProxy.Producer.Exceptions;
-using pro.savel.KafkaRestProxy.Producer.Requests;
+using SergeSavel.KafkaRestProxy.Producer.Contract;
+using SergeSavel.KafkaRestProxy.Producer.Exceptions;
+using SergeSavel.KafkaRestProxy.Producer.Requests;
 
-namespace pro.savel.KafkaRestProxy.Producer
+namespace SergeSavel.KafkaRestProxy.Producer
 {
     public class ProducerService : IDisposable
     {
