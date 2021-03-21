@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using SergeSavel.KafkaRestProxy.Common;
 
-namespace SergeSavel.KafkaRestProxy.AdminClient
+namespace SergeSavel.KafkaRestProxy.Admin
 {
     public static class AdminClientConfigProvider
     {

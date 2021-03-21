@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SergeSavel.KafkaRestProxy.AdminClient.Requests
+namespace SergeSavel.KafkaRestProxy.Admin.Requests
 {
     public class CreateTopicRequest
     {

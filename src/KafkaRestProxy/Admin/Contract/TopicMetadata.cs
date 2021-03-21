@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using SergeSavel.KafkaRestProxy.Common.Contract;
 
-namespace SergeSavel.KafkaRestProxy.AdminClient.Contract
+namespace SergeSavel.KafkaRestProxy.Admin.Contract
 {
     public class TopicMetadata
     {

@@ -3,14 +3,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Confluent.Kafka;
 using Confluent.Kafka.Admin;
-using SergeSavel.KafkaRestProxy.AdminClient.Contract;
-using SergeSavel.KafkaRestProxy.AdminClient.Exceptions;
-using BrokerMetadata = SergeSavel.KafkaRestProxy.AdminClient.Contract.BrokerMetadata;
+using SergeSavel.KafkaRestProxy.Admin.Contract;
+using SergeSavel.KafkaRestProxy.Admin.Exceptions;
+using BrokerMetadata = SergeSavel.KafkaRestProxy.Admin.Contract.BrokerMetadata;
 using KafkaException = SergeSavel.KafkaRestProxy.Common.Exceptions.KafkaException;
-using Metadata = SergeSavel.KafkaRestProxy.AdminClient.Contract.Metadata;
-using TopicMetadata = SergeSavel.KafkaRestProxy.AdminClient.Contract.TopicMetadata;
+using Metadata = SergeSavel.KafkaRestProxy.Admin.Contract.Metadata;
+using TopicMetadata = SergeSavel.KafkaRestProxy.Admin.Contract.TopicMetadata;
 
-namespace SergeSavel.KafkaRestProxy.AdminClient
+namespace SergeSavel.KafkaRestProxy.Admin
 {
     public class AdminClientService : IDisposable
     {

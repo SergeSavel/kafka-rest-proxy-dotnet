@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using SergeSavel.KafkaRestProxy.AdminClient;
+using SergeSavel.KafkaRestProxy.Admin;
 using SergeSavel.KafkaRestProxy.Common.Exceptions;
 using SergeSavel.KafkaRestProxy.Consumer;
 using SergeSavel.KafkaRestProxy.Producer;
