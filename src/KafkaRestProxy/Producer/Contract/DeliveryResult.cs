@@ -4,7 +4,7 @@
     {
         public string Status { get; init; }
 
-        public int Topic { get; init; }
+        public string Topic { get; init; }
 
         public int Partition { get; init; }
 

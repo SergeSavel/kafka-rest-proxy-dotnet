@@ -37,6 +37,7 @@ namespace pro.savel.KafkaRestProxy.Producer
             return new()
             {
                 Status = Enum.GetName(source.Status),
+                Topic = source.Topic,
                 Partition = source.Partition.Value,
                 Offset = source.Offset,
                 Timestamp = source.Timestamp.UnixTimestampMs
