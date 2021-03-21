@@ -5,7 +5,7 @@ using Confluent.Kafka;
 using pro.savel.KafkaRestProxy.Consumer.Contract;
 using pro.savel.KafkaRestProxy.Consumer.Exceptions;
 using pro.savel.KafkaRestProxy.Consumer.Requests;
-using ConsumeException = Confluent.Kafka.ConsumeException;
+using ConsumeException = pro.savel.KafkaRestProxy.Consumer.Exceptions.ConsumeException;
 using TopicPartition = pro.savel.KafkaRestProxy.Consumer.Contract.TopicPartition;
 using WatermarkOffsets = pro.savel.KafkaRestProxy.Consumer.Contract.WatermarkOffsets;
 
@@ -99,9 +99,9 @@ namespace pro.savel.KafkaRestProxy.Consumer
                     ? wrapper.Consumer.Consume(timeout.Value)
                     : wrapper.Consumer.Consume();
             }
-            catch (ConsumeException e)
+            catch (KafkaException e)
             {
-                throw new Exceptions.ConsumeException(e);
+                throw new ConsumeException("Unable to receive message.", e);
             }
 
             return ConsumerMapper.Map(consumeResult);
@@ -127,9 +127,9 @@ namespace pro.savel.KafkaRestProxy.Consumer
                     if (consumeResult == null) break;
                     result.Add(ConsumerMapper.Map(consumeResult));
                 }
-                catch (ConsumeException e)
+                catch (KafkaException e)
                 {
-                    throw new Exceptions.ConsumeException(e);
+                    throw new ConsumeException("Unable to receive message.", e);
                 }
             } while (--limit > 0);
 
@@ -141,22 +141,30 @@ namespace pro.savel.KafkaRestProxy.Consumer
             var wrapper = ConsumerProvider.GetConsumer(consumerId);
             if (wrapper == null) throw new ConsumerNotFoundException(consumerId);
 
-            var result = wrapper.Consumer.Assignment
-                .Select(tp => new
-                {
-                    TopicPartition = tp,
-                    WatermarkOffsets = timeout.HasValue
-                        ? wrapper.Consumer.QueryWatermarkOffsets(tp, TimeSpan.FromMilliseconds(timeout.Value))
-                        : wrapper.Consumer.GetWatermarkOffsets(tp)
-                })
-                .Select(o => new WatermarkOffsets
-                {
-                    Topic = o.TopicPartition.Topic,
-                    Partition = o.TopicPartition.Partition,
-                    Low = o.WatermarkOffsets.Low,
-                    High = o.WatermarkOffsets.High
-                })
-                .ToList();
+            ICollection<WatermarkOffsets> result;
+            try
+            {
+                result = wrapper.Consumer.Assignment
+                    .Select(tp => new
+                    {
+                        TopicPartition = tp,
+                        WatermarkOffsets = timeout.HasValue
+                            ? wrapper.Consumer.QueryWatermarkOffsets(tp, TimeSpan.FromMilliseconds(timeout.Value))
+                            : wrapper.Consumer.GetWatermarkOffsets(tp)
+                    })
+                    .Select(o => new WatermarkOffsets
+                    {
+                        Topic = o.TopicPartition.Topic,
+                        Partition = o.TopicPartition.Partition,
+                        Low = o.WatermarkOffsets.Low,
+                        High = o.WatermarkOffsets.High
+                    })
+                    .ToList();
+            }
+            catch (KafkaException e)
+            {
+                throw new ConsumeException("Unable to get watermark offsets.", e);
+            }
 
             return result;
         }
