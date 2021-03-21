@@ -6,6 +6,7 @@ using Confluent.Kafka.Admin;
 using pro.savel.KafkaRestProxy.AdminClient.Contract;
 using pro.savel.KafkaRestProxy.AdminClient.Exceptions;
 using BrokerMetadata = pro.savel.KafkaRestProxy.AdminClient.Contract.BrokerMetadata;
+using KafkaException = pro.savel.KafkaRestProxy.Common.Exceptions.KafkaException;
 using Metadata = pro.savel.KafkaRestProxy.AdminClient.Contract.Metadata;
 using TopicMetadata = pro.savel.KafkaRestProxy.AdminClient.Contract.TopicMetadata;
 
@@ -28,29 +29,47 @@ namespace pro.savel.KafkaRestProxy.AdminClient
 
         public Metadata GetMetadata()
         {
-            var adminClientMetadata = _adminClient.GetMetadata(Timeout);
-            var metadata = AdminClientMapper.Map(adminClientMetadata);
-
-            return metadata;
+            var kafkaMetadata = GetKafkaMetadata();
+            return AdminClientMapper.Map(kafkaMetadata);
         }
 
         public TopicsMetadata GetTopicsMetadata()
         {
-            var adminClientMetadata = _adminClient.GetMetadata(Timeout);
-
-            return AdminClientMapper.MapTopics(adminClientMetadata);
+            var kafkaMetadata = GetKafkaMetadata();
+            return AdminClientMapper.MapTopics(kafkaMetadata);
         }
 
         public TopicMetadata GetTopicMetadata(string topic)
         {
-            var adminClientMetadata = _adminClient.GetMetadata(topic, Timeout);
+            var kafkaMetadata = GetKafkaMetadata();
 
-            var topicMetadata = adminClientMetadata.Topics[0];
+            var topicMetadata = kafkaMetadata.Topics[0];
 
             if (topicMetadata.Error.Code == ErrorCode.UnknownTopicOrPart)
                 throw new TopicNotFoundException(topic);
 
-            return AdminClientMapper.Map(topicMetadata, adminClientMetadata);
+            return AdminClientMapper.Map(topicMetadata, kafkaMetadata);
+        }
+
+        public BrokersMetadata GetBrokersMetadata()
+        {
+            var kafkaMetadata = GetKafkaMetadata();
+            return AdminClientMapper.MapBrokers(kafkaMetadata);
+        }
+
+        public BrokerMetadata GetBrokerMetadata(int brokerId)
+        {
+            var kafkaMetadata = GetKafkaMetadata();
+
+            var result = kafkaMetadata.Brokers
+                .Where(brokerMetadata => brokerMetadata.BrokerId == brokerId)
+                .Select(brokerMetadata => AdminClientMapper.Map(brokerMetadata, kafkaMetadata))
+                .FirstOrDefault();
+
+            if (result == null)
+                throw new BrokerNotFoundException(brokerId);
+
+            return result;
         }
 
         public async Task<TopicMetadata> CreateTopic(string topic, int? numPartitions = null,
@@ -71,30 +90,23 @@ namespace pro.savel.KafkaRestProxy.AdminClient
             {
                 if (e.Results.Any(result => result.Error.Code == ErrorCode.TopicAlreadyExists))
                     throw new TopicAlreadyExistsException(topic);
-                throw;
+                throw new KafkaException("Unable to create topic.", e);
             }
 
             return GetTopicMetadata(topic);
         }
 
-        public BrokersMetadata GetBrokersMetadata()
+        private Confluent.Kafka.Metadata GetKafkaMetadata()
         {
-            var adminClientMetadata = _adminClient.GetMetadata(Timeout);
-
-            return AdminClientMapper.MapBrokers(adminClientMetadata);
-        }
-
-        public BrokerMetadata GetBrokerMetadata(int brokerId)
-        {
-            var adminClientMetadata = _adminClient.GetMetadata(Timeout);
-
-            var result = adminClientMetadata.Brokers
-                .Where(brokerMetadata => brokerMetadata.BrokerId == brokerId)
-                .Select(brokerMetadata => AdminClientMapper.Map(brokerMetadata, adminClientMetadata))
-                .FirstOrDefault();
-
-            if (result == null)
-                throw new BrokerNotFoundException(brokerId);
+            Confluent.Kafka.Metadata result;
+            try
+            {
+                result = _adminClient.GetMetadata(Timeout);
+            }
+            catch (Confluent.Kafka.KafkaException e)
+            {
+                throw new KafkaException("Unable to get metadata.", e);
+            }
 
             return result;
         }

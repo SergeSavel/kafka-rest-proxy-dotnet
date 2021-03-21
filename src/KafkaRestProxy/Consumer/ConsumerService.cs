@@ -92,9 +92,17 @@ namespace pro.savel.KafkaRestProxy.Consumer
 
             wrapper.UpdateExpiration();
 
-            var consumeResult = timeout.HasValue
-                ? wrapper.Consumer.Consume(timeout.Value)
-                : wrapper.Consumer.Consume();
+            ConsumeResult<string, string> consumeResult;
+            try
+            {
+                consumeResult = timeout.HasValue
+                    ? wrapper.Consumer.Consume(timeout.Value)
+                    : wrapper.Consumer.Consume();
+            }
+            catch (ConsumeException e)
+            {
+                throw new Exceptions.ConsumeException(e);
+            }
 
             return ConsumerMapper.Map(consumeResult);
         }
@@ -121,10 +129,7 @@ namespace pro.savel.KafkaRestProxy.Consumer
                 }
                 catch (ConsumeException e)
                 {
-                    throw new Exceptions.ConsumeException(e)
-                    {
-                        Value = e.Error
-                    };
+                    throw new Exceptions.ConsumeException(e);
                 }
             } while (--limit > 0);
 

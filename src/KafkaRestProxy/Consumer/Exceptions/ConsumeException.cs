@@ -1,11 +1,11 @@
-﻿using System;
-using pro.savel.KafkaRestProxy.Common.Exceptions;
+﻿using pro.savel.KafkaRestProxy.Common.Exceptions;
 
 namespace pro.savel.KafkaRestProxy.Consumer.Exceptions
 {
-    public class ConsumeException : HttpResponseException
+    public class ConsumeException : KafkaException
     {
-        public ConsumeException(Exception innerException) : base(innerException)
+        public ConsumeException(Confluent.Kafka.KafkaException innerException) : base("Unable to receive message.",
+            innerException)
         {
         }
     }
