@@ -32,6 +32,7 @@ namespace pro.savel.KafkaRestProxy
                 {
                     options.JsonSerializerOptions.WriteIndented = Environment.IsDevelopment();
                     options.JsonSerializerOptions.IgnoreNullValues = true;
+                    options.JsonSerializerOptions.PropertyNamingPolicy = null;
                     options.JsonSerializerOptions.Converters.Add(
                         new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
                 })
