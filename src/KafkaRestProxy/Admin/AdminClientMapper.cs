@@ -59,7 +59,7 @@ namespace SergeSavel.KafkaRestProxy.Admin
         {
             return new()
             {
-                Id = source.PartitionId,
+                Partition = source.PartitionId,
                 Leader = source.Leader,
                 Replicas = source.Replicas,
                 InSyncReplicas = source.InSyncReplicas,

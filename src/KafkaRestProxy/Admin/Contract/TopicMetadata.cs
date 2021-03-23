@@ -17,7 +17,7 @@ namespace SergeSavel.KafkaRestProxy.Admin.Contract
 
         public class PartitionMetadata
         {
-            public int Id { get; init; }
+            public int Partition { get; init; }
 
             public int Leader { get; init; }
 
