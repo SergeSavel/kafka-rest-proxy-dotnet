@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text;
 using Confluent.Kafka;
 using SergeSavel.KafkaRestProxy.Consumer.Contract;
@@ -46,6 +47,25 @@ namespace SergeSavel.KafkaRestProxy.Consumer
             {
                 Topic = source.Topic,
                 Partition = source.Partition
+            };
+        }
+
+        public static PartitionOffsets.Offset Map(Offset offset)
+        {
+            string specialValue = null;
+
+            if (offset.IsSpecial)
+                specialValue = offset.Value == Offset.Beginning.Value ? "Beginning"
+                    : offset.Value == Offset.End.Value ? "End"
+                    : offset.Value == Offset.Stored.Value ? "Stored"
+                    : offset.Value == Offset.Unset.Value ? "Unset"
+                    : throw new ArgumentOutOfRangeException(nameof(offset));
+
+            return new PartitionOffsets.Offset
+            {
+                Value = offset.Value,
+                IsSpecial = offset.IsSpecial,
+                SpecialValue = specialValue
             };
         }
     }

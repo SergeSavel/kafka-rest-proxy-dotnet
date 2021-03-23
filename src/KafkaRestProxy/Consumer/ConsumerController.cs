@@ -96,9 +96,10 @@ namespace SergeSavel.KafkaRestProxy.Consumer
         [HttpGet("{consumerId}/offsets")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ICollection<WatermarkOffsets> GetWatermarkOffsets(Guid consumerId, [Range(0, int.MaxValue)] int? timeout)
+        public PartitionOffsets GetPartitionOffsets(Guid consumerId, [Required] string topic,
+            [Required] [Range(0, int.MaxValue)] int partition, [Range(0, int.MaxValue)] int? timeout)
         {
-            return _consumerService.GetWatermarkOffsets(consumerId, timeout);
+            return _consumerService.GetPartitionOffsets(consumerId, topic, partition, timeout);
         }
     }
 }
