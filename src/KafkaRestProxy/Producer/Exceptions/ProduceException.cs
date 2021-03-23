@@ -11,7 +11,7 @@ namespace SergeSavel.KafkaRestProxy.Producer.Exceptions
         {
             StatusCode = innerException.Error.Code switch
             {
-                ErrorCode.UnknownTopicOrPart => StatusCodes.Status404NotFound,
+                ErrorCode.UnknownTopicOrPart => StatusCodes.Status400BadRequest,
                 _ => StatusCodes.Status500InternalServerError
             };
         }
