@@ -157,7 +157,8 @@ namespace SergeSavel.KafkaRestProxy.Consumer
                         Topic = o.TopicPartition.Topic,
                         Partition = o.TopicPartition.Partition,
                         Low = o.WatermarkOffsets.Low,
-                        High = o.WatermarkOffsets.High
+                        High = o.WatermarkOffsets.High,
+                        Current = wrapper.Consumer.Position(o.TopicPartition)
                     })
                     .ToList();
             }
