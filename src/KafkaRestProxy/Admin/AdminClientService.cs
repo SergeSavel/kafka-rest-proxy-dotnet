@@ -41,7 +41,7 @@ namespace SergeSavel.KafkaRestProxy.Admin
 
         public TopicMetadata GetTopicMetadata(string topic)
         {
-            var kafkaMetadata = GetKafkaMetadata();
+            var kafkaMetadata = GetKafkaMetadata(topic);
 
             var topicMetadata = kafkaMetadata.Topics[0];
 
@@ -96,12 +96,12 @@ namespace SergeSavel.KafkaRestProxy.Admin
             return GetTopicMetadata(topic);
         }
 
-        private Confluent.Kafka.Metadata GetKafkaMetadata()
+        private Confluent.Kafka.Metadata GetKafkaMetadata(string topic = null)
         {
             Confluent.Kafka.Metadata result;
             try
             {
-                result = _adminClient.GetMetadata(Timeout);
+                result = topic == null ? _adminClient.GetMetadata(Timeout) : _adminClient.GetMetadata(topic, Timeout);
             }
             catch (Confluent.Kafka.KafkaException e)
             {
