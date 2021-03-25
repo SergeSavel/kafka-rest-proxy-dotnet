@@ -21,14 +21,16 @@ namespace SergeSavel.KafkaRestProxy.Producer
             _producer.Dispose();
         }
 
-        public async Task<DeliveryResult> PostMessage(string topic, PostMessageRequest request)
+        public async Task<DeliveryResult> PostMessage(string topic, int? partition, PostMessageRequest request)
         {
             var producerMessage = ProducerMapper.Map(request);
 
             DeliveryResult<string, string> producerDeliveryResult;
             try
             {
-                producerDeliveryResult = await _producer.ProduceAsync(topic, producerMessage);
+                producerDeliveryResult = partition.HasValue
+                    ? await _producer.ProduceAsync(new TopicPartition(topic, partition.Value), producerMessage)
+                    : await _producer.ProduceAsync(topic, producerMessage);
             }
             catch (KafkaException e)
             {

@@ -17,10 +17,11 @@ namespace SergeSavel.KafkaRestProxy.Producer
             _producerService = producerService;
         }
 
-        [HttpPost("{topic}")]
-        public async Task<ActionResult<DeliveryResult>> PostMessage(string topic, [Required] PostMessageRequest request)
+        [HttpPost("produce")]
+        public async Task<ActionResult<DeliveryResult>> PostMessage([Required] string topic,
+            [Range(0, int.MaxValue)] int? partition, [Required] PostMessageRequest request)
         {
-            var result = await _producerService.PostMessage(topic, request);
+            var result = await _producerService.PostMessage(topic, partition, request);
 
             return Ok(result);
         }
