@@ -18,8 +18,8 @@ namespace SergeSavel.KafkaRestProxy.Producer
 
         public void Dispose()
         {
-            _producer.Flush();
-            _producer.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         public async Task<DeliveryResult> PostMessage(string topic, int? partition, PostMessageRequest request)
@@ -41,6 +41,15 @@ namespace SergeSavel.KafkaRestProxy.Producer
             var deliveryResult = ProducerMapper.Map(producerDeliveryResult);
 
             return deliveryResult;
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _producer.Flush();
+                _producer.Dispose();
+            }
         }
     }
 }

@@ -24,7 +24,8 @@ namespace SergeSavel.KafkaRestProxy.Admin
 
         public void Dispose()
         {
-            _adminClient.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         public Metadata GetMetadata()
@@ -109,6 +110,11 @@ namespace SergeSavel.KafkaRestProxy.Admin
             }
 
             return result;
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing) _adminClient.Dispose();
         }
     }
 }

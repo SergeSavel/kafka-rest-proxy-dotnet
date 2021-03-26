@@ -34,13 +34,22 @@ namespace SergeSavel.KafkaRestProxy.Consumer
 
         public void Dispose()
         {
-            Consumer.Close();
-            Consumer.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         public void UpdateExpiration()
         {
             ExpiresAt = DateTime.Now + _expirationTimeout;
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                Consumer.Close();
+                Consumer.Dispose();
+            }
         }
     }
 }
