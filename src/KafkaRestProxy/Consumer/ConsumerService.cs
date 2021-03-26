@@ -51,6 +51,9 @@ namespace SergeSavel.KafkaRestProxy.Consumer
         {
             var wrapper = ConsumerProvider.GetConsumer(consumerId);
             if (wrapper == null) throw new ConsumerNotFoundException(consumerId);
+
+            wrapper.UpdateExpiration();
+
             return ConsumerMapper.Map(wrapper);
         }
 
