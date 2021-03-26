@@ -18,6 +18,7 @@ namespace SergeSavel.KafkaRestProxy.Producer
 
         public void Dispose()
         {
+            _producer.Flush();
             _producer.Dispose();
         }
 
