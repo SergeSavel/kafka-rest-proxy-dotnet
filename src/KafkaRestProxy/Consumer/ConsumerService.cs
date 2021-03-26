@@ -26,7 +26,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer
             ConsumerProvider.Dispose();
         }
 
-        public List<Contract.Consumer> ListConsumers()
+        public ICollection<Contract.Consumer> ListConsumers()
         {
             return ConsumerProvider.ListConsumers()
                 .Select(ConsumerMapper.Map)
@@ -59,7 +59,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer
             return ConsumerProvider.RemoveConsumer(consumerId);
         }
 
-        public List<TopicPartition> AssignConsumer(AssignConsumerRequest request)
+        public ICollection<TopicPartition> AssignConsumer(AssignConsumerRequest request)
         {
             var wrapper = ConsumerProvider.GetConsumer(request.ConsumerId);
             if (wrapper == null) throw new ConsumerNotFoundException(request.ConsumerId);
@@ -72,7 +72,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer
             return GetConsumerAssignment(request.ConsumerId);
         }
 
-        public List<TopicPartition> GetConsumerAssignment(Guid consumerId)
+        public ICollection<TopicPartition> GetConsumerAssignment(Guid consumerId)
         {
             var wrapper = ConsumerProvider.GetConsumer(consumerId);
             if (wrapper == null) throw new ConsumerNotFoundException(consumerId);
