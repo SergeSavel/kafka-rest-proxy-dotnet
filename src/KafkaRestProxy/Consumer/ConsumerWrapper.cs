@@ -34,6 +34,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer
 
         public void Dispose()
         {
+            Consumer.Close();
             Consumer.Dispose();
         }
 
