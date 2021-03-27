@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using SergeSavel.KafkaRestProxy.Admin;
+using SergeSavel.KafkaRestProxy.Common.Authentication;
 using SergeSavel.KafkaRestProxy.Common.Exceptions;
 using SergeSavel.KafkaRestProxy.Consumer;
 using SergeSavel.KafkaRestProxy.Producer;
@@ -27,10 +28,14 @@ namespace SergeSavel.KafkaRestProxy
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var proxyConfig = new ProxyConfig();
+            Configuration.Bind(ProxyConfig.SectionName, proxyConfig);
+            services.AddSingleton(proxyConfig);
+
             services.AddControllers(options => options.Filters.Add(new HttpResponseExceptionFilter()))
                 .AddJsonOptions(options =>
                 {
-                    options.JsonSerializerOptions.WriteIndented = Environment.IsDevelopment();
+                    options.JsonSerializerOptions.WriteIndented = proxyConfig.IndentOutput;
                     options.JsonSerializerOptions.IgnoreNullValues = true;
                     options.JsonSerializerOptions.PropertyNamingPolicy = null;
                     options.JsonSerializerOptions.Converters.Add(
@@ -42,6 +47,8 @@ namespace SergeSavel.KafkaRestProxy
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "KafkaRestProxy", Version = "v1"});
             });
+
+            services.AddSingleton<BasicAuthService>();
 
             services.AddAdminClient(Configuration);
             services.AddConsumer(Configuration);

@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using SergeSavel.KafkaRestProxy.Common.Authentication;
 using SergeSavel.KafkaRestProxy.Producer.Contract;
 using SergeSavel.KafkaRestProxy.Producer.Requests;
 
@@ -8,6 +9,7 @@ namespace SergeSavel.KafkaRestProxy.Producer
 {
     [ApiController]
     [Route("producer")]
+    [BasicAuth]
     public class ProducerController : ControllerBase
     {
         private readonly ProducerService _producerService;

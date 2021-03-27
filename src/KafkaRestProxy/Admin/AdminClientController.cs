@@ -2,11 +2,13 @@
 using Microsoft.AspNetCore.Mvc;
 using SergeSavel.KafkaRestProxy.Admin.Contract;
 using SergeSavel.KafkaRestProxy.Admin.Requests;
+using SergeSavel.KafkaRestProxy.Common.Authentication;
 
 namespace SergeSavel.KafkaRestProxy.Admin
 {
     [ApiController]
     [Route("admin")]
+    [BasicAuth]
     public class AdminClientController : ControllerBase
     {
         private readonly AdminClientService _adminClientService;

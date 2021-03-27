@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SergeSavel.KafkaRestProxy.Common.Authentication;
 using SergeSavel.KafkaRestProxy.Consumer.Contract;
 using SergeSavel.KafkaRestProxy.Consumer.Requests;
 
@@ -10,6 +11,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer
 {
     [ApiController]
     [Route("consumers")]
+    [BasicAuth]
     public class ConsumerController : ControllerBase
     {
         private readonly ConsumerService _consumerService;
