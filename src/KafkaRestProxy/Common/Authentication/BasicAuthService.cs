@@ -15,6 +15,8 @@ namespace SergeSavel.KafkaRestProxy.Common.Authentication
 
         public bool IsValidUser(string realm, string username, string password)
         {
+            if (_users == null || _users.Count == 0) return true;
+
             if (_users.TryGetValue(username, out var storedPassword))
                 return string.IsNullOrWhiteSpace(password)
                     ? string.IsNullOrWhiteSpace(storedPassword)
