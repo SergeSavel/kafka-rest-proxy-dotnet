@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -48,7 +49,9 @@ namespace SergeSavel.KafkaRestProxy
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "KafkaRestProxy", Version = "v1"});
             });
 
-            services.AddSingleton<BasicAuthService>();
+            services.AddAuthentication("Basic")
+                .AddScheme<AuthenticationSchemeOptions, BasicAuthHandler>("Basic", null);
+            services.AddSingleton<UserService>();
 
             services.AddAdminClient(Configuration);
             services.AddConsumer(Configuration);
@@ -69,7 +72,8 @@ namespace SergeSavel.KafkaRestProxy
 
             app.UseRouting();
 
-            //app.UseAuthorization();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
