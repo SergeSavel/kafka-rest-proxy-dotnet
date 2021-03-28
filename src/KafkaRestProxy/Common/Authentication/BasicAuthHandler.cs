@@ -30,15 +30,15 @@ namespace SergeSavel.KafkaRestProxy.Common.Authentication
             if (endpoint?.Metadata.GetMetadata<IAllowAnonymous>() != null)
                 return AuthenticateResult.NoResult();
 
-            if (!Request.Headers.ContainsKey("Authorization"))
+            if (!Request.Headers.TryGetValue("Authorization", out var authHeader))
                 return AuthenticateResult.Fail("Missing Authorization Header");
 
             User user;
             try
             {
-                var authHeader = AuthenticationHeaderValue.Parse(Request.Headers["Authorization"]);
-                var credentialBytes = Convert.FromBase64String(authHeader.Parameter);
-                var credentials = Encoding.UTF8.GetString(credentialBytes).Split(new[] {':'}, 2);
+                var authHeaderValue = AuthenticationHeaderValue.Parse(authHeader);
+                var credentialBytes = Convert.FromBase64String(authHeaderValue.Parameter ?? string.Empty);
+                var credentials = Encoding.UTF8.GetString(credentialBytes).Split(':', 2);
                 var username = credentials[0];
                 var password = credentials[1];
                 user = await _userService.AuthenticateAsync(username, password);
