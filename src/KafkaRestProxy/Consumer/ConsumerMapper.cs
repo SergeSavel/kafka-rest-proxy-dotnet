@@ -14,7 +14,8 @@ namespace SergeSavel.KafkaRestProxy.Consumer
             return new()
             {
                 Id = source.Id,
-                ExpiresAt = source.ExpiresAt
+                ExpiresAt = source.ExpiresAt,
+                Creator = source.Creator
             };
         }
 

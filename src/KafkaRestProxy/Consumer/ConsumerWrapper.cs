@@ -32,6 +32,8 @@ namespace SergeSavel.KafkaRestProxy.Consumer
 
         public bool IsExpired => DateTime.Now >= ExpiresAt;
 
+        public string Creator { get; init; }
+
         public void Dispose()
         {
             Dispose(true);

@@ -33,7 +33,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer
                 .ToList();
         }
 
-        public Contract.Consumer CreateConsumer(CreateConsumerRequest request)
+        public Contract.Consumer CreateConsumer(CreateConsumerRequest request, string creator)
         {
             var config = _consumerConfig.ToDictionary(kv => kv.Key, kv => kv.Value);
 
@@ -42,7 +42,8 @@ namespace SergeSavel.KafkaRestProxy.Consumer
                     config[key] = value;
 
             var wrapper =
-                ConsumerProvider.CreateConsumer(config, TimeSpan.FromMilliseconds(request.ExpirationTimeoutMs));
+                ConsumerProvider.CreateConsumer(config, TimeSpan.FromMilliseconds(request.ExpirationTimeoutMs),
+                    creator);
 
             return ConsumerMapper.Map(wrapper);
         }

@@ -7,5 +7,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer.Contract
         public Guid Id { get; init; }
 
         public DateTime ExpiresAt { get; init; }
+
+        public string Creator { get; init; }
     }
 }

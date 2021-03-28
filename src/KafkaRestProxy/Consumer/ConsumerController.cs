@@ -32,7 +32,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public ActionResult<Contract.Consumer> CreateConsumer([Required] CreateConsumerRequest request)
         {
-            var consumer = _consumerService.CreateConsumer(request);
+            var consumer = _consumerService.CreateConsumer(request, User.Identity?.Name);
             return CreatedAtAction(nameof(GetConsumer), new {consumerId = consumer.Id}, consumer);
         }
 

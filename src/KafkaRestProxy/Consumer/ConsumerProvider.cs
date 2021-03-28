@@ -22,9 +22,13 @@ namespace SergeSavel.KafkaRestProxy.Consumer
                 }
         }
 
-        public ConsumerWrapper CreateConsumer(IDictionary<string, string> consumerConfig, TimeSpan expirationTimeout)
+        public ConsumerWrapper CreateConsumer(IDictionary<string, string> consumerConfig, TimeSpan expirationTimeout,
+            string creator = null)
         {
-            var consumerWrapper = new ConsumerWrapper(consumerConfig, expirationTimeout);
+            var consumerWrapper = new ConsumerWrapper(consumerConfig, expirationTimeout)
+            {
+                Creator = creator
+            };
 
             if (!_consumers.TryAdd(consumerWrapper.Id, consumerWrapper))
             {
