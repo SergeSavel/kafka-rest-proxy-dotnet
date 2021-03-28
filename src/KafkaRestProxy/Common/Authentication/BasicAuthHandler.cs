@@ -39,9 +39,7 @@ namespace SergeSavel.KafkaRestProxy.Common.Authentication
                 var authHeaderValue = AuthenticationHeaderValue.Parse(authHeader);
                 var credentialBytes = Convert.FromBase64String(authHeaderValue.Parameter ?? string.Empty);
                 var credentials = Encoding.UTF8.GetString(credentialBytes).Split(':', 2);
-                var username = credentials[0];
-                var password = credentials[1];
-                user = await _userService.AuthenticateAsync(username, password);
+                user = await _userService.AuthenticateAsync(credentials[0], credentials[1]);
             }
             catch
             {
