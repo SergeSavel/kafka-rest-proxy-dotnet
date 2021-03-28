@@ -6,35 +6,51 @@ namespace SergeSavel.KafkaRestProxy.Common.Authentication
 {
     public class UserService
     {
-        private readonly IDictionary<string, string> _users;
-
+        private readonly IDictionary<string, UserWithPassword> _users;
 
         public UserService(ProxyConfig proxyConfig)
         {
-            _users = new Dictionary<string, string>(proxyConfig.Users, StringComparer.OrdinalIgnoreCase);
+            _users = new Dictionary<string, UserWithPassword>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var (username, password) in proxyConfig.Users)
+                _users.Add(username, new UserWithPassword
+                {
+                    Name = username,
+                    Password = password
+                });
         }
 
-        public bool IsValidUser(string realm, string username, string password)
-        {
-            return false;
-        }
+        public static User DefaultUser { get; } = new() {Name = string.Empty};
 
-        public Task<string> AuthenticateAsync(string username, string password)
+        public Task<User> AuthenticateAsync(string username, string password)
         {
             return Task.FromResult(Authenticate(username, password));
         }
 
-        public string Authenticate(string username, string password)
+        public User Authenticate(string username, string password)
         {
-            if (_users == null || _users.Count == 0) return "";
+            if (_users == null || _users.Count == 0) return DefaultUser;
 
-            if (!_users.TryGetValue(username, out var storedPassword))
+            if (!_users.TryGetValue(username, out var user))
                 return null;
 
             var authenticated = string.IsNullOrEmpty(password)
-                ? string.IsNullOrEmpty(storedPassword)
-                : password.Equals(storedPassword);
-            return authenticated ? username : null;
+                ? string.IsNullOrEmpty(user.Password)
+                : password.Equals(user.Password);
+            return authenticated ? CopyUser(user) : null;
+        }
+
+        private static User CopyUser(User source)
+        {
+            return new()
+            {
+                Name = source.Name
+            };
+        }
+
+        private class UserWithPassword : User
+        {
+            public string Password { get; init; }
         }
     }
 }

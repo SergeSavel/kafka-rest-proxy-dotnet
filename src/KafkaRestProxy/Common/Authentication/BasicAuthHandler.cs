@@ -33,7 +33,7 @@ namespace SergeSavel.KafkaRestProxy.Common.Authentication
             if (!Request.Headers.ContainsKey("Authorization"))
                 return AuthenticateResult.Fail("Missing Authorization Header");
 
-            string user;
+            User user;
             try
             {
                 var authHeader = AuthenticationHeaderValue.Parse(Request.Headers["Authorization"]);
@@ -53,7 +53,7 @@ namespace SergeSavel.KafkaRestProxy.Common.Authentication
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.Name, user)
+                new Claim(ClaimTypes.Name, user.Name)
             };
             var identity = new ClaimsIdentity(claims, Scheme.Name);
             var principal = new ClaimsPrincipal(identity);
