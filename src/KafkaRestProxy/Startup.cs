@@ -49,6 +49,8 @@ namespace SergeSavel.KafkaRestProxy
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "KafkaRestProxy", Version = "v1"});
             });
 
+            services.AddHealthChecks();
+
             services.AddAuthentication("Basic")
                 .AddScheme<AuthenticationSchemeOptions, BasicAuthHandler>("Basic", null);
             services.AddSingleton<UserService>();
@@ -75,7 +77,11 @@ namespace SergeSavel.KafkaRestProxy
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapHealthChecks("/health");
+                endpoints.MapControllers();
+            });
         }
     }
 }
