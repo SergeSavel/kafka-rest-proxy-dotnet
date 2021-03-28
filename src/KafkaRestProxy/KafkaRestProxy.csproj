@@ -12,12 +12,13 @@
     <PublishTrimmed>true</PublishTrimmed>
     <TrimMode>link</TrimMode>
     <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
+    <Product>Kafka REST Proxy</Product>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Confluent.Kafka" Version="1.6.3"/>
-    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="5.0.1"/>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.1"/>
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Confluent.Kafka" Version="1.6.3"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="5.0.1"/>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.1"/>
+    </ItemGroup>
   
 </Project>
