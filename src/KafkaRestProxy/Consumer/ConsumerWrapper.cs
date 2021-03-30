@@ -47,11 +47,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer
 
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing)
-            {
-                Consumer.Close();
-                Consumer.Dispose();
-            }
+            if (disposing) Consumer.Dispose();
         }
     }
 }

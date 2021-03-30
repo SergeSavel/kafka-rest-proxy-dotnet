@@ -52,6 +52,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer
         public bool RemoveConsumer(Guid id)
         {
             if (!_consumers.TryRemove(id, out var consumerWrapper)) return false;
+            consumerWrapper.Consumer.Close();
             consumerWrapper.Dispose();
             return true;
         }
