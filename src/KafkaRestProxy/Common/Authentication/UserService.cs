@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 
 namespace SergeSavel.KafkaRestProxy.Common.Authentication
 {
@@ -8,16 +9,20 @@ namespace SergeSavel.KafkaRestProxy.Common.Authentication
     {
         private readonly IDictionary<string, UserWithPassword> _users;
 
-        public UserService(ProxyConfig proxyConfig)
+        public UserService(IOptions<ProxyConfig> proxyConfigOptions)
         {
             _users = new Dictionary<string, UserWithPassword>(StringComparer.OrdinalIgnoreCase);
 
-            foreach (var (username, password) in proxyConfig.Users)
-                _users.Add(username, new UserWithPassword
+            foreach (var user in proxyConfigOptions.Value.Users)
+            {
+                if (user.Name == null) throw new ApplicationException("Username must be present.");
+
+                _users.Add(user.Name, new UserWithPassword
                 {
-                    Name = username,
-                    Password = password
+                    Name = user.Name,
+                    Password = user.Password
                 });
+            }
         }
 
         public static User DefaultUser { get; } = new() {Name = string.Empty};

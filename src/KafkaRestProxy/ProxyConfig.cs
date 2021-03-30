@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace SergeSavel.KafkaRestProxy
 {
@@ -8,6 +9,12 @@ namespace SergeSavel.KafkaRestProxy
 
         public bool IndentOutput { get; init; } = true;
 
-        public IDictionary<string, string> Users { get; init; }
+        public ICollection<User> Users { get; init; }
+
+        public class User
+        {
+            [Required] public string Name { get; init; }
+            public string Password { get; init; }
+        }
     }
 }

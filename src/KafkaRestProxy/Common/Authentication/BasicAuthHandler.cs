@@ -30,24 +30,31 @@ namespace SergeSavel.KafkaRestProxy.Common.Authentication
             if (endpoint?.Metadata.GetMetadata<IAllowAnonymous>() != null)
                 return AuthenticateResult.NoResult();
 
-            if (!Request.Headers.TryGetValue("Authorization", out var authHeader))
-                return AuthenticateResult.Fail("Missing Authorization Header");
-
             User user;
-            try
-            {
-                var authHeaderValue = AuthenticationHeaderValue.Parse(authHeader);
-                var credentialBytes = Convert.FromBase64String(authHeaderValue.Parameter ?? string.Empty);
-                var credentials = Encoding.UTF8.GetString(credentialBytes).Split(':', 2);
-                user = await _userService.AuthenticateAsync(credentials[0], credentials[1]);
-            }
-            catch
-            {
-                return AuthenticateResult.Fail("Invalid Authorization Header");
-            }
 
-            if (user == null)
-                return AuthenticateResult.Fail("Invalid Username or Password");
+            if (Request.Headers.TryGetValue("Authorization", out var authHeader))
+            {
+                try
+                {
+                    var authHeaderValue = AuthenticationHeaderValue.Parse(authHeader);
+                    var credentialBytes = Convert.FromBase64String(authHeaderValue.Parameter ?? string.Empty);
+                    var credentials = Encoding.UTF8.GetString(credentialBytes).Split(':', 2);
+                    user = await _userService.AuthenticateAsync(credentials[0], credentials[1]);
+                }
+                catch
+                {
+                    return AuthenticateResult.Fail("Invalid Authorization Header");
+                }
+
+                if (user == null)
+                    return AuthenticateResult.Fail("Invalid Username or Password");
+            }
+            else
+            {
+                user = await _userService.AuthenticateAsync(null, null);
+                if (user == null)
+                    return AuthenticateResult.Fail("Missing Authorization Header");
+            }
 
             var claims = new[]
             {

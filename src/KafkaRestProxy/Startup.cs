@@ -33,6 +33,8 @@ namespace SergeSavel.KafkaRestProxy
             Configuration.Bind(ProxyConfig.SectionName, proxyConfig);
             services.AddSingleton(proxyConfig);
 
+            services.Configure<ProxyConfig>(Configuration.GetSection(ProxyConfig.SectionName));
+
             services.AddControllers(options => options.Filters.Add(new HttpResponseExceptionFilter()))
                 .AddJsonOptions(options =>
                 {
