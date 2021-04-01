@@ -13,7 +13,12 @@ namespace SergeSavel.KafkaRestProxy
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
             return Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder
+                        .UseStartup<Startup>()
+                        .UseUrls("http://localhost:8086");
+                })
                 .UseWindowsService();
         }
     }
