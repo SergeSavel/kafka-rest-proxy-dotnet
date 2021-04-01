@@ -15,7 +15,7 @@ namespace SergeSavel.KafkaRestProxy.Admin
 {
     public class AdminClientService : IDisposable
     {
-        private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(10);
+        private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(20);
         private readonly IAdminClient _adminClient;
 
         public AdminClientService(AdminClientConfig adminClientConfig)
@@ -53,6 +53,33 @@ namespace SergeSavel.KafkaRestProxy.Admin
             return AdminClientMapper.Map(topicMetadata, kafkaMetadata, verbose);
         }
 
+        public async Task<TopicMetadata> CreateTopic(CreateTopicRequest request)
+        {
+            var topicSpecification = new TopicSpecification
+            {
+                Name = request.Name,
+                NumPartitions = request.NumPartitions ?? -1,
+                ReplicationFactor = request.ReplicationFactor ?? -1,
+                Configs = request.Config
+            };
+
+            var options = new CreateTopicsOptions
+            {
+                RequestTimeout = Timeout
+            };
+
+            try
+            {
+                await _adminClient.CreateTopicsAsync(new[] {topicSpecification}, options);
+            }
+            catch (CreateTopicsException e)
+            {
+                throw new AdminClientException("Unable to create topic.", e);
+            }
+
+            return GetTopicMetadata(topicSpecification.Name, true);
+        }
+
         public BrokersMetadata GetBrokersMetadata()
         {
             var kafkaMetadata = GetKafkaMetadata();
@@ -87,33 +114,6 @@ namespace SergeSavel.KafkaRestProxy.Admin
             }
 
             return result;
-        }
-
-        public async Task<TopicMetadata> CreateTopic(CreateTopicRequest request)
-        {
-            var topicSpecification = new TopicSpecification
-            {
-                Name = request.Name,
-                NumPartitions = request.NumPartitions ?? -1,
-                ReplicationFactor = request.ReplicationFactor ?? -1,
-                Configs = request.Config
-            };
-
-            var options = new CreateTopicsOptions
-            {
-                RequestTimeout = Timeout
-            };
-
-            try
-            {
-                await _adminClient.CreateTopicsAsync(new[] {topicSpecification}, options);
-            }
-            catch (CreateTopicsException e)
-            {
-                throw new AdminClientException("Unable to create topic.", e);
-            }
-
-            return GetTopicMetadata(topicSpecification.Name, true);
         }
 
         public async Task<ResourceConfig> GetTopicConfigAsync(string topic)
