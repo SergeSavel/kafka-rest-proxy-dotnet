@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SergeSavel.KafkaRestProxy.Consumer
 {
@@ -52,8 +53,19 @@ namespace SergeSavel.KafkaRestProxy.Consumer
         public bool RemoveConsumer(Guid id)
         {
             if (!_consumers.TryRemove(id, out var consumerWrapper)) return false;
-            consumerWrapper.Consumer.Close();
-            consumerWrapper.Dispose();
+
+            Task.Run(() =>
+            {
+                try
+                {
+                    consumerWrapper.Consumer.Close();
+                }
+                finally
+                {
+                    consumerWrapper.Dispose();
+                }
+            });
+
             return true;
         }
 
