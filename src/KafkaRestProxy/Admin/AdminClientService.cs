@@ -83,7 +83,7 @@ namespace SergeSavel.KafkaRestProxy.Admin
             }
             catch (KafkaException e)
             {
-                throw new Common.Exceptions.KafkaException("Unable to get metadata.", e);
+                throw new AdminClientException("Unable to get metadata.", e);
             }
 
             return result;
@@ -110,9 +110,7 @@ namespace SergeSavel.KafkaRestProxy.Admin
             }
             catch (CreateTopicsException e)
             {
-                if (e.Results.Any(result => result.Error.Code == ErrorCode.TopicAlreadyExists))
-                    throw new TopicAlreadyExistsException(topicSpecification.Name);
-                throw new Common.Exceptions.KafkaException("Unable to create topic.", e);
+                throw new AdminClientException("Unable to create topic.", e);
             }
 
             return GetTopicMetadata(topicSpecification.Name, true);
@@ -138,7 +136,7 @@ namespace SergeSavel.KafkaRestProxy.Admin
             }
             catch (KafkaException e)
             {
-                throw new Common.Exceptions.KafkaException("Unable to get topic config.", e);
+                throw new AdminClientException("Unable to get topic config.", e);
             }
 
             return AdminClientMapper.Map(result.First());
