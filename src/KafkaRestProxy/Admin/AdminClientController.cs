@@ -18,55 +18,55 @@ namespace SergeSavel.KafkaRestProxy.Admin
             _adminClientService = adminClientService;
         }
 
-        [HttpGet("metadata")]
+        [HttpGet]
         public Metadata GetMetadata(bool verbose)
         {
             return _adminClientService.GetMetadata(verbose);
         }
 
-        [HttpGet("metadata/topics")]
+        [HttpGet("topics")]
         public TopicsMetadata GetTopicsMetadata(bool verbose)
         {
             return _adminClientService.GetTopicsMetadata(verbose);
         }
 
-        [HttpGet("metadata/topics/{topic}")]
-        public ActionResult<TopicMetadata> GetTopicMetadata(string topic, bool verbose)
-        {
-            return _adminClientService.GetTopicMetadata(topic, verbose);
-        }
-
-        [HttpGet("metadata/brokers")]
-        public BrokersMetadata GetBrokersMetadata()
-        {
-            return _adminClientService.GetBrokersMetadata();
-        }
-
-        [HttpGet("metadata/brokers/{brokerId}")]
-        public ActionResult<BrokerMetadata> GetBrokerMetadata(int brokerId)
-        {
-            return _adminClientService.GetBrokerMetadata(brokerId);
-        }
-
-        [HttpGet("metadata/topics/{topic}/config")]
-        public async Task<ResourceConfig> GetTopicConfigAsync(string topic)
-        {
-            return await _adminClientService.GetTopicConfigAsync(topic);
-        }
-
-        [HttpGet("metadata/brokers/{brokerId}/config")]
-        public async Task<ResourceConfig> GetTBrokerConfigAsync(int brokerId)
-        {
-            return await _adminClientService.GetBrokerConfigAsync(brokerId);
-        }
-
-        [HttpPost("metadata/topics")]
+        [HttpPost("topics")]
         public async Task<ActionResult<TopicMetadata>> CreateTopicAsync(CreateTopicRequest request)
         {
             var result =
                 await _adminClientService.CreateTopic(request);
 
             return CreatedAtAction(nameof(GetTopicMetadata), new {topic = result.Topic}, result);
+        }
+
+        [HttpGet("topics/{topic}")]
+        public ActionResult<TopicMetadata> GetTopicMetadata(string topic, bool verbose)
+        {
+            return _adminClientService.GetTopicMetadata(topic, verbose);
+        }
+
+        [HttpGet("topics/{topic}/config")]
+        public async Task<ResourceConfig> GetTopicConfigAsync(string topic)
+        {
+            return await _adminClientService.GetTopicConfigAsync(topic);
+        }
+
+        [HttpGet("brokers")]
+        public BrokersMetadata GetBrokersMetadata()
+        {
+            return _adminClientService.GetBrokersMetadata();
+        }
+
+        [HttpGet("brokers/{brokerId}")]
+        public ActionResult<BrokerMetadata> GetBrokerMetadata(int brokerId)
+        {
+            return _adminClientService.GetBrokerMetadata(brokerId);
+        }
+
+        [HttpGet("brokers/{brokerId}/config")]
+        public async Task<ResourceConfig> GetTBrokerConfigAsync(int brokerId)
+        {
+            return await _adminClientService.GetBrokerConfigAsync(brokerId);
         }
     }
 }
