@@ -142,6 +142,32 @@ namespace SergeSavel.KafkaRestProxy.Admin
             return AdminClientMapper.Map(result.First());
         }
 
+        public async Task<ResourceConfig> GetBrokerConfigAsync(int brokerId)
+        {
+            var resource = new ConfigResource
+            {
+                Name = brokerId.ToString(),
+                Type = ResourceType.Broker
+            };
+
+            var options = new DescribeConfigsOptions
+            {
+                RequestTimeout = Timeout
+            };
+
+            ICollection<DescribeConfigsResult> result;
+            try
+            {
+                result = await _adminClient.DescribeConfigsAsync(new[] {resource}, options);
+            }
+            catch (KafkaException e)
+            {
+                throw new AdminClientException("Unable to get broker config.", e);
+            }
+
+            return AdminClientMapper.Map(result.First());
+        }
+
         protected virtual void Dispose(bool disposing)
         {
             if (disposing) _adminClient.Dispose();

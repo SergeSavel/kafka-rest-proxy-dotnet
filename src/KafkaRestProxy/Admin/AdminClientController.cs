@@ -49,13 +49,19 @@ namespace SergeSavel.KafkaRestProxy.Admin
         }
 
         [HttpGet("metadata/topics/{topic}/config")]
-        public async Task<ResourceConfig> GetTopicMetadata(string topic)
+        public async Task<ResourceConfig> GetTopicConfigAsync(string topic)
         {
             return await _adminClientService.GetTopicConfigAsync(topic);
         }
 
+        [HttpGet("metadata/brokers/{brokerId}/config")]
+        public async Task<ResourceConfig> GetTBrokerConfigAsync(int brokerId)
+        {
+            return await _adminClientService.GetBrokerConfigAsync(brokerId);
+        }
+
         [HttpPost("metadata/topics")]
-        public async Task<ActionResult<TopicMetadata>> CreateTopic(CreateTopicRequest request)
+        public async Task<ActionResult<TopicMetadata>> CreateTopicAsync(CreateTopicRequest request)
         {
             var result =
                 await _adminClientService.CreateTopic(request);
