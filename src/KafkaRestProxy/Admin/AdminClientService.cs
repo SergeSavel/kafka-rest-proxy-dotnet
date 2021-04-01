@@ -28,19 +28,19 @@ namespace SergeSavel.KafkaRestProxy.Admin
             GC.SuppressFinalize(this);
         }
 
-        public Metadata GetMetadata()
+        public Metadata GetMetadata(bool verbose)
         {
             var kafkaMetadata = GetKafkaMetadata();
-            return AdminClientMapper.Map(kafkaMetadata);
+            return AdminClientMapper.Map(kafkaMetadata, verbose);
         }
 
-        public TopicsMetadata GetTopicsMetadata()
+        public TopicsMetadata GetTopicsMetadata(bool verbose)
         {
             var kafkaMetadata = GetKafkaMetadata();
-            return AdminClientMapper.MapTopics(kafkaMetadata);
+            return AdminClientMapper.MapTopics(kafkaMetadata, verbose);
         }
 
-        public TopicMetadata GetTopicMetadata(string topic)
+        public TopicMetadata GetTopicMetadata(string topic, bool verbose)
         {
             var kafkaMetadata = GetKafkaMetadata(topic);
 
@@ -49,7 +49,7 @@ namespace SergeSavel.KafkaRestProxy.Admin
             if (topicMetadata.Error.Code == ErrorCode.UnknownTopicOrPart)
                 throw new TopicNotFoundException(topic);
 
-            return AdminClientMapper.Map(topicMetadata, kafkaMetadata);
+            return AdminClientMapper.Map(topicMetadata, kafkaMetadata, verbose);
         }
 
         public BrokersMetadata GetBrokersMetadata()
@@ -94,7 +94,7 @@ namespace SergeSavel.KafkaRestProxy.Admin
                 throw new KafkaException("Unable to create topic.", e);
             }
 
-            return GetTopicMetadata(topic);
+            return GetTopicMetadata(topic, true);
         }
 
         private Confluent.Kafka.Metadata GetKafkaMetadata(string topic = null)

@@ -19,7 +19,7 @@ namespace SergeSavel.KafkaRestProxy.Admin.Contract
         {
             public int Partition { get; init; }
 
-            public int Leader { get; init; }
+            public int? Leader { get; init; }
 
             public ICollection<int> Replicas { get; init; }
 

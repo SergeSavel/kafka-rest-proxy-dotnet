@@ -19,21 +19,21 @@ namespace SergeSavel.KafkaRestProxy.Admin
         }
 
         [HttpGet("metadata")]
-        public Metadata GetMetadata()
+        public Metadata GetMetadata(bool verbose)
         {
-            return _adminClientService.GetMetadata();
+            return _adminClientService.GetMetadata(verbose);
         }
 
         [HttpGet("metadata/topics")]
-        public TopicsMetadata GetTopicsMetadata()
+        public TopicsMetadata GetTopicsMetadata(bool verbose)
         {
-            return _adminClientService.GetTopicsMetadata();
+            return _adminClientService.GetTopicsMetadata(verbose);
         }
 
         [HttpGet("metadata/topics/{topic}")]
-        public ActionResult<TopicMetadata> GetTopicMetadata(string topic)
+        public ActionResult<TopicMetadata> GetTopicMetadata(string topic, bool verbose)
         {
-            return _adminClientService.GetTopicMetadata(topic);
+            return _adminClientService.GetTopicMetadata(topic, verbose);
         }
 
         [HttpPost("metadata/topics")]

@@ -10,14 +10,14 @@ namespace SergeSavel.KafkaRestProxy.Admin
 {
     public static class AdminClientMapper
     {
-        public static Metadata Map(Confluent.Kafka.Metadata source)
+        public static Metadata Map(Confluent.Kafka.Metadata source, bool verbose)
         {
             return new()
             {
                 Brokers = source.Brokers.Select(Map).ToArray(),
-                Topics = source.Topics.Select(Map).ToArray(),
-                OriginatingBrokerId = source.OriginatingBrokerId,
-                OriginatingBrokerName = source.OriginatingBrokerName
+                Topics = source.Topics.Select(topicMetadata => Map(topicMetadata, verbose)).ToArray(),
+                OriginatingBrokerId = verbose ? source.OriginatingBrokerId : null,
+                OriginatingBrokerName = verbose ? source.OriginatingBrokerName : null
             };
         }
 
@@ -38,42 +38,43 @@ namespace SergeSavel.KafkaRestProxy.Admin
             };
         }
 
-        public static TopicMetadata Map(Confluent.Kafka.TopicMetadata source)
+        public static TopicMetadata Map(Confluent.Kafka.TopicMetadata source, bool verbose)
         {
-            return Map(source, null);
+            return Map(source, null, verbose);
         }
 
-        public static TopicMetadata Map(Confluent.Kafka.TopicMetadata source, Confluent.Kafka.Metadata metadata)
+        public static TopicMetadata Map(Confluent.Kafka.TopicMetadata source, Confluent.Kafka.Metadata metadata,
+            bool verbose)
         {
             return new()
             {
                 Topic = source.Topic,
-                Partitions = source.Partitions.Select(Map).ToArray(),
-                Error = CommonMapper.Map(source.Error),
-                OriginatingBrokerId = metadata?.OriginatingBrokerId,
-                OriginatingBrokerName = metadata?.OriginatingBrokerName
-            };
-        }
-
-        private static TopicMetadata.PartitionMetadata Map(PartitionMetadata source)
-        {
-            return new()
-            {
-                Partition = source.PartitionId,
-                Leader = source.Leader,
-                Replicas = source.Replicas,
-                InSyncReplicas = source.InSyncReplicas,
+                Partitions = source.Partitions.Select(partitionMetadata => Map(partitionMetadata, verbose)).ToArray(),
+                OriginatingBrokerId = verbose ? metadata?.OriginatingBrokerId : null,
+                OriginatingBrokerName = verbose ? metadata?.OriginatingBrokerName : null,
                 Error = CommonMapper.Map(source.Error)
             };
         }
 
-        public static TopicsMetadata MapTopics(Confluent.Kafka.Metadata source)
+        private static TopicMetadata.PartitionMetadata Map(PartitionMetadata source, bool verbose)
         {
             return new()
             {
-                Topics = source.Topics.Select(Map).ToArray(),
-                OriginatingBrokerId = source.OriginatingBrokerId,
-                OriginatingBrokerName = source.OriginatingBrokerName
+                Partition = source.PartitionId,
+                Leader = verbose ? source.Leader : null,
+                Replicas = verbose ? source.Replicas : null,
+                InSyncReplicas = verbose ? source.InSyncReplicas : null,
+                Error = CommonMapper.Map(source.Error)
+            };
+        }
+
+        public static TopicsMetadata MapTopics(Confluent.Kafka.Metadata source, bool verbose)
+        {
+            return new()
+            {
+                Topics = source.Topics.Select(topicMetadata => Map(topicMetadata, verbose)).ToArray(),
+                OriginatingBrokerId = verbose ? source.OriginatingBrokerId : null,
+                OriginatingBrokerName = verbose ? source.OriginatingBrokerName : null
             };
         }
 
