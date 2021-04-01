@@ -4,7 +4,7 @@ using System.Runtime.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace SergeSavel.KafkaRestProxy
+namespace SergeSavel.KafkaRestProxy.Proxy
 {
     [ApiController]
     [Route("")]

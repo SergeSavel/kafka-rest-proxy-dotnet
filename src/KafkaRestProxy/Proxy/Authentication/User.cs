@@ -1,4 +1,4 @@
-﻿namespace SergeSavel.KafkaRestProxy.Common.Authentication
+﻿namespace SergeSavel.KafkaRestProxy.Proxy.Authentication
 {
     public class User
     {

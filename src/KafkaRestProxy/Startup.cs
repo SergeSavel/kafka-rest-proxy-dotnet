@@ -1,6 +1,5 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -8,10 +7,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using SergeSavel.KafkaRestProxy.Admin;
-using SergeSavel.KafkaRestProxy.Common.Authentication;
 using SergeSavel.KafkaRestProxy.Common.Exceptions;
 using SergeSavel.KafkaRestProxy.Consumer;
 using SergeSavel.KafkaRestProxy.Producer;
+using SergeSavel.KafkaRestProxy.Proxy;
 
 namespace SergeSavel.KafkaRestProxy
 {
@@ -29,22 +28,15 @@ namespace SergeSavel.KafkaRestProxy
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var proxyConfig = new ProxyConfig();
-            Configuration.Bind(ProxyConfig.SectionName, proxyConfig);
-            services.AddSingleton(proxyConfig);
-
-            services.Configure<ProxyConfig>(Configuration.GetSection(ProxyConfig.SectionName));
-
             services.AddControllers(options => options.Filters.Add(new HttpResponseExceptionFilter()))
                 .AddJsonOptions(options =>
                 {
-                    options.JsonSerializerOptions.WriteIndented = proxyConfig.IndentOutput;
+                    options.JsonSerializerOptions.WriteIndented = Configuration.GetSection("IndentOutput").Get<bool>();
                     options.JsonSerializerOptions.IgnoreNullValues = true;
                     options.JsonSerializerOptions.PropertyNamingPolicy = null;
                     options.JsonSerializerOptions.Converters.Add(
                         new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
-                })
-                ;
+                });
 
             services.AddSwaggerGen(c =>
             {
@@ -53,10 +45,7 @@ namespace SergeSavel.KafkaRestProxy
 
             services.AddHealthChecks();
 
-            services.AddAuthentication("Basic")
-                .AddScheme<AuthenticationSchemeOptions, BasicAuthHandler>("Basic", null);
-            services.AddSingleton<UserService>();
-
+            services.AddProxy(Configuration);
             services.AddAdminClient(Configuration);
             services.AddConsumer(Configuration);
             services.AddProducer(Configuration);

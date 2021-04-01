@@ -7,15 +7,19 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Server.HttpSys;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace SergeSavel.KafkaRestProxy.Common.Authentication
+namespace SergeSavel.KafkaRestProxy.Proxy.Authentication
 {
     public class BasicAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
         private const string Realm = "default";
+        private static readonly string BasicScheme = AuthenticationSchemes.Basic.ToString();
         private readonly UserService _userService;
+
+        private string _failureMessage;
 
         public BasicAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options, ILoggerFactory logger,
             UrlEncoder encoder, ISystemClock clock, UserService userService) : base(options, logger, encoder, clock)
@@ -30,30 +34,40 @@ namespace SergeSavel.KafkaRestProxy.Common.Authentication
             if (endpoint?.Metadata.GetMetadata<IAllowAnonymous>() != null)
                 return AuthenticateResult.NoResult();
 
-            User user;
+            User user = null;
 
             if (Request.Headers.TryGetValue("Authorization", out var authHeader))
             {
                 try
                 {
                     var authHeaderValue = AuthenticationHeaderValue.Parse(authHeader);
-                    var credentialBytes = Convert.FromBase64String(authHeaderValue.Parameter ?? string.Empty);
-                    var credentials = Encoding.UTF8.GetString(credentialBytes).Split(':', 2);
-                    user = await _userService.AuthenticateAsync(credentials[0], credentials[1]);
+                    if (BasicScheme.Equals(authHeaderValue.Scheme, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var credentialBytes = Convert.FromBase64String(authHeaderValue.Parameter ?? string.Empty);
+                        var credentials = Encoding.UTF8.GetString(credentialBytes).Split(':', 2);
+                        user = await _userService.AuthenticateAsync(BasicScheme, credentials[0], credentials[1]);
+                    }
                 }
                 catch
                 {
-                    return AuthenticateResult.Fail("Invalid Authorization Header");
+                    _failureMessage = "Invalid Authorization Header";
+                    return AuthenticateResult.Fail(_failureMessage);
                 }
 
                 if (user == null)
-                    return AuthenticateResult.Fail("Invalid Username or Password");
+                {
+                    _failureMessage = "Invalid Username or Password";
+                    return AuthenticateResult.Fail(_failureMessage);
+                }
             }
             else
             {
-                user = await _userService.AuthenticateAsync(null, null);
+                user = await _userService.AuthenticateAsync(null, null, null);
                 if (user == null)
-                    return AuthenticateResult.Fail("Missing Authorization Header");
+                {
+                    _failureMessage = "Missing Authorization Header";
+                    return AuthenticateResult.Fail(_failureMessage);
+                }
             }
 
             var claims = new[]
@@ -67,11 +81,11 @@ namespace SergeSavel.KafkaRestProxy.Common.Authentication
             return AuthenticateResult.Success(ticket);
         }
 
-        protected override Task HandleChallengeAsync(AuthenticationProperties properties)
+        protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
         {
             Response.Headers["WWW-Authenticate"] = $"Basic realm=\"{Realm}\"";
             Response.StatusCode = 401;
-            return Task.CompletedTask;
+            await Response.WriteAsync(_failureMessage);
         }
     }
 }
