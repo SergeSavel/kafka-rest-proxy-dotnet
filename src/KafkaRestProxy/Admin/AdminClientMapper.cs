@@ -1,5 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Confluent.Kafka;
+using Confluent.Kafka.Admin;
 using SergeSavel.KafkaRestProxy.Admin.Contract;
 using SergeSavel.KafkaRestProxy.Common.Mappers;
 using BrokerMetadata = SergeSavel.KafkaRestProxy.Admin.Contract.BrokerMetadata;
@@ -65,6 +67,22 @@ namespace SergeSavel.KafkaRestProxy.Admin
                 Replicas = verbose ? source.Replicas : null,
                 InSyncReplicas = verbose ? source.InSyncReplicas : null,
                 Error = CommonMapper.Map(source.Error)
+            };
+        }
+
+        public static ResourceConfig Map(DescribeConfigsResult source)
+        {
+            return new()
+            {
+                ResourceType = Enum.GetName(source.ConfigResource.Type),
+                ResourceName = source.ConfigResource.Name,
+                Entries = source.Entries?.ToDictionary(kv => kv.Value.Name, kv => new ResourceConfig.ConfigEntryValue
+                {
+                    Value = kv.Value.Value,
+                    IsDefault = kv.Value.IsDefault,
+                    IsReadOnly = kv.Value.IsReadOnly,
+                    IsSensitive = kv.Value.IsSensitive
+                })
             };
         }
 

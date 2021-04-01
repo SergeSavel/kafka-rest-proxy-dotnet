@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Confluent.Kafka;
@@ -7,7 +8,6 @@ using SergeSavel.KafkaRestProxy.Admin.Contract;
 using SergeSavel.KafkaRestProxy.Admin.Exceptions;
 using SergeSavel.KafkaRestProxy.Admin.Requests;
 using BrokerMetadata = SergeSavel.KafkaRestProxy.Admin.Contract.BrokerMetadata;
-using KafkaException = SergeSavel.KafkaRestProxy.Common.Exceptions.KafkaException;
 using Metadata = SergeSavel.KafkaRestProxy.Admin.Contract.Metadata;
 using TopicMetadata = SergeSavel.KafkaRestProxy.Admin.Contract.TopicMetadata;
 
@@ -74,6 +74,21 @@ namespace SergeSavel.KafkaRestProxy.Admin
             return result;
         }
 
+        private Confluent.Kafka.Metadata GetKafkaMetadata(string topic = null)
+        {
+            Confluent.Kafka.Metadata result;
+            try
+            {
+                result = topic == null ? _adminClient.GetMetadata(Timeout) : _adminClient.GetMetadata(topic, Timeout);
+            }
+            catch (KafkaException e)
+            {
+                throw new Common.Exceptions.KafkaException("Unable to get metadata.", e);
+            }
+
+            return result;
+        }
+
         public async Task<TopicMetadata> CreateTopic(CreateTopicRequest request)
         {
             var topicSpecification = new TopicSpecification
@@ -84,33 +99,49 @@ namespace SergeSavel.KafkaRestProxy.Admin
                 Configs = request.Config
             };
 
+            var options = new CreateTopicsOptions
+            {
+                RequestTimeout = Timeout
+            };
+
             try
             {
-                await _adminClient.CreateTopicsAsync(new[] {topicSpecification});
+                await _adminClient.CreateTopicsAsync(new[] {topicSpecification}, options);
             }
             catch (CreateTopicsException e)
             {
                 if (e.Results.Any(result => result.Error.Code == ErrorCode.TopicAlreadyExists))
                     throw new TopicAlreadyExistsException(topicSpecification.Name);
-                throw new KafkaException("Unable to create topic.", e);
+                throw new Common.Exceptions.KafkaException("Unable to create topic.", e);
             }
 
             return GetTopicMetadata(topicSpecification.Name, true);
         }
 
-        private Confluent.Kafka.Metadata GetKafkaMetadata(string topic = null)
+        public async Task<ResourceConfig> GetTopicConfigAsync(string topic)
         {
-            Confluent.Kafka.Metadata result;
+            var resource = new ConfigResource
+            {
+                Name = topic,
+                Type = ResourceType.Topic
+            };
+
+            var options = new DescribeConfigsOptions
+            {
+                RequestTimeout = Timeout
+            };
+
+            ICollection<DescribeConfigsResult> result;
             try
             {
-                result = topic == null ? _adminClient.GetMetadata(Timeout) : _adminClient.GetMetadata(topic, Timeout);
+                result = await _adminClient.DescribeConfigsAsync(new[] {resource}, options);
             }
-            catch (Confluent.Kafka.KafkaException e)
+            catch (KafkaException e)
             {
-                throw new KafkaException("Unable to get metadata.", e);
+                throw new Common.Exceptions.KafkaException("Unable to get topic config.", e);
             }
 
-            return result;
+            return AdminClientMapper.Map(result.First());
         }
 
         protected virtual void Dispose(bool disposing)

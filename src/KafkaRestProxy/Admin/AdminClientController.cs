@@ -36,15 +36,6 @@ namespace SergeSavel.KafkaRestProxy.Admin
             return _adminClientService.GetTopicMetadata(topic, verbose);
         }
 
-        [HttpPost("metadata/topics")]
-        public async Task<ActionResult<TopicMetadata>> CreateTopic(CreateTopicRequest request)
-        {
-            var result =
-                await _adminClientService.CreateTopic(request);
-
-            return CreatedAtAction(nameof(GetTopicMetadata), new {topic = result.Topic}, result);
-        }
-
         [HttpGet("metadata/brokers")]
         public BrokersMetadata GetBrokersMetadata()
         {
@@ -55,6 +46,21 @@ namespace SergeSavel.KafkaRestProxy.Admin
         public ActionResult<BrokerMetadata> GetBrokerMetadata(int brokerId)
         {
             return _adminClientService.GetBrokerMetadata(brokerId);
+        }
+
+        [HttpGet("metadata/topics/{topic}/config")]
+        public async Task<ResourceConfig> GetTopicMetadata(string topic)
+        {
+            return await _adminClientService.GetTopicConfigAsync(topic);
+        }
+
+        [HttpPost("metadata/topics")]
+        public async Task<ActionResult<TopicMetadata>> CreateTopic(CreateTopicRequest request)
+        {
+            var result =
+                await _adminClientService.CreateTopic(request);
+
+            return CreatedAtAction(nameof(GetTopicMetadata), new {topic = result.Topic}, result);
         }
     }
 }
