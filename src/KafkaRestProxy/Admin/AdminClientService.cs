@@ -5,6 +5,7 @@ using Confluent.Kafka;
 using Confluent.Kafka.Admin;
 using SergeSavel.KafkaRestProxy.Admin.Contract;
 using SergeSavel.KafkaRestProxy.Admin.Exceptions;
+using SergeSavel.KafkaRestProxy.Admin.Requests;
 using BrokerMetadata = SergeSavel.KafkaRestProxy.Admin.Contract.BrokerMetadata;
 using KafkaException = SergeSavel.KafkaRestProxy.Common.Exceptions.KafkaException;
 using Metadata = SergeSavel.KafkaRestProxy.Admin.Contract.Metadata;
@@ -73,14 +74,14 @@ namespace SergeSavel.KafkaRestProxy.Admin
             return result;
         }
 
-        public async Task<TopicMetadata> CreateTopic(string topic, int? numPartitions = null,
-            short? replicationFactor = null)
+        public async Task<TopicMetadata> CreateTopic(CreateTopicRequest request)
         {
             var topicSpecification = new TopicSpecification
             {
-                Name = topic,
-                NumPartitions = numPartitions ?? -1,
-                ReplicationFactor = replicationFactor ?? -1
+                Name = request.Name,
+                NumPartitions = request.NumPartitions ?? -1,
+                ReplicationFactor = request.ReplicationFactor ?? -1,
+                Configs = request.Config
             };
 
             try
@@ -90,11 +91,11 @@ namespace SergeSavel.KafkaRestProxy.Admin
             catch (CreateTopicsException e)
             {
                 if (e.Results.Any(result => result.Error.Code == ErrorCode.TopicAlreadyExists))
-                    throw new TopicAlreadyExistsException(topic);
+                    throw new TopicAlreadyExistsException(topicSpecification.Name);
                 throw new KafkaException("Unable to create topic.", e);
             }
 
-            return GetTopicMetadata(topic, true);
+            return GetTopicMetadata(topicSpecification.Name, true);
         }
 
         private Confluent.Kafka.Metadata GetKafkaMetadata(string topic = null)

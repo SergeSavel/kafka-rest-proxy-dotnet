@@ -40,7 +40,7 @@ namespace SergeSavel.KafkaRestProxy.Admin
         public async Task<ActionResult<TopicMetadata>> CreateTopic(CreateTopicRequest request)
         {
             var result =
-                await _adminClientService.CreateTopic(request.Name, request.NumPartitions, request.ReplicationFactor);
+                await _adminClientService.CreateTopic(request);
 
             return CreatedAtAction(nameof(GetTopicMetadata), new {topic = result.Topic}, result);
         }
