@@ -25,10 +25,10 @@ namespace SergeSavel.KafkaRestProxy.Consumer
 
             return new ConsumerMessage
             {
-                Timestamp = source.Message.Timestamp.UnixTimestampMs,
                 Topic = source.Topic,
                 Partition = source.Partition,
                 Offset = source.Offset,
+                Timestamp = source.Message?.Timestamp.UnixTimestampMs,
                 Key = source.Message?.Key,
                 Headers = source.Message?.Headers
                     .ToDictionary(h => h.Key, h => MapHeaderBytes(h.GetValueBytes())),

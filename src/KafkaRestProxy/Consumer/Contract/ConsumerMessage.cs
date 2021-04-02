@@ -4,7 +4,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer.Contract
 {
     public class ConsumerMessage
     {
-        public long Timestamp { get; init; }
+        public bool IsPartitionEOF { get; init; }
 
         public string Topic { get; init; }
 
@@ -12,12 +12,12 @@ namespace SergeSavel.KafkaRestProxy.Consumer.Contract
 
         public long Offset { get; init; }
 
+        public long? Timestamp { get; init; }
+
         public string Key { get; init; }
 
         public IDictionary<string, string> Headers { get; init; }
 
         public string Value { get; init; }
-
-        public bool IsPartitionEOF { get; init; }
     }
 }
