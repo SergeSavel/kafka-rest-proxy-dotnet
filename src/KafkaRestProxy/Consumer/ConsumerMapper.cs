@@ -29,10 +29,11 @@ namespace SergeSavel.KafkaRestProxy.Consumer
                 Topic = source.Topic,
                 Partition = source.Partition,
                 Offset = source.Offset,
-                Key = source.Message.Key,
-                Headers = source.Message.Headers
+                Key = source.Message?.Key,
+                Headers = source.Message?.Headers
                     .ToDictionary(h => h.Key, h => MapHeaderBytes(h.GetValueBytes())),
-                Value = source.Message.Value
+                Value = source.Message?.Value,
+                IsPartitionEOF = source.IsPartitionEOF
             };
         }
 

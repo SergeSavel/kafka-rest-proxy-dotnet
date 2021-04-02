@@ -17,5 +17,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer.Contract
         public IDictionary<string, string> Headers { get; init; }
 
         public string Value { get; init; }
+
+        public bool IsPartitionEOF { get; init; }
     }
 }
