@@ -37,7 +37,7 @@ namespace SergeSavel.KafkaRestProxy.Admin
         {
             await _adminClientService.CreateTopic(request, timeout);
 
-            return CreatedAtAction(nameof(GetTopicMetadata), new {topic = request.Name, timeout});
+            return CreatedAtAction(nameof(GetTopicMetadata), new {topic = request.Name, timeout}, null);
         }
 
         [HttpGet("topics/{topic}")]
