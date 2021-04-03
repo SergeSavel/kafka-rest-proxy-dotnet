@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Confluent.Kafka;
 using SergeSavel.KafkaRestProxy.Consumer.Contract;
-using SergeSavel.KafkaRestProxy.Consumer.Exceptions;
 using SergeSavel.KafkaRestProxy.Consumer.Requests;
 using ConsumeException = SergeSavel.KafkaRestProxy.Consumer.Exceptions.ConsumeException;
 using TopicPartition = SergeSavel.KafkaRestProxy.Consumer.Contract.TopicPartition;
@@ -51,7 +50,6 @@ namespace SergeSavel.KafkaRestProxy.Consumer
         public Contract.Consumer GetConsumer(Guid consumerId)
         {
             var wrapper = ConsumerProvider.GetConsumer(consumerId);
-            if (wrapper == null) throw new ConsumerNotFoundException(consumerId);
 
             wrapper.UpdateExpiration();
 
@@ -66,7 +64,6 @@ namespace SergeSavel.KafkaRestProxy.Consumer
         public ICollection<TopicPartition> AssignConsumer(AssignConsumerRequest request)
         {
             var wrapper = ConsumerProvider.GetConsumer(request.ConsumerId);
-            if (wrapper == null) throw new ConsumerNotFoundException(request.ConsumerId);
 
             wrapper.UpdateExpiration();
 
@@ -79,7 +76,8 @@ namespace SergeSavel.KafkaRestProxy.Consumer
         public ICollection<TopicPartition> GetConsumerAssignment(Guid consumerId)
         {
             var wrapper = ConsumerProvider.GetConsumer(consumerId);
-            if (wrapper == null) throw new ConsumerNotFoundException(consumerId);
+
+            wrapper.UpdateExpiration();
 
             var result = wrapper.Consumer.Assignment
                 .Select(ConsumerMapper.Map)
@@ -91,7 +89,6 @@ namespace SergeSavel.KafkaRestProxy.Consumer
         public ConsumerMessage Consume(Guid consumerId, int? timeout)
         {
             var wrapper = ConsumerProvider.GetConsumer(consumerId);
-            if (wrapper == null) throw new ConsumerNotFoundException(consumerId);
 
             wrapper.UpdateExpiration();
 
@@ -114,7 +111,6 @@ namespace SergeSavel.KafkaRestProxy.Consumer
         public IEnumerable<ConsumerMessage> ConsumeMultiple(Guid consumerId, int? timeout, int? limit)
         {
             var wrapper = ConsumerProvider.GetConsumer(consumerId);
-            if (wrapper == null) throw new ConsumerNotFoundException(consumerId);
 
             wrapper.UpdateExpiration();
 
@@ -142,7 +138,8 @@ namespace SergeSavel.KafkaRestProxy.Consumer
         public PartitionOffsets GetPartitionOffsets(Guid consumerId, string topic, int partition, int? timeout)
         {
             var wrapper = ConsumerProvider.GetConsumer(consumerId);
-            if (wrapper == null) throw new ConsumerNotFoundException(consumerId);
+
+            wrapper.UpdateExpiration();
 
             Confluent.Kafka.TopicPartition topicPartition;
             WatermarkOffsets watermarkOffsets;

@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SergeSavel.KafkaRestProxy.Consumer.Exceptions;
 
 namespace SergeSavel.KafkaRestProxy.Consumer
 {
@@ -42,7 +43,14 @@ namespace SergeSavel.KafkaRestProxy.Consumer
 
         public ConsumerWrapper GetConsumer(Guid id)
         {
-            return _consumers.TryGetValue(id, out var consumerWrapper) ? consumerWrapper : null;
+            if (!_consumers.TryGetValue(id, out var consumerWrapper))
+                throw new ConsumerNotFoundException(id);
+            return consumerWrapper;
+        }
+
+        public void TryGetConsumer(Guid id, out ConsumerWrapper consumerWrapper)
+        {
+            _consumers.TryGetValue(id, out consumerWrapper);
         }
 
         public ICollection<ConsumerWrapper> ListConsumers()
