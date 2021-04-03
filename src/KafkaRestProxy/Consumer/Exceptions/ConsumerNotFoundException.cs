@@ -9,6 +9,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer.Exceptions
         public ConsumerNotFoundException(Guid consumerId)
         {
             StatusCode = StatusCodes.Status404NotFound;
+            Value = $"Consumer '{consumerId}' not found.";
         }
     }
 }
