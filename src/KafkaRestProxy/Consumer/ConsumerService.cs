@@ -157,7 +157,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer
             }
             catch (KafkaException e)
             {
-                throw new ConsumeException("Unable to receive message.", e);
+                throw new ConsumeException("Unable to get partition offsets.", e);
             }
 
             return new PartitionOffsets
