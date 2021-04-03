@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SergeSavel.KafkaRestProxy.Admin.Contract;
@@ -19,54 +20,55 @@ namespace SergeSavel.KafkaRestProxy.Admin
         }
 
         [HttpGet]
-        public Metadata GetMetadata(bool verbose)
+        public Metadata GetMetadata(bool verbose, [Range(0, int.MaxValue)] int timeout)
         {
-            return _adminClientService.GetMetadata(verbose);
+            return _adminClientService.GetMetadata(verbose, timeout);
         }
 
         [HttpGet("topics")]
-        public TopicsMetadata GetTopicsMetadata(bool verbose)
+        public TopicsMetadata GetTopicsMetadata(bool verbose, [Range(0, int.MaxValue)] int timeout)
         {
-            return _adminClientService.GetTopicsMetadata(verbose);
+            return _adminClientService.GetTopicsMetadata(verbose, timeout);
         }
 
         [HttpPost("topics")]
-        public async Task<ActionResult<TopicMetadata>> CreateTopicAsync(CreateTopicRequest request)
+        public async Task<ActionResult<TopicMetadata>> CreateTopicAsync(CreateTopicRequest request,
+            [Range(0, int.MaxValue)] int timeout)
         {
-            var result =
-                await _adminClientService.CreateTopic(request);
+            await _adminClientService.CreateTopic(request, timeout);
 
-            return CreatedAtAction(nameof(GetTopicMetadata), new {topic = result.Topic}, result);
+            return CreatedAtAction(nameof(GetTopicMetadata), new {topic = request.Name, timeout});
         }
 
         [HttpGet("topics/{topic}")]
-        public ActionResult<TopicMetadata> GetTopicMetadata(string topic, bool verbose)
+        public ActionResult<TopicMetadata> GetTopicMetadata(string topic, bool verbose,
+            [Range(0, int.MaxValue)] int timeout)
         {
-            return _adminClientService.GetTopicMetadata(topic, verbose);
+            return _adminClientService.GetTopicMetadata(topic, verbose, timeout);
         }
 
         [HttpGet("topics/{topic}/config")]
-        public async Task<ResourceConfig> GetTopicConfigAsync(string topic)
+        public async Task<ResourceConfig> GetTopicConfigAsync(string topic, [Range(0, int.MaxValue)] int timeout)
         {
-            return await _adminClientService.GetTopicConfigAsync(topic);
+            return await _adminClientService.GetTopicConfigAsync(topic, timeout);
         }
 
         [HttpGet("brokers")]
-        public BrokersMetadata GetBrokersMetadata()
+        public BrokersMetadata GetBrokersMetadata([Range(0, int.MaxValue)] int timeout)
         {
-            return _adminClientService.GetBrokersMetadata();
+            return _adminClientService.GetBrokersMetadata(timeout);
         }
 
         [HttpGet("brokers/{brokerId}")]
-        public ActionResult<BrokerMetadata> GetBrokerMetadata(int brokerId)
+        public ActionResult<BrokerMetadata> GetBrokerMetadata(int brokerId, [Range(0, int.MaxValue)] int timeout)
         {
-            return _adminClientService.GetBrokerMetadata(brokerId);
+            return _adminClientService.GetBrokerMetadata(brokerId, timeout);
         }
 
         [HttpGet("brokers/{brokerId}/config")]
-        public async Task<ResourceConfig> GetTBrokerConfigAsync(int brokerId)
+        public async Task<ResourceConfig> GetTBrokerConfigAsync(int brokerId, [Range(0, int.MaxValue)] int timeout)
         {
-            return await _adminClientService.GetBrokerConfigAsync(brokerId);
+            return await _adminClientService.GetBrokerConfigAsync(brokerId, timeout);
         }
     }
 }

@@ -15,7 +15,6 @@ namespace SergeSavel.KafkaRestProxy.Admin
 {
     public class AdminClientService : IDisposable
     {
-        private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(20);
         private readonly IAdminClient _adminClient;
 
         public AdminClientService(AdminClientConfig adminClientConfig)
@@ -29,21 +28,21 @@ namespace SergeSavel.KafkaRestProxy.Admin
             GC.SuppressFinalize(this);
         }
 
-        public Metadata GetMetadata(bool verbose)
+        public Metadata GetMetadata(bool verbose, int timeoutMs)
         {
-            var kafkaMetadata = GetKafkaMetadata();
+            var kafkaMetadata = GetKafkaMetadata(timeoutMs);
             return AdminClientMapper.Map(kafkaMetadata, verbose);
         }
 
-        public TopicsMetadata GetTopicsMetadata(bool verbose)
+        public TopicsMetadata GetTopicsMetadata(bool verbose, int timeoutMs)
         {
-            var kafkaMetadata = GetKafkaMetadata();
+            var kafkaMetadata = GetKafkaMetadata(timeoutMs);
             return AdminClientMapper.MapTopics(kafkaMetadata, verbose);
         }
 
-        public TopicMetadata GetTopicMetadata(string topic, bool verbose)
+        public TopicMetadata GetTopicMetadata(string topic, bool verbose, int timeoutMs)
         {
-            var kafkaMetadata = GetKafkaMetadata(topic);
+            var kafkaMetadata = GetKafkaMetadata(topic, timeoutMs);
 
             var topicMetadata = kafkaMetadata.Topics[0];
 
@@ -53,7 +52,7 @@ namespace SergeSavel.KafkaRestProxy.Admin
             return AdminClientMapper.Map(topicMetadata, kafkaMetadata, verbose);
         }
 
-        public async Task<TopicMetadata> CreateTopic(CreateTopicRequest request)
+        public async Task CreateTopic(CreateTopicRequest request, int timeoutMs)
         {
             var topicSpecification = new TopicSpecification
             {
@@ -65,7 +64,7 @@ namespace SergeSavel.KafkaRestProxy.Admin
 
             var options = new CreateTopicsOptions
             {
-                RequestTimeout = Timeout
+                RequestTimeout = TimeSpan.FromMilliseconds(timeoutMs)
             };
 
             try
@@ -76,19 +75,17 @@ namespace SergeSavel.KafkaRestProxy.Admin
             {
                 throw new AdminClientException("Unable to create topic.", e);
             }
-
-            return GetTopicMetadata(topicSpecification.Name, true);
         }
 
-        public BrokersMetadata GetBrokersMetadata()
+        public BrokersMetadata GetBrokersMetadata(int timeoutMs)
         {
-            var kafkaMetadata = GetKafkaMetadata();
+            var kafkaMetadata = GetKafkaMetadata(timeoutMs);
             return AdminClientMapper.MapBrokers(kafkaMetadata);
         }
 
-        public BrokerMetadata GetBrokerMetadata(int brokerId)
+        public BrokerMetadata GetBrokerMetadata(int brokerId, int timeoutMs)
         {
-            var kafkaMetadata = GetKafkaMetadata();
+            var kafkaMetadata = GetKafkaMetadata(timeoutMs);
 
             var result = kafkaMetadata.Brokers
                 .Where(brokerMetadata => brokerMetadata.BrokerId == brokerId)
@@ -101,12 +98,14 @@ namespace SergeSavel.KafkaRestProxy.Admin
             return result;
         }
 
-        private Confluent.Kafka.Metadata GetKafkaMetadata(string topic = null)
+        private Confluent.Kafka.Metadata GetKafkaMetadata(int timeoutMs)
         {
+            var timeout = TimeSpan.FromMilliseconds(timeoutMs);
+
             Confluent.Kafka.Metadata result;
             try
             {
-                result = topic == null ? _adminClient.GetMetadata(Timeout) : _adminClient.GetMetadata(topic, Timeout);
+                result = _adminClient.GetMetadata(timeout);
             }
             catch (KafkaException e)
             {
@@ -116,7 +115,24 @@ namespace SergeSavel.KafkaRestProxy.Admin
             return result;
         }
 
-        public async Task<ResourceConfig> GetTopicConfigAsync(string topic)
+        private Confluent.Kafka.Metadata GetKafkaMetadata(string topic, int timeoutMs)
+        {
+            var timeout = TimeSpan.FromMilliseconds(timeoutMs);
+
+            Confluent.Kafka.Metadata result;
+            try
+            {
+                result = _adminClient.GetMetadata(topic, timeout);
+            }
+            catch (KafkaException e)
+            {
+                throw new AdminClientException("Unable to get metadata.", e);
+            }
+
+            return result;
+        }
+
+        public async Task<ResourceConfig> GetTopicConfigAsync(string topic, int timeoutMs)
         {
             var resource = new ConfigResource
             {
@@ -126,7 +142,7 @@ namespace SergeSavel.KafkaRestProxy.Admin
 
             var options = new DescribeConfigsOptions
             {
-                RequestTimeout = Timeout
+                RequestTimeout = TimeSpan.FromMilliseconds(timeoutMs)
             };
 
             ICollection<DescribeConfigsResult> result;
@@ -142,7 +158,7 @@ namespace SergeSavel.KafkaRestProxy.Admin
             return AdminClientMapper.Map(result.First());
         }
 
-        public async Task<ResourceConfig> GetBrokerConfigAsync(int brokerId)
+        public async Task<ResourceConfig> GetBrokerConfigAsync(int brokerId, int timeoutMs)
         {
             var resource = new ConfigResource
             {
@@ -152,7 +168,7 @@ namespace SergeSavel.KafkaRestProxy.Admin
 
             var options = new DescribeConfigsOptions
             {
-                RequestTimeout = Timeout
+                RequestTimeout = TimeSpan.FromMilliseconds(timeoutMs)
             };
 
             ICollection<DescribeConfigsResult> result;
