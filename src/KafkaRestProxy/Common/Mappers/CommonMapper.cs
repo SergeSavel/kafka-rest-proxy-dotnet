@@ -13,7 +13,10 @@ namespace SergeSavel.KafkaRestProxy.Common.Mappers
             return new Error
             {
                 Code = (int) source.Code,
-                Reason = source.Reason
+                Reason = source.Reason,
+                IsBrokerError = source.IsBrokerError,
+                IsLocalError = source.IsLocalError,
+                IsFatal = source.IsFatal
             };
         }
     }
