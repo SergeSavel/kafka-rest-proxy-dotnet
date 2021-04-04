@@ -15,18 +15,33 @@ namespace SergeSavel.KafkaRestProxy.Consumer
     {
         private readonly ConsumerConfig _consumerConfig;
         private readonly ILogger<ConsumerService> _logger;
+        private readonly IConsumer<string, string> _staticConsumer;
 
         public ConsumerService(ConsumerConfig consumerConfig, ILogger<ConsumerService> logger)
         {
             _consumerConfig = consumerConfig;
             _logger = logger;
+            _staticConsumer = new ConsumerBuilder<string, string>(consumerConfig)
+                .Build();
         }
 
         public ConsumerProvider ConsumerProvider { get; } = new();
 
         public void Dispose()
         {
-            ConsumerProvider.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                ConsumerProvider.Dispose();
+
+                _staticConsumer.Close();
+                _staticConsumer.Dispose();
+            }
         }
 
         public ICollection<Contract.Consumer> ListConsumers()
@@ -163,7 +178,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer
                     var stopwatch = Stopwatch.StartNew();
 
                     watermarkOffsets =
-                        wrapper.Consumer.QueryWatermarkOffsets(topicPartition,
+                        _staticConsumer.QueryWatermarkOffsets(topicPartition,
                             TimeSpan.FromMilliseconds(timeout.Value));
 
                     if (_logger.IsEnabled(LogLevel.Debug))
@@ -172,7 +187,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer
                 }
                 else
                 {
-                    watermarkOffsets = wrapper.Consumer.GetWatermarkOffsets(topicPartition);
+                    watermarkOffsets = _staticConsumer.GetWatermarkOffsets(topicPartition);
                 }
             }
             catch (KafkaException e)
