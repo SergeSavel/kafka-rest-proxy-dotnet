@@ -8,7 +8,7 @@ namespace SergeSavel.KafkaRestProxy.Admin
         public static void AddAdminClient(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddSingleton(AdminClientConfigProvider.GetConfig(configuration));
-            services.AddScoped<AdminClientService>();
+            services.AddSingleton<AdminClientService>(); // ???
         }
     }
 }
