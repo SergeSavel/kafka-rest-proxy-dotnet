@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Confluent.Kafka;
+using Microsoft.Extensions.Logging;
 using SergeSavel.KafkaRestProxy.Consumer.Contract;
 using SergeSavel.KafkaRestProxy.Consumer.Requests;
 using ConsumeException = SergeSavel.KafkaRestProxy.Consumer.Exceptions.ConsumeException;
@@ -12,10 +14,12 @@ namespace SergeSavel.KafkaRestProxy.Consumer
     public class ConsumerService : IDisposable
     {
         private readonly ConsumerConfig _consumerConfig;
+        private readonly ILogger<ConsumerService> _logger;
 
-        public ConsumerService(ConsumerConfig consumerConfig)
+        public ConsumerService(ConsumerConfig consumerConfig, ILogger<ConsumerService> logger)
         {
             _consumerConfig = consumerConfig;
+            _logger = logger;
         }
 
         public ConsumerProvider ConsumerProvider { get; } = new();
@@ -149,9 +153,27 @@ namespace SergeSavel.KafkaRestProxy.Consumer
             {
                 topicPartition = new Confluent.Kafka.TopicPartition(topic, partition);
 
-                watermarkOffsets = timeout.HasValue
-                    ? wrapper.Consumer.QueryWatermarkOffsets(topicPartition, TimeSpan.FromMilliseconds(timeout.Value))
-                    : wrapper.Consumer.GetWatermarkOffsets(topicPartition);
+                if (timeout.HasValue)
+                {
+                    if (_logger.IsEnabled(LogLevel.Debug))
+                        _logger.LogDebug(
+                            "Start calling 'QueryWatermarkOffsets()'. Topic='{Topic}', Partition='{Partition}', Timeout='{Timeout}'",
+                            topic, partition, timeout);
+
+                    var stopwatch = Stopwatch.StartNew();
+
+                    watermarkOffsets =
+                        wrapper.Consumer.QueryWatermarkOffsets(topicPartition,
+                            TimeSpan.FromMilliseconds(timeout.Value));
+
+                    if (_logger.IsEnabled(LogLevel.Debug))
+                        _logger.LogDebug("End calling 'QueryWatermarkOffsets()'. Took {Ms} ms",
+                            stopwatch.ElapsedMilliseconds);
+                }
+                else
+                {
+                    watermarkOffsets = wrapper.Consumer.GetWatermarkOffsets(topicPartition);
+                }
 
                 position = wrapper.Consumer.Position(topicPartition);
             }
