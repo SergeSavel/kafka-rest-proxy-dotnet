@@ -17,6 +17,8 @@ namespace SergeSavel.KafkaRestProxy.Consumer
                 GroupId = "kafka-rest-proxy-dotnet"
             };
 
+            //result.Debug = "all";
+
             configuration?.Bind("Kafka:Consumer", result);
 
             return result;
