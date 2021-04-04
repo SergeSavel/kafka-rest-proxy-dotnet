@@ -31,7 +31,8 @@ namespace SergeSavel.KafkaRestProxy
             services.AddControllers(options => options.Filters.Add(new HttpResponseExceptionFilter()))
                 .AddJsonOptions(options =>
                 {
-                    options.JsonSerializerOptions.WriteIndented = Configuration.GetSection("IndentOutput").Get<bool>();
+                    options.JsonSerializerOptions.WriteIndented =
+                        Configuration.GetSection("IndentOutput").Get<bool?>() ?? true;
                     options.JsonSerializerOptions.IgnoreNullValues = true;
                     options.JsonSerializerOptions.PropertyNamingPolicy = null;
                     options.JsonSerializerOptions.Converters.Add(
