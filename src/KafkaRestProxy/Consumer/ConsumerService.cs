@@ -174,13 +174,16 @@ namespace SergeSavel.KafkaRestProxy.Consumer
                 {
                     watermarkOffsets = wrapper.Consumer.GetWatermarkOffsets(topicPartition);
                 }
-
-                position = wrapper.Consumer.Position(topicPartition);
             }
             catch (KafkaException e)
             {
+                if (_logger.IsEnabled(LogLevel.Debug))
+                    _logger.LogDebug("Error: {Reason}", e.Error.Reason);
+
                 throw new ConsumeException("Unable to get partition offsets.", e);
             }
+
+            position = wrapper.Consumer.Position(topicPartition);
 
             return new PartitionOffsets
             {
