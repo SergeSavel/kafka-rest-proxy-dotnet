@@ -56,17 +56,18 @@ namespace SergeSavel.KafkaRestProxy.Consumer
 
         [HttpPost("{consumerId}/assignment")]
         [HttpPut("{consumerId}/assignment")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<IEnumerable<TopicPartition>> AssignConsumer(Guid consumerId,
+        public ActionResult<ICollection<TopicPartition>> AssignConsumer(Guid consumerId,
             [Required] AssignConsumerRequest request)
         {
             if (consumerId != request.ConsumerId)
                 return BadRequest("Consumer Id does not match provided data.");
 
-            var result = _consumerService.AssignConsumer(request);
-            return Ok(result);
+            var consumerAssignment = _consumerService.AssignConsumer(request);
+
+            return CreatedAtAction(nameof(GetConsumerAssignment), new {consumerId}, consumerAssignment);
         }
 
         [HttpGet("{consumerId}/assignment")]
