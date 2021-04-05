@@ -12,15 +12,17 @@ namespace SergeSavel.KafkaRestProxy.Proxy.Authentication
 
         public UserService(IOptions<BasicAuthUsers> basicAuthUsersOptions)
         {
-            _basicAuthUsers = new Dictionary<string, UserWithPassword>(StringComparer.OrdinalIgnoreCase);
-
             if (basicAuthUsersOptions.Value != null)
+            {
+                _basicAuthUsers = new Dictionary<string, UserWithPassword>(StringComparer.OrdinalIgnoreCase);
+
                 foreach (var (userName, userInfo) in basicAuthUsersOptions.Value)
                     _basicAuthUsers.Add(userName, new UserWithPassword
                     {
                         Name = userName,
                         Password = userInfo.Password
                     });
+            }
         }
 
         public static User DefaultUser { get; } = new() {Name = string.Empty};
@@ -33,6 +35,8 @@ namespace SergeSavel.KafkaRestProxy.Proxy.Authentication
         public User Authenticate(string scheme, string username, string password)
         {
             if (_basicAuthUsers == null || _basicAuthUsers.Count == 0) return DefaultUser;
+
+            if (username == null) return null;
 
             if (!_basicAuthUsers.TryGetValue(username, out var user))
                 return null;
