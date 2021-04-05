@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SergeSavel.KafkaRestProxy.Admin.Contract;
 using SergeSavel.KafkaRestProxy.Admin.Requests;
@@ -32,16 +33,17 @@ namespace SergeSavel.KafkaRestProxy.Admin
         }
 
         [HttpPost("topics")]
-        public async Task<ActionResult<TopicMetadata>> CreateTopicAsync(CreateTopicRequest request,
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        public async Task<ActionResult<bool>> CreateTopicAsync(CreateTopicRequest request,
             [Range(0, int.MaxValue)] int timeout)
         {
             await _adminClientService.CreateTopic(request, timeout);
 
-            return CreatedAtAction(nameof(GetTopicMetadata), new {topic = request.Name, timeout}, null);
+            return CreatedAtAction(nameof(GetTopicMetadata), new {topic = request.Name, timeout}, true);
         }
 
         [HttpGet("topics/{topic}")]
-        public ActionResult<TopicMetadata> GetTopicMetadata(string topic, bool verbose,
+        public TopicMetadata GetTopicMetadata(string topic, bool verbose,
             [Range(0, int.MaxValue)] int timeout)
         {
             return _adminClientService.GetTopicMetadata(topic, verbose, timeout);
@@ -60,7 +62,7 @@ namespace SergeSavel.KafkaRestProxy.Admin
         }
 
         [HttpGet("brokers/{brokerId}")]
-        public ActionResult<BrokerMetadata> GetBrokerMetadata(int brokerId, [Range(0, int.MaxValue)] int timeout)
+        public BrokerMetadata GetBrokerMetadata(int brokerId, [Range(0, int.MaxValue)] int timeout)
         {
             return _adminClientService.GetBrokerMetadata(brokerId, timeout);
         }
