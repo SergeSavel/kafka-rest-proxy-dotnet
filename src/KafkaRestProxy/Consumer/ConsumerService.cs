@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
 using SergeSavel.KafkaRestProxy.Consumer.Contract;
@@ -156,6 +157,8 @@ namespace SergeSavel.KafkaRestProxy.Consumer
 
         public PartitionOffsets GetPartitionOffsets(Guid consumerId, string topic, int partition, int? timeout)
         {
+            var eventId = new EventId(Thread.CurrentThread.ManagedThreadId, nameof(GetPartitionOffsets));
+
             var wrapper = ConsumerProvider.GetConsumer(consumerId);
 
             wrapper.UpdateExpiration();
@@ -171,7 +174,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer
                 if (timeout.HasValue)
                 {
                     if (_logger.IsEnabled(LogLevel.Debug))
-                        _logger.LogDebug(
+                        _logger.LogDebug(eventId,
                             "Start calling 'QueryWatermarkOffsets()'. Topic='{Topic}', Partition='{Partition}', Timeout='{Timeout}'",
                             topic, partition, timeout);
 
@@ -182,7 +185,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer
                             TimeSpan.FromMilliseconds(timeout.Value));
 
                     if (_logger.IsEnabled(LogLevel.Debug))
-                        _logger.LogDebug("End calling 'QueryWatermarkOffsets()'. Took {Ms} ms",
+                        _logger.LogDebug(eventId, "End calling 'QueryWatermarkOffsets()'. Took {Ms} ms",
                             stopwatch.ElapsedMilliseconds);
                 }
                 else
