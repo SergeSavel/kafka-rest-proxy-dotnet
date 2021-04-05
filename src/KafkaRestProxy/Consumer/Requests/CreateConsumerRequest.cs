@@ -7,6 +7,6 @@ namespace SergeSavel.KafkaRestProxy.Consumer.Requests
     {
         [Required] [Range(1000, 86400000)] public int ExpirationTimeoutMs { get; init; }
 
-        public IDictionary<string, string> Config { get; init; }
+        public IReadOnlyDictionary<string, string> Config { get; init; }
     }
 }

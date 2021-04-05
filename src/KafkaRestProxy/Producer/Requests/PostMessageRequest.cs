@@ -9,6 +9,6 @@ namespace SergeSavel.KafkaRestProxy.Producer.Requests
 
         [Required] public string Value { get; init; }
 
-        public IDictionary<string, string> Headers { get; init; }
+        public IReadOnlyDictionary<string, string> Headers { get; init; }
     }
 }
