@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Reflection;
 using System.Runtime.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace SergeSavel.KafkaRestProxy.Proxy
 {
     [ApiController]
+    [AllowAnonymous]
     [Route("")]
     public class RootController : ControllerBase
     {
@@ -26,7 +28,7 @@ namespace SergeSavel.KafkaRestProxy.Proxy
                     assembly.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version,
                     TargetFramework = assembly.GetCustomAttribute<TargetFrameworkAttribute>()?.FrameworkName
                 },
-                Environment = new
+                Runtime = new
                 {
                     Version = Environment.Version.ToString(),
                     Is64Bit = Environment.Is64BitProcess
