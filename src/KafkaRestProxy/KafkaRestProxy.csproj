@@ -17,7 +17,7 @@
     <Authors>Sergey Savelev</Authors>
     <Description>A simple Apache Kafka REST proxy</Description>
     <Copyright>Sergey Savelev</Copyright>
-    <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
+    <PackageLicenseUrl>https://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/SergeSavel/kafka-rest-proxy-dotnet</RepositoryUrl>
   </PropertyGroup>
 
