@@ -5,7 +5,7 @@
     <RootNamespace>SergeSavel.KafkaRestProxy</RootNamespace>
     <Company>Serge Savel</Company>
     <AssemblyVersion>1.0</AssemblyVersion>
-    <FileVersion>1.0.0</FileVersion>
+    <FileVersion>1.0.1</FileVersion>
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
     <RuntimeIdentifier>win-x86</RuntimeIdentifier>
