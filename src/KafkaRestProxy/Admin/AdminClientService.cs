@@ -85,7 +85,7 @@ namespace SergeSavel.KafkaRestProxy.Admin
             {
                 await _adminClient.CreateTopicsAsync(new[] {topicSpecification}, options);
             }
-            catch (CreateTopicsException e)
+            catch (KafkaException e)
             {
                 throw new AdminClientException("Unable to create topic.", e);
             }

@@ -27,6 +27,7 @@ namespace SergeSavel.KafkaRestProxy.Admin.Exceptions
             {
                 ErrorCode.UnknownTopicOrPart => StatusCodes.Status400BadRequest,
                 ErrorCode.TopicAlreadyExists => StatusCodes.Status400BadRequest,
+                ErrorCode.Local_UnsupportedFeature => StatusCodes.Status400BadRequest,
                 _ => StatusCodes.Status500InternalServerError
             };
         }
