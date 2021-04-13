@@ -5,7 +5,7 @@
     <RootNamespace>SergeSavel.KafkaRestProxy</RootNamespace>
     <Company>Serge Savel</Company>
     <AssemblyVersion>1.0</AssemblyVersion>
-    <FileVersion>1.0.1</FileVersion>
+    <FileVersion>1.0.2</FileVersion>
     <PublishSingleFile>true</PublishSingleFile>
     <SelfContained>true</SelfContained>
     <RuntimeIdentifier>win-x86</RuntimeIdentifier>
@@ -19,6 +19,7 @@
     <Copyright>Sergey Savelev</Copyright>
     <PackageLicenseUrl>https://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/SergeSavel/kafka-rest-proxy-dotnet</RepositoryUrl>
+    <PackageVersion>1.0.2</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
