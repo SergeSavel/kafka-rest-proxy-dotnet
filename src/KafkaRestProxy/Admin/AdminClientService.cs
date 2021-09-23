@@ -21,6 +21,7 @@ using Confluent.Kafka.Admin;
 using SergeSavel.KafkaRestProxy.Admin.Contract;
 using SergeSavel.KafkaRestProxy.Admin.Exceptions;
 using SergeSavel.KafkaRestProxy.Admin.Requests;
+using SergeSavel.KafkaRestProxy.Producer;
 using BrokerMetadata = SergeSavel.KafkaRestProxy.Admin.Contract.BrokerMetadata;
 using Metadata = SergeSavel.KafkaRestProxy.Admin.Contract.Metadata;
 using TopicMetadata = SergeSavel.KafkaRestProxy.Admin.Contract.TopicMetadata;
@@ -31,9 +32,10 @@ namespace SergeSavel.KafkaRestProxy.Admin
     {
         private readonly IAdminClient _adminClient;
 
-        public AdminClientService(AdminClientConfig adminClientConfig)
+        public AdminClientService(ProducerService producerService, AdminClientConfig adminClientConfig)
         {
-            _adminClient = new AdminClientBuilder(adminClientConfig).Build();
+            //_adminClient = new AdminClientBuilder(adminClientConfig).Build();
+            _adminClient = new DependentAdminClientBuilder(producerService.Handle).Build();
         }
 
         public void Dispose()
@@ -83,7 +85,7 @@ namespace SergeSavel.KafkaRestProxy.Admin
 
             try
             {
-                await _adminClient.CreateTopicsAsync(new[] {topicSpecification}, options);
+                await _adminClient.CreateTopicsAsync(new[] { topicSpecification }, options);
             }
             catch (KafkaException e)
             {
@@ -162,7 +164,7 @@ namespace SergeSavel.KafkaRestProxy.Admin
             ICollection<DescribeConfigsResult> result;
             try
             {
-                result = await _adminClient.DescribeConfigsAsync(new[] {resource}, options);
+                result = await _adminClient.DescribeConfigsAsync(new[] { resource }, options);
             }
             catch (KafkaException e)
             {
@@ -188,7 +190,7 @@ namespace SergeSavel.KafkaRestProxy.Admin
             ICollection<DescribeConfigsResult> result;
             try
             {
-                result = await _adminClient.DescribeConfigsAsync(new[] {resource}, options);
+                result = await _adminClient.DescribeConfigsAsync(new[] { resource }, options);
             }
             catch (KafkaException e)
             {

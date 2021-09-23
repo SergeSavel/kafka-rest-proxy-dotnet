@@ -30,6 +30,8 @@ namespace SergeSavel.KafkaRestProxy.Producer
             _producer = new ProducerBuilder<string, string>(config).Build();
         }
 
+        public Handle Handle => _producer.Handle;
+
         public void Dispose()
         {
             Dispose(true);
