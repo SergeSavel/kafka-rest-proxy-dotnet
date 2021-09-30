@@ -12,21 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+using System;
 
-namespace SergeSavel.KafkaRestProxy.Producer.Requests
+namespace SergeSavel.KafkaRestProxy.Common.Exceptions
 {
-    public class PostMessageRequest
+    public class BadRequestException : HttpResponseException
     {
-        public KeyValueType KeyType { get; init; } = KeyValueType.String;
-        public string KeySchema { get; init; }
-        public string Key { get; init; }
+        public BadRequestException(string message) : base(message)
+        {
+            StatusCode = 400;
+        }
 
-        public KeyValueType ValueType { get; init; } = KeyValueType.String;
-        public string ValueSchema { get; init; }
-        [Required] public string Value { get; init; }
-
-        public IReadOnlyDictionary<string, string> Headers { get; init; }
+        public BadRequestException(string message, Exception innerException) : base(message, innerException)
+        {
+            StatusCode = 400;
+        }
     }
 }

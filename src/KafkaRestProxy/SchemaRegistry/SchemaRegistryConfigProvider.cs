@@ -12,21 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+using Confluent.SchemaRegistry;
+using Microsoft.Extensions.Configuration;
 
-namespace SergeSavel.KafkaRestProxy.Producer.Requests
+namespace SergeSavel.KafkaRestProxy.SchemaRegistry
 {
-    public class PostMessageRequest
+    public class SchemaRegistryConfigProvider
     {
-        public KeyValueType KeyType { get; init; } = KeyValueType.String;
-        public string KeySchema { get; init; }
-        public string Key { get; init; }
-
-        public KeyValueType ValueType { get; init; } = KeyValueType.String;
-        public string ValueSchema { get; init; }
-        [Required] public string Value { get; init; }
-
-        public IReadOnlyDictionary<string, string> Headers { get; init; }
+        public static SchemaRegistryConfig GetConfig(IConfiguration configuration = null)
+        {
+            var result = new SchemaRegistryConfig();
+            configuration?.Bind("SchemaRegistry", result);
+            return result;
+        }
     }
 }

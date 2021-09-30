@@ -12,21 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-
 namespace SergeSavel.KafkaRestProxy.Producer.Requests
 {
-    public class PostMessageRequest
+    public enum KeyValueType
     {
-        public KeyValueType KeyType { get; init; } = KeyValueType.String;
-        public string KeySchema { get; init; }
-        public string Key { get; init; }
-
-        public KeyValueType ValueType { get; init; } = KeyValueType.String;
-        public string ValueSchema { get; init; }
-        [Required] public string Value { get; init; }
-
-        public IReadOnlyDictionary<string, string> Headers { get; init; }
+        String,
+        Bytes,
+        AvroAsXml,
+        JsonAsXml
     }
 }
