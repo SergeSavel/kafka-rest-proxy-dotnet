@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Avro;
@@ -62,54 +61,59 @@ namespace SergeSavel.KafkaRestProxy.Producer
         {
             var headers = ProducerMapper.MapHeaders(request.Headers);
 
+            var keySerializationContext = new SerializationContext(MessageComponentType.Key, topic, headers);
             byte[] keyBytes;
-            if (request.Key == null)
+            switch (request.KeyType)
             {
-                keyBytes = null;
-            }
-            else if (request.KeyType == KeyValueType.String)
-            {
-                keyBytes = Encoding.UTF8.GetBytes(request.Key);
-            }
-            else if (request.KeyType == KeyValueType.Bytes)
-            {
-                keyBytes = Convert.FromBase64String(request.Key);
-            }
-            else if (request.KeyType == KeyValueType.AvroAsXml)
-            {
-                var genericRecord =
-                    ProducerGenericMapper.GetGenericRecord(request.Key, request.KeySchema, _schemaCache);
-                keyBytes = await GetAvroSerializer().SerializeAsync(genericRecord,
-                    new SerializationContext(MessageComponentType.Key, topic, headers));
-            }
-            else
-            {
-                throw new BadRequestException("Unexpected key serialization type: " + request.KeyType);
+                case KeyValueType.Null:
+                    keyBytes = Serializers.Null.Serialize(null, keySerializationContext);
+                    break;
+                case KeyValueType.String:
+                    keyBytes = Serializers.Utf8.Serialize(request.Key, keySerializationContext);
+                    break;
+                case KeyValueType.Bytes:
+                {
+                    var data = Convert.FromBase64String(request.Key);
+                    keyBytes = Serializers.ByteArray.Serialize(data, keySerializationContext);
+                    break;
+                }
+                case KeyValueType.AvroAsXml:
+                {
+                    var genericRecord =
+                        ProducerGenericMapper.GetGenericRecord(request.Key, request.KeySchema, _schemaCache);
+                    keyBytes = await GetAvroSerializer().SerializeAsync(genericRecord, keySerializationContext);
+                    break;
+                }
+                default:
+                    throw new BadRequestException("Unexpected key serialization type: " + request.KeyType);
             }
 
+            var valueSerializationContext = new SerializationContext(MessageComponentType.Value, topic, headers);
             byte[] valueBytes;
-            if (request.Value == null)
+            switch (request.ValueType)
             {
-                valueBytes = null;
-            }
-            else if (request.ValueType == KeyValueType.String)
-            {
-                valueBytes = Encoding.UTF8.GetBytes(request.Value);
-            }
-            else if (request.ValueType == KeyValueType.Bytes)
-            {
-                valueBytes = Convert.FromBase64String(request.Value);
-            }
-            else if (request.ValueType == KeyValueType.AvroAsXml)
-            {
-                var genericRecord =
-                    ProducerGenericMapper.GetGenericRecord(request.Value, request.ValueSchema, _schemaCache);
-                valueBytes = await GetAvroSerializer().SerializeAsync(genericRecord,
-                    new SerializationContext(MessageComponentType.Value, topic, headers)).ConfigureAwait(false);
-            }
-            else
-            {
-                throw new BadRequestException("Unexpected value serialization type: " + request.ValueType);
+                case KeyValueType.Null:
+                    valueBytes = Serializers.Null.Serialize(null, valueSerializationContext);
+                    break;
+                case KeyValueType.String:
+                    valueBytes = Serializers.Utf8.Serialize(request.Value, valueSerializationContext);
+                    break;
+                case KeyValueType.Bytes:
+                {
+                    var data = Convert.FromBase64String(request.Value);
+                    valueBytes = Serializers.ByteArray.Serialize(data, valueSerializationContext);
+                    break;
+                }
+                case KeyValueType.AvroAsXml:
+                {
+                    var genericRecord =
+                        ProducerGenericMapper.GetGenericRecord(request.Value, request.ValueSchema, _schemaCache);
+                    valueBytes = await GetAvroSerializer().SerializeAsync(genericRecord, valueSerializationContext)
+                        .ConfigureAwait(false);
+                    break;
+                }
+                default:
+                    throw new BadRequestException("Unexpected value serialization type: " + request.ValueType);
             }
 
             var message = new Message<byte[], byte[]>
