@@ -81,7 +81,8 @@ namespace SergeSavel.KafkaRestProxy.Producer
                 {
                     var genericRecord =
                         ProducerGenericMapper.GetGenericRecord(request.Key, request.KeySchema, _schemaCache);
-                    keyBytes = await GetAvroSerializer().SerializeAsync(genericRecord, keySerializationContext);
+                    keyBytes = await GetAvroSerializer().SerializeAsync(genericRecord, keySerializationContext)
+                        .ConfigureAwait(false);
                     break;
                 }
                 default:
@@ -128,7 +129,8 @@ namespace SergeSavel.KafkaRestProxy.Producer
             {
                 producerDeliveryResult = partition.HasValue
                     ? await _producer.ProduceAsync(new TopicPartition(topic, partition.Value), message)
-                    : await _producer.ProduceAsync(topic, message);
+                        .ConfigureAwait(false)
+                    : await _producer.ProduceAsync(topic, message).ConfigureAwait(false);
             }
             catch (KafkaException e)
             {

@@ -37,7 +37,7 @@ namespace SergeSavel.KafkaRestProxy.Producer
         public async Task<ActionResult<DeliveryResult>> PostMessage([Required] string topic,
             [Range(0, int.MaxValue)] int? partition, [Required] PostMessageRequest request)
         {
-            var result = await _producerService.PostMessage(topic, partition, request);
+            var result = await _producerService.PostMessage(topic, partition, request).ConfigureAwait(false);
 
             return Ok(result);
         }
