@@ -44,8 +44,9 @@ namespace SergeSavel.KafkaRestProxy.Producer
 
         public ProducerService(ProducerConfig config, SchemaRegistryService schemaRegistryService)
         {
-            _producer = new ProducerBuilder<byte[], byte[]>(config).Build();
-            //_stringStringProducer = new ProducerBuilder<string, string>(config).Build();
+            var rawSerializer = new RawSerializer();
+            _producer = new ProducerBuilder<byte[], byte[]>(config).SetKeySerializer(rawSerializer)
+                .SetValueSerializer(rawSerializer).Build();
             _schemaRegistryClient = schemaRegistryService.Client;
         }
 
