@@ -22,6 +22,7 @@ using Avro.Generic;
 using Confluent.Kafka;
 using Confluent.SchemaRegistry;
 using Confluent.SchemaRegistry.Serdes;
+using SergeSavel.KafkaRestProxy.Common.Contract;
 using SergeSavel.KafkaRestProxy.Common.Exceptions;
 using SergeSavel.KafkaRestProxy.Producer.Contract;
 using SergeSavel.KafkaRestProxy.Producer.Exceptions;

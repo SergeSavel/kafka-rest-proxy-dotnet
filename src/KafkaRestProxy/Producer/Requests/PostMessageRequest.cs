@@ -14,6 +14,7 @@
 
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using SergeSavel.KafkaRestProxy.Common.Contract;
 
 namespace SergeSavel.KafkaRestProxy.Producer.Requests
 {
