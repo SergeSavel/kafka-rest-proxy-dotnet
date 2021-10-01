@@ -20,11 +20,11 @@ namespace SergeSavel.KafkaRestProxy.Producer.Requests
 {
     public class PostMessageRequest
     {
-        public KeyValueType KeyType { get; init; } = KeyValueType.String;
+        public KeyValueType KeyType { get; init; } = KeyValueTypeDefaults.Key;
         public string KeySchema { get; init; }
         public string Key { get; init; }
 
-        public KeyValueType ValueType { get; init; } = KeyValueType.String;
+        public KeyValueType ValueType { get; init; } = KeyValueTypeDefaults.Value;
         public string ValueSchema { get; init; }
         [Required] public string Value { get; init; }
 
