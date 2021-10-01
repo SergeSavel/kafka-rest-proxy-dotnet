@@ -17,6 +17,7 @@ namespace SergeSavel.KafkaRestProxy.Common.Contract
     public enum KeyValueType
     {
         Null,
+        Ignore,
         Bytes,
         String,
         AvroAsXml
