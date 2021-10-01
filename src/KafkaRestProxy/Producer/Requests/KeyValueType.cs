@@ -18,7 +18,6 @@ namespace SergeSavel.KafkaRestProxy.Producer.Requests
     {
         String,
         Bytes,
-        AvroAsXml,
-        JsonAsXml
+        AvroAsXml
     }
 }

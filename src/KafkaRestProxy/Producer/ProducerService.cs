@@ -46,7 +46,6 @@ namespace SergeSavel.KafkaRestProxy.Producer
         [Obsolete] private IProducer<GenericRecord, GenericRecord> _dependentGenericGenericProducer;
         [Obsolete] private IProducer<GenericRecord, string> _dependentGenericStringProducer;
         [Obsolete] private IProducer<string, GenericRecord> _dependentStringGenericProducer;
-        private JsonSerializer<GenericRecord> _jsonSerializer;
 
         public ProducerService(ProducerConfig config, SchemaRegistryService schemaRegistryService)
         {
@@ -87,13 +86,6 @@ namespace SergeSavel.KafkaRestProxy.Producer
                 keyBytes = await GetAvroSerializer().SerializeAsync(genericRecord,
                     new SerializationContext(MessageComponentType.Key, topic, headers));
             }
-            else if (request.KeyType == KeyValueType.JsonAsXml)
-            {
-                var genericRecord =
-                    ProducerGenericMapper.GetGenericRecord(request.Key, request.KeySchema, _schemaCache);
-                keyBytes = await GetJsonSerializer().SerializeAsync(genericRecord,
-                    new SerializationContext(MessageComponentType.Key, topic, headers));
-            }
             else
             {
                 throw new BadRequestException("Unexpected key serialization type: " + request.KeyType);
@@ -113,13 +105,6 @@ namespace SergeSavel.KafkaRestProxy.Producer
                 valueBytes = Convert.FromBase64String(request.Value);
             }
             else if (request.ValueType == KeyValueType.AvroAsXml)
-            {
-                var genericRecord =
-                    ProducerGenericMapper.GetGenericRecord(request.Value, request.ValueSchema, _schemaCache);
-                valueBytes = await GetAvroSerializer().SerializeAsync(genericRecord,
-                    new SerializationContext(MessageComponentType.Value, topic, headers)).ConfigureAwait(false);
-            }
-            else if (request.ValueType == KeyValueType.JsonAsXml)
             {
                 var genericRecord =
                     ProducerGenericMapper.GetGenericRecord(request.Value, request.ValueSchema, _schemaCache);
@@ -341,8 +326,6 @@ namespace SergeSavel.KafkaRestProxy.Producer
             if (serializationType == KeyValueType.AvroAsXml)
                 return GetAvroSerializer();
 
-            if (serializationType == KeyValueType.JsonAsXml)
-                return GetJsonSerializer();
 
             throw new BadRequestException("Unexpected serialization type:" + serializationType);
         }
@@ -366,27 +349,6 @@ namespace SergeSavel.KafkaRestProxy.Producer
             }
 
             return _avroSerializer;
-        }
-
-        private JsonSerializer<GenericRecord> GetJsonSerializer()
-        {
-            if (_jsonSerializer == null)
-            {
-                _producerSemaphore.Wait(TimeSpan.FromSeconds(10));
-                try
-                {
-                    if (_schemaRegistryClient == null)
-                        throw new BadRequestException("SchemaRegistry Client not initialized.");
-
-                    _jsonSerializer = new JsonSerializer<GenericRecord>(_schemaRegistryClient);
-                }
-                finally
-                {
-                    _producerSemaphore.Release();
-                }
-            }
-
-            return _jsonSerializer;
         }
 
         protected virtual void Dispose(bool disposing)
