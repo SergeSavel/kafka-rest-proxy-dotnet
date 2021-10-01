@@ -294,6 +294,7 @@ namespace SergeSavel.KafkaRestProxy.Producer
             return _dependentGenericGenericProducer;
         }
 
+        [Obsolete]
         private IProducer<GenericRecord, string> GetAvroStringProducer()
         {
             if (_dependentGenericStringProducer == null)
@@ -321,6 +322,7 @@ namespace SergeSavel.KafkaRestProxy.Producer
             return _dependentGenericStringProducer;
         }
 
+        [Obsolete]
         internal IAsyncSerializer<GenericRecord> GetGenericSerializer(KeyValueType serializationType)
         {
             if (serializationType == KeyValueType.AvroAsXml)
