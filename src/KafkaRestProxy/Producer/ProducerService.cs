@@ -34,11 +34,11 @@ namespace SergeSavel.KafkaRestProxy.Producer
     public class ProducerService : IDisposable
     {
         private readonly IProducer<byte[], byte[]> _producer;
-
-        private readonly SemaphoreSlim _producerSemaphore = new(1);
         private readonly ConcurrentDictionary<string, RecordSchema> _schemaCache = new();
 
         private readonly ISchemaRegistryClient _schemaRegistryClient;
+
+        private readonly SemaphoreSlim _semaphore = new(1);
 
         private AvroSerializer<GenericRecord> _avroSerializer;
 
@@ -61,6 +61,7 @@ namespace SergeSavel.KafkaRestProxy.Producer
         {
             var headers = ProducerMapper.MapHeaders(request.Headers);
 
+            // Can be written better.
             var keySerializationContext = new SerializationContext(MessageComponentType.Key, topic, headers);
             byte[] keyBytes;
             switch (request.KeyType)
@@ -89,6 +90,7 @@ namespace SergeSavel.KafkaRestProxy.Producer
                     throw new BadRequestException("Unexpected key serialization type: " + request.KeyType);
             }
 
+            // Can be written better.
             var valueSerializationContext = new SerializationContext(MessageComponentType.Value, topic, headers);
             byte[] valueBytes;
             switch (request.ValueType)
@@ -146,7 +148,7 @@ namespace SergeSavel.KafkaRestProxy.Producer
         {
             if (_avroSerializer == null)
             {
-                _producerSemaphore.Wait(TimeSpan.FromSeconds(10));
+                _semaphore.Wait(TimeSpan.FromSeconds(10));
                 try
                 {
                     if (_schemaRegistryClient == null)
@@ -156,7 +158,7 @@ namespace SergeSavel.KafkaRestProxy.Producer
                 }
                 finally
                 {
-                    _producerSemaphore.Release();
+                    _semaphore.Release();
                 }
             }
 
