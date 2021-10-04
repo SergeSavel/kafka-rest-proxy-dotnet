@@ -14,7 +14,7 @@
 
 using System;
 
-namespace SergeSavel.KafkaRestProxy.Common
+namespace SergeSavel.KafkaRestProxy.Common.Extensions
 {
     public static class DecimalExtensions
     {
