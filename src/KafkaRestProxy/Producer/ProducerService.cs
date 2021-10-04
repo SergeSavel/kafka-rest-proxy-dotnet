@@ -115,7 +115,7 @@ namespace SergeSavel.KafkaRestProxy.Producer
                 case KeyValueType.AvroAsXml:
                 {
                     var genericRecord =
-                        request.Key.AsGenericRecord(request.ValueSchema, _schemaCache);
+                        request.Value.AsGenericRecord(request.ValueSchema, _schemaCache);
                     valueBytes = await GetAvroSerializer().SerializeAsync(genericRecord, valueSerializationContext)
                         .ConfigureAwait(false);
                     break;
