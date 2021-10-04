@@ -21,7 +21,7 @@ using System.Linq;
 using System.Xml.Linq;
 using Avro;
 using Avro.Generic;
-using SergeSavel.KafkaRestProxy.Common;
+using SergeSavel.KafkaRestProxy.Common.Extensions;
 
 namespace SergeSavel.KafkaRestProxy.Producer
 {
