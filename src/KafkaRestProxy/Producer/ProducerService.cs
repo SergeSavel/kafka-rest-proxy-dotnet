@@ -23,6 +23,7 @@ using Confluent.SchemaRegistry;
 using Confluent.SchemaRegistry.Serdes;
 using SergeSavel.KafkaRestProxy.Common.Contract;
 using SergeSavel.KafkaRestProxy.Common.Exceptions;
+using SergeSavel.KafkaRestProxy.Common.Extensions;
 using SergeSavel.KafkaRestProxy.Producer.Contract;
 using SergeSavel.KafkaRestProxy.Producer.Exceptions;
 using SergeSavel.KafkaRestProxy.Producer.Requests;
@@ -85,7 +86,7 @@ namespace SergeSavel.KafkaRestProxy.Producer
                 case KeyValueType.AvroAsXml:
                 {
                     var genericRecord =
-                        ProducerGenericMapper.GetGenericRecord(request.Key, request.KeySchema, _schemaCache);
+                        request.Key.AsGenericRecord(request.KeySchema, _schemaCache);
                     keyBytes = await GetAvroSerializer().SerializeAsync(genericRecord, keySerializationContext)
                         .ConfigureAwait(false);
                     break;
@@ -114,7 +115,7 @@ namespace SergeSavel.KafkaRestProxy.Producer
                 case KeyValueType.AvroAsXml:
                 {
                     var genericRecord =
-                        ProducerGenericMapper.GetGenericRecord(request.Value, request.ValueSchema, _schemaCache);
+                        request.Key.AsGenericRecord(request.ValueSchema, _schemaCache);
                     valueBytes = await GetAvroSerializer().SerializeAsync(genericRecord, valueSerializationContext)
                         .ConfigureAwait(false);
                     break;
