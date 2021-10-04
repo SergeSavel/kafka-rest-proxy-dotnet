@@ -621,13 +621,13 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
             var effectiveSchema = GetEffectiveSchema<LogicalSchema>(schema);
             var targetScale = GetScalePropertyValueFromSchema(effectiveSchema);
 
-            var decimalValue = XmlConvert.ToDecimal(element.Value);
-            var actualScale = decimalValue.GetScale();
+            var value = XmlConvert.ToDecimal(element.Value);
 
+            var actualScale = value.GetScale();
             if (targetScale > actualScale)
-                decimalValue = decimal.Multiply(decimalValue, Scales[targetScale - actualScale]);
+                value = decimal.Multiply(value, Scales[targetScale - actualScale]);
 
-            return new AvroDecimal(decimalValue);
+            return new AvroDecimal(value);
         }
 
         private static int GetScalePropertyValueFromSchema(Schema schema, int defaultVal = 0)
@@ -646,31 +646,36 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
         private static DateTime ParseDate(XElement element, Schema schema)
         {
             var unused = GetEffectiveSchema<LogicalSchema>(schema);
-            return XmlConvert.ToDateTime(element.Value, XmlDateTimeSerializationMode.Local);
+            var value = XmlConvert.ToDateTime(element.Value, XmlDateTimeSerializationMode.Unspecified);
+            return value;
         }
 
         private static DateTime ParseTimestampMillis(XElement element, Schema schema)
         {
             var unused = GetEffectiveSchema<LogicalSchema>(schema);
-            return XmlConvert.ToDateTime(element.Value, XmlDateTimeSerializationMode.Unspecified);
+            var value = XmlConvert.ToDateTime(element.Value, XmlDateTimeSerializationMode.Utc);
+            return value;
         }
 
         private static DateTime ParseTimestampMicros(XElement element, Schema schema)
         {
             var unused = GetEffectiveSchema<LogicalSchema>(schema);
-            return XmlConvert.ToDateTime(element.Value, XmlDateTimeSerializationMode.Unspecified);
+            var value = XmlConvert.ToDateTime(element.Value, XmlDateTimeSerializationMode.Utc);
+            return value;
         }
 
         private static TimeSpan ParseTimeMillis(XElement element, Schema schema)
         {
             var unused = GetEffectiveSchema<LogicalSchema>(schema);
-            return XmlConvert.ToTimeSpan(element.Value);
+            var value = XmlConvert.ToTimeSpan(element.Value);
+            return value;
         }
 
         private static TimeSpan ParseTimeMicros(XElement element, Schema schema)
         {
             var unused = GetEffectiveSchema<LogicalSchema>(schema);
-            return XmlConvert.ToTimeSpan(element.Value);
+            var value = XmlConvert.ToTimeSpan(element.Value);
+            return value;
         }
 
         private static T GetEffectiveSchema<T>(Schema schema) where T : Schema
@@ -681,13 +686,25 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
                     return matchedSchema;
                 case UnionSchema unionSchema:
                 {
+                    T result = null;
+
                     foreach (var innerSchema in unionSchema.Schemas)
                         if (innerSchema is T matchedSchema)
-                            return matchedSchema;
-                    throw new InvalidOperationException($"'{typeof(T).Name}' not included in union.");
+                        {
+                            if (result != null)
+                                throw new InvalidOperationException(
+                                    $"Schema '{typeof(T).Name}' presented in union more than once.");
+                            result = matchedSchema;
+                        }
+
+                    if (result == null)
+                        throw new InvalidOperationException($"'Schema {typeof(T).Name}' not included in union.");
+
+                    return result;
                 }
                 default:
-                    throw new InvalidOperationException($"Cannot convert '{schema.GetType()}' to '{typeof(T)}'.");
+                    throw new InvalidOperationException(
+                        $"Cannot convert schema '{schema.GetType()}' to '{typeof(T)}'.");
             }
         }
     }
