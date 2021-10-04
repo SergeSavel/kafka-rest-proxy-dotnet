@@ -19,7 +19,7 @@ using Confluent.Kafka;
 using Confluent.Kafka.SyncOverAsync;
 using Confluent.SchemaRegistry;
 using Confluent.SchemaRegistry.Serdes;
-using SergeSavel.KafkaRestProxy.Consumer.Extensions;
+using SergeSavel.KafkaRestProxy.Common.Extensions;
 
 namespace SergeSavel.KafkaRestProxy.Consumer
 {

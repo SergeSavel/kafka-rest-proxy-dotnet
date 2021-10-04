@@ -19,7 +19,7 @@ using System.Xml.Linq;
 using Avro;
 using Avro.Generic;
 
-namespace SergeSavel.KafkaRestProxy.Consumer.Extensions
+namespace SergeSavel.KafkaRestProxy.Common.Extensions
 {
     public static class AvroExtensions
     {
