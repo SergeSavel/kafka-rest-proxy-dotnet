@@ -69,11 +69,12 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
         private static readonly XName XFixed = FixedString;
         private static readonly XName XDecimal = DecimalString;
         private static readonly XName XUuid = UuidString;
-        private static readonly XName XDate = DateString;
-        private static readonly XName XTimeMillis = TimeMillisString;
-        private static readonly XName XTimeMicros = TimeMicrosString;
-        private static readonly XName XTimestampMillis = TimestampMillisString;
-        private static readonly XName XTimestampMicros = TimestampMicrosString;
+
+        //private static readonly XName XDate = DateString;
+        //private static readonly XName XTimeMillis = TimeMillisString;
+        //private static readonly XName XTimeMicros = TimeMicrosString;
+        //private static readonly XName XTimestampMillis = TimestampMillisString;
+        //private static readonly XName XTimestampMicros = TimestampMicrosString;
         private static readonly XName XMapItem = MapItemString;
         private static readonly XName XKey = KeyString;
 
@@ -132,8 +133,6 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
             1.00000000000000000000000000000000000000000000000000m
         };
 
-        //private static readonly DateTime StartDateUtc = new(1970, 01, 01, 0, 0, 0, DateTimeKind.Utc);
-
         // Serialization
 
         public static string AsXmlString(this GenericRecord record)
@@ -142,7 +141,7 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
 
             var document = new XDocument();
 
-            AddRecord(document, record, record.Schema, record.Schema.Name, record.Schema.Namespace);
+            AddRecord(document, record, record.Schema.Name, record.Schema.Namespace);
 
             //var result = document.ToString(SaveOptions.DisableFormatting);
             var result = document.ToString();
@@ -158,125 +157,38 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
                 return;
             }
 
-            switch (schema)
-            {
-                case PrimitiveSchema:
-                    AddPrimitive(parent, value, name);
-                    break;
-                case LogicalSchema logicalSchema:
-                    AddLogical(parent, value, logicalSchema, name);
-                    break;
-                case RecordSchema recordSchema when value is GenericRecord recordValue:
-                    AddRecord(parent, recordValue, recordSchema, name);
-                    break;
-                case EnumSchema enumSchema when value is GenericEnum enumValue:
-                    AddEnum(parent, enumValue, enumSchema, name);
-                    break;
-                case ArraySchema arraySchema when value is Array arrayValue:
-                    AddArray(parent, arrayValue, arraySchema, name);
-                    break;
-                case MapSchema mapSchema when value is IDictionary<string, object> mapValue:
-                    AddMap(parent, mapValue, mapSchema, name);
-                    break;
-                case FixedSchema fixedSchema when value is GenericFixed fixedValue:
-                    AddFixed(parent, fixedValue, fixedSchema, name);
-                    break;
-                default:
-                    throw new InvalidOperationException(
-                        $"Unexpected combination of schema type ({schema.GetType()}) and value type ({value.GetType()}).");
-            }
-        }
-
-        private static void AddPrimitive(XContainer parent, object value, string name = null,
-            string nspace = null)
-        {
-            switch (value)
-            {
-                case bool boolValue:
-                    AddBoolean(parent, boolValue, name, nspace);
-                    break;
-                case int intValue:
-                    AddInt(parent, intValue, name, nspace);
-                    break;
-                case long longValue:
-                    AddLong(parent, longValue, name, nspace);
-                    break;
-                case float floatValue:
-                    AddFloat(parent, floatValue, name, nspace);
-                    break;
-                case double doubleValue:
-                    AddDouble(parent, doubleValue, name, nspace);
-                    break;
-                case byte[] bytesValue:
-                    AddBytes(parent, bytesValue, name, nspace);
-                    break;
-                case string stringValue:
-                    AddString(parent, stringValue, name, nspace);
-                    break;
-                default:
-                    throw new InvalidOperationException(
-                        $"Unexpected primitive value type ({value.GetType()}).");
-            }
-
-            // switch (schema.Name)
-            // {
-            //     case "boolean" when value is bool boolValue:
-            //         AddBoolean(parent, boolValue, name, nspace);
-            //         break;
-            //     case "int" when value is int intValue:
-            //         AddInt(parent, intValue, name, nspace);
-            //         break;
-            //     case "long" when value is long longValue:
-            //         AddLong(parent, longValue, name, nspace);
-            //         break;
-            //     case "float" when value is float floatValue:
-            //         AddFloat(parent, floatValue, name, nspace);
-            //         break;
-            //     case "double" when value is double doubleValue:
-            //         AddDouble(parent, floatValue, name, nspace);
-            //         break;
-            //     case "bytes" when value is byte[] bytesValue:
-            //         AddBytes(parent, floatValue, name, nspace);
-            //         break;
-            //     case "string" when value is string stringValue:
-            //         AddString(parent, stringValue, name, nspace);
-            //         break;
-            //     default:
-            //         throw new InvalidOperationException(
-            //             $"Unexpected combination of primitive schema type ({schema.Name}) and value type ({value.GetType()}).");
-            // }
-        }
-
-        private static void AddLogical(XContainer parent, object value, LogicalSchema schema, string name = null,
-            string nspace = null)
-        {
-            switch (schema.LogicalTypeName)
-            {
-                case DecimalString when value is AvroDecimal avroDecimalValue:
-                    AddDecimal(parent, avroDecimalValue, name, nspace);
-                    break;
-                case UuidString when value is Guid guidValue:
-                    AddUuid(parent, guidValue, name, nspace);
-                    break;
-                case DateString when value is DateTime dateValue:
-                    AddDate(parent, dateValue, name, nspace);
-                    break;
-                case TimeMillisString when value is TimeSpan timespanMillisValue:
-                    AddTimeMillis(parent, timespanMillisValue, name, nspace);
-                    break;
-                case TimeMicrosString when value is TimeSpan timespanMicrosValue:
-                    AddTimeMicros(parent, timespanMicrosValue, name, nspace);
-                    break;
-                case TimestampMillisString when value is DateTime datetimeMillisValue:
-                    AddTimestampMillis(parent, datetimeMillisValue, name, nspace);
-                    break;
-                case TimestampMicrosString when value is DateTime datetimeMicrosValue:
-                    AddTimestampMicros(parent, datetimeMicrosValue, name, nspace);
-                    break;
-                default:
-                    throw new InvalidOperationException(
-                        $"Unexpected combination of primitive schema type ({schema.Name}) and value type ({value.GetType()}).");
-            }
+            if (value is bool booleanValue)
+                AddBoolean(parent, booleanValue, name);
+            else if (value is int intValue)
+                AddInt(parent, intValue, name);
+            else if (value is long longValue)
+                AddLong(parent, longValue, name);
+            else if (value is float floatValue)
+                AddFloat(parent, floatValue, name);
+            else if (value is double doubleValue)
+                AddDouble(parent, doubleValue, name);
+            else if (value is byte[] bytesValue)
+                AddBytes(parent, bytesValue, name);
+            else if (value is string stringValue)
+                AddString(parent, stringValue, name);
+            else if (value is GenericRecord recordValue)
+                AddRecord(parent, recordValue, name);
+            else if (value is GenericEnum enumValue)
+                AddEnum(parent, enumValue, name);
+            else if (value is Array arrayValue)
+                AddArray(parent, arrayValue, schema, name);
+            else if (value is IDictionary<string, object> mapValue)
+                AddMap(parent, mapValue, schema, name);
+            else if (value is GenericFixed fixedValue)
+                AddFixed(parent, fixedValue, name);
+            else if (value is AvroDecimal decimalValue)
+                AddDecimal(parent, decimalValue, name);
+            else if (value is Guid guidValue)
+                AddUuid(parent, guidValue, name);
+            else if (value is DateTime datetimeValue)
+                AddDateTime(parent, datetimeValue, schema, name);
+            else if (value is TimeSpan timespanValue)
+                AddTimeSpan(parent, timespanValue, schema, name);
         }
 
         private static void AddNull(XContainer parent, string name = null, string nspace = null)
@@ -397,7 +309,7 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
             parent.Add(element);
         }
 
-        private static void AddRecord(XContainer parent, GenericRecord value, RecordSchema schema, string name = null,
+        private static void AddRecord(XContainer parent, GenericRecord value, string name = null,
             string nspace = null)
         {
             var element = new XElement(XRecord);
@@ -408,45 +320,14 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
             if (nspace != null)
                 element.SetAttributeValue(XNamespace, nspace);
 
-            foreach (var field in schema.Fields)
+            foreach (var field in value.Schema.Fields)
                 if (value.TryGetValue(field.Pos, out var fieldValue))
                     AddValue(element, fieldValue, field.Schema, field.Name);
 
             parent.Add(element);
         }
 
-        private static void AddArray(XContainer parent, Array value, ArraySchema schema, string name = null)
-        {
-            var element = new XElement(XArray);
-
-            if (name != null)
-                element.SetAttributeValue(XName, name);
-
-            foreach (var item in value) AddValue(element, item, schema.ItemSchema);
-
-            parent.Add(element);
-        }
-
-        private static void AddMap(XContainer parent, IDictionary<string, object> value, MapSchema schema,
-            string name = null)
-        {
-            var element = new XElement(XMap);
-
-            if (name != null)
-                element.SetAttributeValue(XName, name);
-
-            foreach (var (itemKey, itemValue) in value)
-            {
-                var itemElement = new XElement(XMapItem);
-                itemElement.SetAttributeValue(XKey, itemKey);
-                AddValue(itemElement, itemValue, schema.ValueSchema);
-                element.Add(itemElement);
-            }
-
-            parent.Add(element);
-        }
-
-        private static void AddEnum(XContainer parent, GenericEnum value, EnumSchema schema, string name = null,
+        private static void AddEnum(XContainer parent, GenericEnum value, string name = null,
             string nspace = null)
         {
             var element = new XElement(XEnum);
@@ -462,7 +343,41 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
             parent.Add(element);
         }
 
-        private static void AddFixed(XContainer parent, GenericFixed value, FixedSchema schema, string name = null,
+        private static void AddArray(XContainer parent, Array value, Schema schema, string name = null)
+        {
+            var arraySchema = GetEffectiveSchema<ArraySchema>(schema);
+
+            var element = new XElement(XArray);
+
+            if (name != null)
+                element.SetAttributeValue(XName, name);
+
+            foreach (var item in value) AddValue(element, item, arraySchema.ItemSchema);
+
+            parent.Add(element);
+        }
+
+        private static void AddMap(XContainer parent, IDictionary<string, object> value, Schema schema,
+            string name = null)
+        {
+            var mapSchema = GetEffectiveSchema<MapSchema>(schema);
+            var element = new XElement(XMap);
+
+            if (name != null)
+                element.SetAttributeValue(XName, name);
+
+            foreach (var (itemKey, itemValue) in value)
+            {
+                var itemElement = new XElement(XMapItem);
+                itemElement.SetAttributeValue(XKey, itemKey);
+                AddValue(itemElement, itemValue, mapSchema.ValueSchema);
+                element.Add(itemElement);
+            }
+
+            parent.Add(element);
+        }
+
+        private static void AddFixed(XContainer parent, GenericFixed value, string name = null,
             string nspace = null)
         {
             var element = new XElement(XFixed);
@@ -511,10 +426,12 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
             parent.Add(element);
         }
 
-        private static void AddDate(XContainer parent, DateTime value, string name = null,
+        private static void AddDateTime(XContainer parent, DateTime value, Schema schema, string name = null,
             string nspace = null)
         {
-            var element = new XElement(XDate);
+            var logicalSchema = GetEffectiveSchema<LogicalSchema>(schema);
+
+            var element = new XElement(logicalSchema.LogicalTypeName); // ???
 
             if (name != null)
                 element.SetAttributeValue(XName, name);
@@ -522,17 +439,17 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
             if (nspace != null)
                 element.SetAttributeValue(XNamespace, nspace);
 
-            //var intValue = (int)(value - StartDateUtc).TotalDays;
-            //element.Value = XmlConvert.ToString(intValue);
-            element.Value = XmlConvert.ToString(value, XmlDateTimeSerializationMode.Local);
+            element.Value = XmlConvert.ToString(value, XmlDateTimeSerializationMode.Unspecified);
 
             parent.Add(element);
         }
 
-        private static void AddTimeMillis(XContainer parent, TimeSpan value, string name = null,
+        private static void AddTimeSpan(XContainer parent, TimeSpan value, Schema schema, string name = null,
             string nspace = null)
         {
-            var element = new XElement(XTimeMillis);
+            var logicalSchema = GetEffectiveSchema<LogicalSchema>(schema);
+
+            var element = new XElement(logicalSchema.LogicalTypeName); // ???
 
             if (name != null)
                 element.SetAttributeValue(XName, name);
@@ -541,58 +458,6 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
                 element.SetAttributeValue(XNamespace, nspace);
 
             element.Value = XmlConvert.ToString(value);
-
-            parent.Add(element);
-        }
-
-        private static void AddTimeMicros(XContainer parent, TimeSpan value, string name = null,
-            string nspace = null)
-        {
-            var element = new XElement(XTimeMicros);
-
-            if (name != null)
-                element.SetAttributeValue(XName, name);
-
-            if (nspace != null)
-                element.SetAttributeValue(XNamespace, nspace);
-
-            element.Value = XmlConvert.ToString(value);
-
-            parent.Add(element);
-        }
-
-        private static void AddTimestampMillis(XContainer parent, DateTime value, string name = null,
-            string nspace = null)
-        {
-            var element = new XElement(XTimestampMillis);
-
-            if (name != null)
-                element.SetAttributeValue(XName, name);
-
-            if (nspace != null)
-                element.SetAttributeValue(XNamespace, nspace);
-
-            //var longValue = (long)(value - StartDateUtc).TotalMilliseconds;
-            //element.Value = XmlConvert.ToString(longValue);
-            element.Value = XmlConvert.ToString(value, XmlDateTimeSerializationMode.Utc);
-
-            parent.Add(element);
-        }
-
-        private static void AddTimestampMicros(XContainer parent, DateTime value, string name = null,
-            string nspace = null)
-        {
-            var element = new XElement(XTimestampMicros);
-
-            if (name != null)
-                element.SetAttributeValue(XName, name);
-
-            if (nspace != null)
-                element.SetAttributeValue(XNamespace, nspace);
-
-            //var longValue = (long)((value - StartDateUtc).TotalMilliseconds * 1000);
-            //element.Value = XmlConvert.ToString(longValue);
-            element.Value = XmlConvert.ToString(value, XmlDateTimeSerializationMode.Utc);
 
             parent.Add(element);
         }
@@ -760,10 +625,6 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
             var actualScale = decimalValue.GetScale();
 
             if (targetScale > actualScale)
-                // decimalValue *= Powers[targetScale-actualScale];
-                // var longValue = decimal.ToUInt64(decimalValue);
-                // var bigint = BigInteger.Multiply(Powers[targetScale], longValue);
-                //     result = new AvroDecimal(bigint, targetScale);
                 decimalValue = decimal.Multiply(decimalValue, Scales[targetScale - actualScale]);
 
             return new AvroDecimal(decimalValue);
@@ -788,32 +649,28 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
             return XmlConvert.ToDateTime(element.Value, XmlDateTimeSerializationMode.Local);
         }
 
+        private static DateTime ParseTimestampMillis(XElement element, Schema schema)
+        {
+            var unused = GetEffectiveSchema<LogicalSchema>(schema);
+            return XmlConvert.ToDateTime(element.Value, XmlDateTimeSerializationMode.Unspecified);
+        }
+
+        private static DateTime ParseTimestampMicros(XElement element, Schema schema)
+        {
+            var unused = GetEffectiveSchema<LogicalSchema>(schema);
+            return XmlConvert.ToDateTime(element.Value, XmlDateTimeSerializationMode.Unspecified);
+        }
+
         private static TimeSpan ParseTimeMillis(XElement element, Schema schema)
         {
             var unused = GetEffectiveSchema<LogicalSchema>(schema);
-            //return TimeSpan.Parse(element.Value, CultureInfo.InvariantCulture.DateTimeFormat);
             return XmlConvert.ToTimeSpan(element.Value);
         }
 
         private static TimeSpan ParseTimeMicros(XElement element, Schema schema)
         {
             var unused = GetEffectiveSchema<LogicalSchema>(schema);
-            //return TimeSpan.Parse(element.Value, CultureInfo.InvariantCulture.DateTimeFormat);
             return XmlConvert.ToTimeSpan(element.Value);
-        }
-
-        private static DateTime ParseTimestampMillis(XElement element, Schema schema)
-        {
-            var unused = GetEffectiveSchema<LogicalSchema>(schema);
-            //return DateTime.Parse(element.Value, CultureInfo.InvariantCulture.DateTimeFormat);
-            return XmlConvert.ToDateTime(element.Value, XmlDateTimeSerializationMode.Utc);
-        }
-
-        private static DateTime ParseTimestampMicros(XElement element, Schema schema)
-        {
-            var unused = GetEffectiveSchema<LogicalSchema>(schema);
-            //return DateTime.Parse(element.Value, CultureInfo.InvariantCulture.DateTimeFormat);
-            return XmlConvert.ToDateTime(element.Value, XmlDateTimeSerializationMode.Utc);
         }
 
         private static T GetEffectiveSchema<T>(Schema schema) where T : Schema
