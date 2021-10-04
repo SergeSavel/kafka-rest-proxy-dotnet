@@ -776,10 +776,10 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
             return string.IsNullOrEmpty(scaleVal) ? defaultVal : int.Parse(scaleVal, CultureInfo.CurrentCulture);
         }
 
-        private static string ParseUuid(XElement element, Schema schema)
+        private static Guid ParseUuid(XElement element, Schema schema)
         {
             var unused = GetEffectiveSchema<LogicalSchema>(schema);
-            return element.Value;
+            return Guid.Parse(element.Value);
         }
 
         private static DateTime ParseDate(XElement element, Schema schema)
