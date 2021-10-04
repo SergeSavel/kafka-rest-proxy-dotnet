@@ -27,32 +27,55 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
 {
     public static class AvroExtensions
     {
-        private static readonly XName NameNamespace = "namespace";
-        private static readonly XName NameName = "name";
+        private const string NamespaceString = "namespace";
+        private const string NameString = "name";
+        private const string NullString = "null";
+        private const string BooleanString = "boolean";
+        private const string IntString = "int";
+        private const string LongString = "long";
+        private const string FloatString = "float";
+        private const string DoubleString = "double";
+        private const string BytesString = "bytes";
+        private const string StringString = "string";
+        private const string RecordString = "record";
+        private const string EnumString = "enum";
+        private const string ArrayString = "array";
+        private const string MapString = "map";
+        private const string FixedString = "fixed";
+        private const string DecimalString = "decimal";
+        private const string UuidString = "uuid";
+        private const string DateString = "date";
+        private const string TimeMillisString = "time-millis";
+        private const string TimeMicrosString = "time-micros";
+        private const string TimestampMillisString = "timestamp-millis";
+        private const string TimestampMicrosString = "timestamp-micros";
+        private const string MapItemString = "mapItem";
+        private const string KeyString = "key";
 
-        private static readonly XName NameNull = "null";
-        private static readonly XName NameBoolean = "boolean";
-        private static readonly XName NameInt = "int";
-        private static readonly XName NameLong = "long";
-        private static readonly XName NameFloat = "float";
-        private static readonly XName NameDouble = "double";
-        private static readonly XName NameBytes = "bytes";
-        private static readonly XName NameString = "string";
-
-        private static readonly XName NameRecord = "record";
-        private static readonly XName NameEnum = "enum";
-        private static readonly XName NameArray = "array";
-        private static readonly XName NameMap = "map";
-        private static readonly XName NameFixed = "fixed";
-
-        private static readonly XName NameDecimal = "decimal";
-        private static readonly XName NameUuid = "uuid";
-        private static readonly XName NameDate = "date";
-        private static readonly XName NameTimestampMillis = "timestamp-millis";
-        private static readonly XName NameTimestampMicros = "timestamp-micros";
-
-        private static readonly XName NameMapItem = "mapItem";
-        private static readonly XName NameKey = "key";
+        private static readonly XName XNamespace = NamespaceString;
+        private static readonly XName XName = NameString;
+        private static readonly XName XNull = NullString;
+        private static readonly XName XBoolean = BooleanString;
+        private static readonly XName XInt = IntString;
+        private static readonly XName XLong = LongString;
+        private static readonly XName XFloat = FloatString;
+        private static readonly XName XDouble = DoubleString;
+        private static readonly XName XBytes = BytesString;
+        private static readonly XName XString = StringString;
+        private static readonly XName XRecord = RecordString;
+        private static readonly XName XEnum = EnumString;
+        private static readonly XName XArray = ArrayString;
+        private static readonly XName XMap = MapString;
+        private static readonly XName XFixed = FixedString;
+        private static readonly XName XDecimal = DecimalString;
+        private static readonly XName XUuid = UuidString;
+        private static readonly XName XDate = DateString;
+        private static readonly XName XTimeMillis = TimeMillisString;
+        private static readonly XName XTimeMicros = TimeMicrosString;
+        private static readonly XName XTimestampMillis = TimestampMillisString;
+        private static readonly XName XTimestampMicros = TimestampMicrosString;
+        private static readonly XName XMapItem = MapItemString;
+        private static readonly XName XKey = KeyString;
 
         private static readonly decimal[] Scales =
         {
@@ -109,7 +132,9 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
             1.00000000000000000000000000000000000000000000000000m
         };
 
-        private static readonly DateTime StartDateUtc = new(1970, 01, 01, 0, 0, 0, DateTimeKind.Utc);
+        //private static readonly DateTime StartDateUtc = new(1970, 01, 01, 0, 0, 0, DateTimeKind.Utc);
+
+        // Serialization
 
         public static string AsXmlString(this GenericRecord record)
         {
@@ -227,19 +252,25 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
         {
             switch (schema.LogicalTypeName)
             {
-                case "decimal" when value is AvroDecimal avroDecimalValue:
+                case DecimalString when value is AvroDecimal avroDecimalValue:
                     AddDecimal(parent, avroDecimalValue, name, nspace);
                     break;
-                case "uuid" when value is Guid guidValue:
+                case UuidString when value is Guid guidValue:
                     AddUuid(parent, guidValue, name, nspace);
                     break;
-                case "date" when value is DateTime dateValue:
+                case DateString when value is DateTime dateValue:
                     AddDate(parent, dateValue, name, nspace);
                     break;
-                case "timestamp-millis" when value is DateTime datetimeMillisValue:
+                case TimeMillisString when value is TimeSpan timespanMillisValue:
+                    AddTimeMillis(parent, timespanMillisValue, name, nspace);
+                    break;
+                case TimeMicrosString when value is TimeSpan timespanMicrosValue:
+                    AddTimeMicros(parent, timespanMicrosValue, name, nspace);
+                    break;
+                case TimestampMillisString when value is DateTime datetimeMillisValue:
                     AddTimestampMillis(parent, datetimeMillisValue, name, nspace);
                     break;
-                case "timestamp-micros" when value is DateTime datetimeMicrosValue:
+                case TimestampMicrosString when value is DateTime datetimeMicrosValue:
                     AddTimestampMicros(parent, datetimeMicrosValue, name, nspace);
                     break;
                 default:
@@ -250,26 +281,26 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
 
         private static void AddNull(XContainer parent, string name = null, string nspace = null)
         {
-            var element = new XElement(NameNull);
+            var element = new XElement(XNull);
 
             if (name != null)
-                element.SetAttributeValue(NameName, name);
+                element.SetAttributeValue(XName, name);
 
             if (nspace != null)
-                element.SetAttributeValue(NameNamespace, nspace);
+                element.SetAttributeValue(XNamespace, nspace);
 
             parent.Add(element);
         }
 
         private static void AddBoolean(XContainer parent, bool value, string name = null, string nspace = null)
         {
-            var element = new XElement(NameBoolean);
+            var element = new XElement(XBoolean);
 
             if (name != null)
-                element.SetAttributeValue(NameName, name);
+                element.SetAttributeValue(XName, name);
 
             if (nspace != null)
-                element.SetAttributeValue(NameNamespace, nspace);
+                element.SetAttributeValue(XNamespace, nspace);
 
             element.Value = XmlConvert.ToString(value);
 
@@ -278,13 +309,13 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
 
         private static void AddInt(XContainer parent, int value, string name = null, string nspace = null)
         {
-            var element = new XElement(NameInt);
+            var element = new XElement(XInt);
 
             if (name != null)
-                element.SetAttributeValue(NameName, name);
+                element.SetAttributeValue(XName, name);
 
             if (nspace != null)
-                element.SetAttributeValue(NameNamespace, nspace);
+                element.SetAttributeValue(XNamespace, nspace);
 
             element.Value = XmlConvert.ToString(value);
 
@@ -293,13 +324,13 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
 
         private static void AddLong(XContainer parent, long value, string name = null, string nspace = null)
         {
-            var element = new XElement(NameLong);
+            var element = new XElement(XLong);
 
             if (name != null)
-                element.SetAttributeValue(NameName, name);
+                element.SetAttributeValue(XName, name);
 
             if (nspace != null)
-                element.SetAttributeValue(NameNamespace, nspace);
+                element.SetAttributeValue(XNamespace, nspace);
 
             element.Value = XmlConvert.ToString(value);
 
@@ -308,13 +339,13 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
 
         private static void AddFloat(XContainer parent, float value, string name = null, string nspace = null)
         {
-            var element = new XElement(NameFloat);
+            var element = new XElement(XFloat);
 
             if (name != null)
-                element.SetAttributeValue(NameName, name);
+                element.SetAttributeValue(XName, name);
 
             if (nspace != null)
-                element.SetAttributeValue(NameNamespace, nspace);
+                element.SetAttributeValue(XNamespace, nspace);
 
             element.Value = XmlConvert.ToString(value);
 
@@ -323,13 +354,13 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
 
         private static void AddDouble(XContainer parent, double value, string name = null, string nspace = null)
         {
-            var element = new XElement(NameDouble);
+            var element = new XElement(XDouble);
 
             if (name != null)
-                element.SetAttributeValue(NameName, name);
+                element.SetAttributeValue(XName, name);
 
             if (nspace != null)
-                element.SetAttributeValue(NameNamespace, nspace);
+                element.SetAttributeValue(XNamespace, nspace);
 
             element.Value = XmlConvert.ToString(value);
 
@@ -338,13 +369,13 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
 
         private static void AddBytes(XContainer parent, byte[] value, string name = null, string nspace = null)
         {
-            var element = new XElement(NameBytes);
+            var element = new XElement(XBytes);
 
             if (name != null)
-                element.SetAttributeValue(NameName, name);
+                element.SetAttributeValue(XName, name);
 
             if (nspace != null)
-                element.SetAttributeValue(NameNamespace, nspace);
+                element.SetAttributeValue(XNamespace, nspace);
 
             element.Value = Convert.ToBase64String(value);
 
@@ -353,13 +384,13 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
 
         private static void AddString(XContainer parent, string value, string name = null, string nspace = null)
         {
-            var element = new XElement(NameString);
+            var element = new XElement(XString);
 
             if (name != null)
-                element.SetAttributeValue(NameName, name);
+                element.SetAttributeValue(XName, name);
 
             if (nspace != null)
-                element.SetAttributeValue(NameNamespace, nspace);
+                element.SetAttributeValue(XNamespace, nspace);
 
             element.Value = value;
 
@@ -369,13 +400,13 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
         private static void AddRecord(XContainer parent, GenericRecord value, RecordSchema schema, string name = null,
             string nspace = null)
         {
-            var element = new XElement(NameRecord);
+            var element = new XElement(XRecord);
 
             if (name != null)
-                element.SetAttributeValue(NameName, name);
+                element.SetAttributeValue(XName, name);
 
             if (nspace != null)
-                element.SetAttributeValue(NameNamespace, nspace);
+                element.SetAttributeValue(XNamespace, nspace);
 
             foreach (var field in schema.Fields)
                 if (value.TryGetValue(field.Pos, out var fieldValue))
@@ -386,10 +417,10 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
 
         private static void AddArray(XContainer parent, Array value, ArraySchema schema, string name = null)
         {
-            var element = new XElement(NameArray);
+            var element = new XElement(XArray);
 
             if (name != null)
-                element.SetAttributeValue(NameName, name);
+                element.SetAttributeValue(XName, name);
 
             foreach (var item in value) AddValue(element, item, schema.ItemSchema);
 
@@ -399,15 +430,15 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
         private static void AddMap(XContainer parent, IDictionary<string, object> value, MapSchema schema,
             string name = null)
         {
-            var element = new XElement(NameMap);
+            var element = new XElement(XMap);
 
             if (name != null)
-                element.SetAttributeValue(NameName, name);
+                element.SetAttributeValue(XName, name);
 
             foreach (var (itemKey, itemValue) in value)
             {
-                var itemElement = new XElement(NameMapItem);
-                itemElement.SetAttributeValue(NameKey, itemKey);
+                var itemElement = new XElement(XMapItem);
+                itemElement.SetAttributeValue(XKey, itemKey);
                 AddValue(itemElement, itemValue, schema.ValueSchema);
                 element.Add(itemElement);
             }
@@ -418,13 +449,13 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
         private static void AddEnum(XContainer parent, GenericEnum value, EnumSchema schema, string name = null,
             string nspace = null)
         {
-            var element = new XElement(NameEnum);
+            var element = new XElement(XEnum);
 
             if (name != null)
-                element.SetAttributeValue(NameName, name);
+                element.SetAttributeValue(XName, name);
 
             if (nspace != null)
-                element.SetAttributeValue(NameNamespace, nspace);
+                element.SetAttributeValue(XNamespace, nspace);
 
             element.Value = value.Value;
 
@@ -434,13 +465,13 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
         private static void AddFixed(XContainer parent, GenericFixed value, FixedSchema schema, string name = null,
             string nspace = null)
         {
-            var element = new XElement(NameFixed);
+            var element = new XElement(XFixed);
 
             if (name != null)
-                element.SetAttributeValue(NameName, name);
+                element.SetAttributeValue(XName, name);
 
             if (nspace != null)
-                element.SetAttributeValue(NameNamespace, nspace);
+                element.SetAttributeValue(XNamespace, nspace);
 
             element.Value = BitConverter.ToString(value.Value).Replace("-", string.Empty).ToLowerInvariant();
 
@@ -450,13 +481,13 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
         private static void AddDecimal(XContainer parent, AvroDecimal value, string name = null,
             string nspace = null)
         {
-            var element = new XElement(NameDecimal);
+            var element = new XElement(XDecimal);
 
             if (name != null)
-                element.SetAttributeValue(NameName, name);
+                element.SetAttributeValue(XName, name);
 
             if (nspace != null)
-                element.SetAttributeValue(NameNamespace, nspace);
+                element.SetAttributeValue(XNamespace, nspace);
 
             var decimalValue = value.ToType<decimal>();
             element.Value = XmlConvert.ToString(decimalValue);
@@ -467,13 +498,13 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
         private static void AddUuid(XContainer parent, Guid value, string name = null,
             string nspace = null)
         {
-            var element = new XElement(NameUuid);
+            var element = new XElement(XUuid);
 
             if (name != null)
-                element.SetAttributeValue(NameName, name);
+                element.SetAttributeValue(XName, name);
 
             if (nspace != null)
-                element.SetAttributeValue(NameNamespace, nspace);
+                element.SetAttributeValue(XNamespace, nspace);
 
             element.Value = XmlConvert.ToString(value);
 
@@ -483,16 +514,49 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
         private static void AddDate(XContainer parent, DateTime value, string name = null,
             string nspace = null)
         {
-            var element = new XElement(NameDate);
+            var element = new XElement(XDate);
 
             if (name != null)
-                element.SetAttributeValue(NameName, name);
+                element.SetAttributeValue(XName, name);
 
             if (nspace != null)
-                element.SetAttributeValue(NameNamespace, nspace);
+                element.SetAttributeValue(XNamespace, nspace);
 
-            var intValue = (int)(value - StartDateUtc).TotalDays;
-            element.Value = XmlConvert.ToString(intValue);
+            //var intValue = (int)(value - StartDateUtc).TotalDays;
+            //element.Value = XmlConvert.ToString(intValue);
+            element.Value = XmlConvert.ToString(value, XmlDateTimeSerializationMode.Local);
+
+            parent.Add(element);
+        }
+
+        private static void AddTimeMillis(XContainer parent, TimeSpan value, string name = null,
+            string nspace = null)
+        {
+            var element = new XElement(XTimeMillis);
+
+            if (name != null)
+                element.SetAttributeValue(XName, name);
+
+            if (nspace != null)
+                element.SetAttributeValue(XNamespace, nspace);
+
+            element.Value = XmlConvert.ToString(value);
+
+            parent.Add(element);
+        }
+
+        private static void AddTimeMicros(XContainer parent, TimeSpan value, string name = null,
+            string nspace = null)
+        {
+            var element = new XElement(XTimeMicros);
+
+            if (name != null)
+                element.SetAttributeValue(XName, name);
+
+            if (nspace != null)
+                element.SetAttributeValue(XNamespace, nspace);
+
+            element.Value = XmlConvert.ToString(value);
 
             parent.Add(element);
         }
@@ -500,16 +564,17 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
         private static void AddTimestampMillis(XContainer parent, DateTime value, string name = null,
             string nspace = null)
         {
-            var element = new XElement(NameTimestampMillis);
+            var element = new XElement(XTimestampMillis);
 
             if (name != null)
-                element.SetAttributeValue(NameName, name);
+                element.SetAttributeValue(XName, name);
 
             if (nspace != null)
-                element.SetAttributeValue(NameNamespace, nspace);
+                element.SetAttributeValue(XNamespace, nspace);
 
-            var longValue = (long)(value - StartDateUtc).TotalMilliseconds;
-            element.Value = XmlConvert.ToString(longValue);
+            //var longValue = (long)(value - StartDateUtc).TotalMilliseconds;
+            //element.Value = XmlConvert.ToString(longValue);
+            element.Value = XmlConvert.ToString(value, XmlDateTimeSerializationMode.Utc);
 
             parent.Add(element);
         }
@@ -517,19 +582,22 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
         private static void AddTimestampMicros(XContainer parent, DateTime value, string name = null,
             string nspace = null)
         {
-            var element = new XElement(NameTimestampMicros);
+            var element = new XElement(XTimestampMicros);
 
             if (name != null)
-                element.SetAttributeValue(NameName, name);
+                element.SetAttributeValue(XName, name);
 
             if (nspace != null)
-                element.SetAttributeValue(NameNamespace, nspace);
+                element.SetAttributeValue(XNamespace, nspace);
 
-            var longValue = (long)((value - StartDateUtc).TotalMilliseconds * 1000);
-            element.Value = XmlConvert.ToString(longValue);
+            //var longValue = (long)((value - StartDateUtc).TotalMilliseconds * 1000);
+            //element.Value = XmlConvert.ToString(longValue);
+            element.Value = XmlConvert.ToString(value, XmlDateTimeSerializationMode.Utc);
 
             parent.Add(element);
         }
+
+        // Deserialization
 
         public static GenericRecord AsGenericRecord(this string xmlString, string schemaString,
             ConcurrentDictionary<string, RecordSchema> schemaCache)
@@ -543,7 +611,7 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
             if (rootElement == null)
                 throw new InvalidOperationException("XML document doesn't have a root element.");
 
-            if (rootElement.Name.LocalName != "record")
+            if (rootElement.Name.LocalName != RecordString)
                 throw new InvalidOperationException("Invalid root element name.");
 
             var schema = GetSchema(rootElement, schemaString, schemaCache);
@@ -556,11 +624,11 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
         private static RecordSchema GetSchema(XElement rootElement, string schemaString,
             ConcurrentDictionary<string, RecordSchema> schemaCache)
         {
-            var schemaName = rootElement.Attribute(NameName)?.Value;
+            var schemaName = rootElement.Attribute(XName)?.Value;
             if (string.IsNullOrWhiteSpace(schemaName))
                 throw new InvalidOperationException("Record name not provided..");
 
-            var schemaNamespace = rootElement.Attribute(NameNamespace)?.Value ?? string.Empty;
+            var schemaNamespace = rootElement.Attribute(XNamespace)?.Value ?? string.Empty;
 
             var schemaFullName =
                 (string.IsNullOrWhiteSpace(schemaNamespace) ? schemaName : schemaNamespace + "." + schemaName)
@@ -596,38 +664,38 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
 
             return elementName switch
             {
-                "null" => null,
-                "boolean" => bool.Parse(element.Value),
-                "int" => int.Parse(element.Value),
-                "long" => long.Parse(element.Value),
-                "float" => float.Parse(element.Value),
-                "double" => double.Parse(element.Value),
-                "bytes" => Convert.FromBase64String(element.Value),
-                "string" => element.Value,
-                "record" => ParseRecord(element, schema),
-                "enum" => ParseEnum(element, schema),
-                "array" => ParseArray(element, schema),
-                "map" => ParseMap(element, schema),
-                "fixed" => ParseFixed(element, schema),
-                "decimal" => ParseDecimal(element, schema),
-                "uuid" => ParseUuid(element, schema),
-                "date" => ParseDate(element, schema),
-                "time-millis" => ParseTimeMillis(element, schema),
-                "time-micros" => ParseTimeMicros(element, schema),
-                "timestamp-millis" => ParseTimestampMillis(element, schema),
-                "timestamp-micros" => ParseTimestampMicros(element, schema),
+                NullString => null,
+                BooleanString => XmlConvert.ToBoolean(element.Value),
+                IntString => XmlConvert.ToInt32(element.Value),
+                LongString => XmlConvert.ToInt64(element.Value),
+                FloatString => XmlConvert.ToSingle(element.Value),
+                DoubleString => XmlConvert.ToDouble(element.Value),
+                BytesString => Convert.FromBase64String(element.Value),
+                StringString => element.Value,
+                RecordString => ParseRecord(element, schema),
+                EnumString => ParseEnum(element, schema),
+                ArrayString => ParseArray(element, schema),
+                MapString => ParseMap(element, schema),
+                FixedString => ParseFixed(element, schema),
+                DecimalString => ParseDecimal(element, schema),
+                UuidString => ParseUuid(element, schema),
+                DateString => ParseDate(element, schema),
+                TimeMillisString => ParseTimeMillis(element, schema),
+                TimeMicrosString => ParseTimeMicros(element, schema),
+                TimestampMillisString => ParseTimestampMillis(element, schema),
+                TimestampMicrosString => ParseTimestampMicros(element, schema),
                 _ => throw new InvalidOperationException($"Invalid element: '{elementName}'.")
             };
         }
 
-        private static GenericRecord ParseRecord(XElement element, Schema schema)
+        private static GenericRecord ParseRecord(XContainer element, Schema schema)
         {
             var effectiveSchema = GetEffectiveSchema<RecordSchema>(schema);
             var record = new GenericRecord(effectiveSchema);
 
             foreach (var childElement in element.Elements())
             {
-                var fieldName = childElement.Attribute(NameName)?.Value;
+                var fieldName = childElement.Attribute(XName)?.Value;
                 if (string.IsNullOrWhiteSpace(fieldName))
                     throw new InvalidOperationException("Element doesn't have a name.");
 
@@ -648,7 +716,7 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
             return new GenericEnum(effectiveSchema, element.Value);
         }
 
-        private static Array ParseArray(XElement element, Schema schema)
+        private static Array ParseArray(XContainer element, Schema schema)
         {
             var effectiveSchema = GetEffectiveSchema<ArraySchema>(schema);
             var array = new ArrayList();
@@ -666,7 +734,7 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
 
             foreach (var childElement in element.Elements())
             {
-                var keyAttribute = childElement.Attribute(NameKey);
+                var keyAttribute = childElement.Attribute(XKey);
                 if (keyAttribute == null)
                     throw new InvalidOperationException("Map item element doesn't have a 'key' attribute.");
 
@@ -688,7 +756,7 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
             var effectiveSchema = GetEffectiveSchema<LogicalSchema>(schema);
             var targetScale = GetScalePropertyValueFromSchema(effectiveSchema);
 
-            var decimalValue = decimal.Parse(element.Value, CultureInfo.InvariantCulture.NumberFormat);
+            var decimalValue = XmlConvert.ToDecimal(element.Value);
             var actualScale = decimalValue.GetScale();
 
             if (targetScale > actualScale)
@@ -717,31 +785,35 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
         private static DateTime ParseDate(XElement element, Schema schema)
         {
             var unused = GetEffectiveSchema<LogicalSchema>(schema);
-            return DateTime.Parse(element.Value, CultureInfo.InvariantCulture.DateTimeFormat);
+            return XmlConvert.ToDateTime(element.Value, XmlDateTimeSerializationMode.Local);
         }
 
         private static TimeSpan ParseTimeMillis(XElement element, Schema schema)
         {
             var unused = GetEffectiveSchema<LogicalSchema>(schema);
-            return TimeSpan.Parse(element.Value, CultureInfo.InvariantCulture.DateTimeFormat);
+            //return TimeSpan.Parse(element.Value, CultureInfo.InvariantCulture.DateTimeFormat);
+            return XmlConvert.ToTimeSpan(element.Value);
         }
 
         private static TimeSpan ParseTimeMicros(XElement element, Schema schema)
         {
             var unused = GetEffectiveSchema<LogicalSchema>(schema);
-            return TimeSpan.Parse(element.Value, CultureInfo.InvariantCulture.DateTimeFormat);
+            //return TimeSpan.Parse(element.Value, CultureInfo.InvariantCulture.DateTimeFormat);
+            return XmlConvert.ToTimeSpan(element.Value);
         }
 
         private static DateTime ParseTimestampMillis(XElement element, Schema schema)
         {
             var unused = GetEffectiveSchema<LogicalSchema>(schema);
-            return DateTime.Parse(element.Value, CultureInfo.InvariantCulture.DateTimeFormat);
+            //return DateTime.Parse(element.Value, CultureInfo.InvariantCulture.DateTimeFormat);
+            return XmlConvert.ToDateTime(element.Value, XmlDateTimeSerializationMode.Utc);
         }
 
         private static DateTime ParseTimestampMicros(XElement element, Schema schema)
         {
             var unused = GetEffectiveSchema<LogicalSchema>(schema);
-            return DateTime.Parse(element.Value, CultureInfo.InvariantCulture.DateTimeFormat);
+            //return DateTime.Parse(element.Value, CultureInfo.InvariantCulture.DateTimeFormat);
+            return XmlConvert.ToDateTime(element.Value, XmlDateTimeSerializationMode.Utc);
         }
 
         private static T GetEffectiveSchema<T>(Schema schema) where T : Schema
