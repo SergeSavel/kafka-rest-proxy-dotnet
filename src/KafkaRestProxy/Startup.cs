@@ -22,7 +22,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using SergeSavel.KafkaRestProxy.Admin;
 using SergeSavel.KafkaRestProxy.Common.Exceptions;
-using SergeSavel.KafkaRestProxy.Consumer.Extensions;
+using SergeSavel.KafkaRestProxy.Consumer;
 using SergeSavel.KafkaRestProxy.Producer;
 using SergeSavel.KafkaRestProxy.Proxy;
 using SergeSavel.KafkaRestProxy.SchemaRegistry;
