@@ -21,6 +21,7 @@ using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
 using SergeSavel.KafkaRestProxy.Consumer.Contract;
 using SergeSavel.KafkaRestProxy.Consumer.Requests;
+using SergeSavel.KafkaRestProxy.SchemaRegistry;
 using ConsumeException = SergeSavel.KafkaRestProxy.Consumer.Exceptions.ConsumeException;
 using TopicPartition = SergeSavel.KafkaRestProxy.Consumer.Contract.TopicPartition;
 
@@ -32,15 +33,17 @@ namespace SergeSavel.KafkaRestProxy.Consumer
         private readonly ILogger<ConsumerService> _logger;
         private readonly IConsumer<string, string> _staticConsumer;
 
-        public ConsumerService(ConsumerConfig consumerConfig, ILogger<ConsumerService> logger)
+        public ConsumerService(ConsumerConfig consumerConfig, ILogger<ConsumerService> logger,
+            SchemaRegistryService schemaRegistryService)
         {
             _consumerConfig = consumerConfig;
             _logger = logger;
             _staticConsumer = new ConsumerBuilder<string, string>(consumerConfig)
                 .Build();
+            ConsumerProvider = new ConsumerProvider(schemaRegistryService.Client);
         }
 
-        public ConsumerProvider ConsumerProvider { get; } = new();
+        public ConsumerProvider ConsumerProvider { get; }
 
         public void Dispose()
         {
@@ -76,7 +79,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer
 
             var wrapper =
                 ConsumerProvider.CreateConsumer(config, TimeSpan.FromMilliseconds(request.ExpirationTimeoutMs),
-                    creator);
+                    request.KeyType, request.ValueType, creator);
 
             return ConsumerMapper.Map(wrapper);
         }

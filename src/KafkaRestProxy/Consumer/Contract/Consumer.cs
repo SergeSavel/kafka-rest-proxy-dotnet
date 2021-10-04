@@ -23,5 +23,9 @@ namespace SergeSavel.KafkaRestProxy.Consumer.Contract
         public DateTime ExpiresAt { get; init; }
 
         public string Creator { get; init; }
+
+        public string KeyType { get; init; }
+
+        public string ValueType { get; init; }
     }
 }

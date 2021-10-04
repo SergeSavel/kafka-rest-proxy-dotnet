@@ -15,26 +15,24 @@
 using System;
 using System.Collections.Generic;
 using Confluent.Kafka;
+using SergeSavel.KafkaRestProxy.Common.Contract;
 
 namespace SergeSavel.KafkaRestProxy.Consumer
 {
     public class ConsumerWrapper : IDisposable
     {
-        private static readonly IDeserializer<string> KeyDeserializer = Deserializers.Utf8;
-
-        private static readonly IDeserializer<string> ValueDeserializer = Deserializers.Utf8;
-
         private readonly TimeSpan _expirationTimeout;
 
-        public ConsumerWrapper(IDictionary<string, string> consumerConfig, TimeSpan expirationTimeout)
+        public ConsumerWrapper(IDictionary<string, string> consumerConfig, TimeSpan expirationTimeout,
+            IDeserializer<string> keyDeserializer, IDeserializer<string> valueDeserializer)
         {
             _expirationTimeout = expirationTimeout;
 
             UpdateExpiration();
 
             Consumer = new ConsumerBuilder<string, string>(consumerConfig)
-                .SetKeyDeserializer(KeyDeserializer)
-                .SetValueDeserializer(ValueDeserializer)
+                .SetKeyDeserializer(keyDeserializer)
+                .SetValueDeserializer(valueDeserializer)
                 .Build();
         }
 
@@ -47,6 +45,10 @@ namespace SergeSavel.KafkaRestProxy.Consumer
         public bool IsExpired => DateTime.Now >= ExpiresAt;
 
         public string Creator { get; init; }
+
+        public KeyValueType KeyType { get; init; }
+
+        public KeyValueType ValueType { get; init; }
 
         public void Dispose()
         {
