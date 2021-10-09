@@ -143,8 +143,7 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
 
             AddRecord(document, record, record.Schema.Name, record.Schema.Namespace);
 
-            //var result = document.ToString(SaveOptions.DisableFormatting);
-            var result = document.ToString();
+            var result = document.ToString(SaveOptions.DisableFormatting);
 
             return result;
         }
