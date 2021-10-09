@@ -114,8 +114,16 @@ namespace SergeSavel.KafkaRestProxy.Producer
                 }
                 case KeyValueType.AvroAsXml:
                 {
-                    var genericRecord =
-                        request.Value.AsGenericRecord(request.ValueSchema, _schemaCache);
+                    GenericRecord genericRecord;
+                    try
+                    {
+                        genericRecord = request.Value.AsGenericRecord(request.ValueSchema, _schemaCache);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new BadRequestException("An error occured while parsing generic record.", e);
+                    }
+
                     valueBytes = await GetAvroSerializer().SerializeAsync(genericRecord, valueSerializationContext)
                         .ConfigureAwait(false);
                     break;

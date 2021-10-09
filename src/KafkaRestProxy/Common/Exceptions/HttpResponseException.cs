@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Text;
 
 namespace SergeSavel.KafkaRestProxy.Common.Exceptions
 {
@@ -20,7 +21,17 @@ namespace SergeSavel.KafkaRestProxy.Common.Exceptions
     {
         public HttpResponseException(string message, Exception innerException) : base(message, innerException)
         {
-            Value = message;
+            var sb = new StringBuilder();
+            sb.Append(message);
+
+            while (innerException != null)
+            {
+                sb.AppendLine();
+                sb.Append(innerException.Message);
+                innerException = innerException.InnerException;
+            }
+
+            Value = sb.ToString();
         }
 
         public HttpResponseException(string message) : base(message)

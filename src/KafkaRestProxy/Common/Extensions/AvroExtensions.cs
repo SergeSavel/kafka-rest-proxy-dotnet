@@ -590,7 +590,7 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
                 }
                 catch (Exception e)
                 {
-                    throw new InvalidOperationException($"An error occured while parsing field {fieldName}.", e);
+                    throw new InvalidOperationException($"Cannot parse record field '{fieldName}'.", e);
                 }
             }
 
@@ -720,7 +720,7 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
                         }
 
                     if (result == null)
-                        throw new InvalidOperationException($"'Schema {typeof(T).Name}' not included in union.");
+                        throw new InvalidOperationException($"Schema '{typeof(T).Name}' not included in union.");
 
                     return result;
                 }
