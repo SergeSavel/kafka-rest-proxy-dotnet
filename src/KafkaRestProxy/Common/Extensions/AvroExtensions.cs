@@ -479,9 +479,25 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
             if (rootElement.Name.LocalName != RecordString)
                 throw new InvalidOperationException("Invalid root element name.");
 
-            var schema = GetSchema(rootElement, schemaString, schemaCache);
+            RecordSchema schema;
+            try
+            {
+                schema = GetSchema(rootElement, schemaString, schemaCache);
+            }
+            catch (Exception e)
+            {
+                throw new InvalidOperationException("Cannot parse record schema.", e);
+            }
 
-            var result = ParseRecord(rootElement, schema);
+            GenericRecord result;
+            try
+            {
+                result = ParseRecord(rootElement, schema);
+            }
+            catch (Exception e)
+            {
+                throw new InvalidOperationException("Cannot parse record.", e);
+            }
 
             return result;
         }
@@ -569,7 +585,14 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
                         throw new InvalidOperationException(
                             $"Field '{fieldName}' not found in schema '{effectiveSchema.SchemaName}'.");
 
-                record.Add(field.Pos, ParseValue(childElement, field.Schema));
+                try
+                {
+                    record.Add(field.Pos, ParseValue(childElement, field.Schema));
+                }
+                catch (Exception e)
+                {
+                    throw new InvalidOperationException($"An error occured while parsing field {fieldName}.", e);
+                }
             }
 
             return record;
