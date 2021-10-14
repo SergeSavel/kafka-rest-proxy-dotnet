@@ -26,14 +26,15 @@ namespace SergeSavel.KafkaRestProxy.Producer
         {
             var result = new Headers();
 
-            foreach (var (key, stringValue) in source)
-                if (key != null)
-                {
-                    byte[] value = null;
-                    if (stringValue != null)
-                        value = Encoding.UTF8.GetBytes(stringValue);
-                    result.Add(key, value);
-                }
+            if (source != null)
+                foreach (var (key, stringValue) in source)
+                    if (key != null)
+                    {
+                        byte[] value = null;
+                        if (stringValue != null)
+                            value = Encoding.UTF8.GetBytes(stringValue);
+                        result.Add(key, value);
+                    }
 
             return result;
         }
