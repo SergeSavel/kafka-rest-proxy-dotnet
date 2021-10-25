@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace SergeSavel.KafkaRestProxy.Producer.Requests
 {
@@ -21,7 +20,7 @@ namespace SergeSavel.KafkaRestProxy.Producer.Requests
     {
         public string Key { get; init; }
 
-        [Required] public string Value { get; init; }
+        public string Value { get; init; }
 
         public IReadOnlyDictionary<string, string> Headers { get; init; }
     }
