@@ -14,18 +14,18 @@
 
 using System;
 
-namespace SergeSavel.KafkaRestProxy.Consumer.Contract
+namespace SergeSavel.KafkaRestProxy.Common.Exceptions
 {
-    public class Consumer
+    public class BadRequestException : HttpResponseException
     {
-        public Guid Id { get; init; }
+        public BadRequestException(string message) : base(message)
+        {
+            StatusCode = 400;
+        }
 
-        public DateTime ExpiresAt { get; init; }
-
-        public string Creator { get; init; }
-
-        public string KeyType { get; init; }
-
-        public string ValueType { get; init; }
+        public BadRequestException(string message, Exception innerException) : base(message, innerException)
+        {
+            StatusCode = 400;
+        }
     }
 }

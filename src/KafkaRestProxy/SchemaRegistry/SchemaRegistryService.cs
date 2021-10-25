@@ -13,19 +13,30 @@
 // limitations under the License.
 
 using System;
+using Confluent.SchemaRegistry;
 
-namespace SergeSavel.KafkaRestProxy.Consumer.Contract
+namespace SergeSavel.KafkaRestProxy.SchemaRegistry
 {
-    public class Consumer
+    public class SchemaRegistryService : IDisposable
     {
-        public Guid Id { get; init; }
+        public SchemaRegistryService(SchemaRegistryConfig config)
+        {
+            if (config.Url == null) return;
 
-        public DateTime ExpiresAt { get; init; }
+            Client = new CachedSchemaRegistryClient(config);
+        }
 
-        public string Creator { get; init; }
+        public ISchemaRegistryClient Client { get; }
 
-        public string KeyType { get; init; }
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-        public string ValueType { get; init; }
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing) Client?.Dispose();
+        }
     }
 }

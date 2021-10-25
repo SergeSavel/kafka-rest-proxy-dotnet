@@ -16,7 +16,12 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Confluent.Kafka;
+using Confluent.SchemaRegistry;
+using SergeSavel.KafkaRestProxy.Common.Contract;
+using SergeSavel.KafkaRestProxy.Common.Exceptions;
 using SergeSavel.KafkaRestProxy.Consumer.Exceptions;
 
 namespace SergeSavel.KafkaRestProxy.Consumer
@@ -24,6 +29,15 @@ namespace SergeSavel.KafkaRestProxy.Consumer
     public class ConsumerProvider : IDisposable
     {
         private readonly ConcurrentDictionary<Guid, ConsumerWrapper> _consumers = new();
+        private readonly ISchemaRegistryClient _schemaRegistryClient;
+        private readonly SemaphoreSlim _semaphore = new(1);
+
+        private IDeserializer<string> _avroDeserializer;
+
+        public ConsumerProvider(ISchemaRegistryClient schemaRegistryClient)
+        {
+            _schemaRegistryClient = schemaRegistryClient;
+        }
 
         public void Dispose()
         {
@@ -39,12 +53,18 @@ namespace SergeSavel.KafkaRestProxy.Consumer
         }
 
         public ConsumerWrapper CreateConsumer(IDictionary<string, string> consumerConfig, TimeSpan expirationTimeout,
-            string creator = null)
+            KeyValueType keyType, KeyValueType valueType, string creator = null)
         {
-            var consumerWrapper = new ConsumerWrapper(consumerConfig, expirationTimeout)
-            {
-                Creator = creator
-            };
+            var keyDeserializer = GetDeserializer(keyType);
+            var valueDeserializer = GetDeserializer(valueType);
+
+            var consumerWrapper =
+                new ConsumerWrapper(consumerConfig, expirationTimeout, keyDeserializer, valueDeserializer)
+                {
+                    Creator = creator,
+                    KeyType = keyType,
+                    ValueType = valueType
+                };
 
             if (!_consumers.TryAdd(consumerWrapper.Id, consumerWrapper))
             {
@@ -96,6 +116,40 @@ namespace SergeSavel.KafkaRestProxy.Consumer
             foreach (var consumerWrapper in _consumers.Values)
                 if (consumerWrapper.IsExpired)
                     RemoveConsumer(consumerWrapper.Id);
+        }
+
+        private IDeserializer<string> GetDeserializer(KeyValueType keyValueType)
+        {
+            return keyValueType switch
+            {
+                KeyValueType.Null => StringDeserializers.Null,
+                KeyValueType.Ignore => StringDeserializers.Ignore,
+                KeyValueType.Bytes => StringDeserializers.Base64,
+                KeyValueType.String => StringDeserializers.Utf8,
+                KeyValueType.AvroAsXml => GetAvroDeserializer(),
+                _ => throw new ArgumentException("Unexpected key/value type: ")
+            };
+        }
+
+        private IDeserializer<string> GetAvroDeserializer()
+        {
+            if (_avroDeserializer == null)
+            {
+                _semaphore.Wait(TimeSpan.FromSeconds(10));
+                try
+                {
+                    if (_schemaRegistryClient == null)
+                        throw new BadRequestException("SchemaRegistry Client not initialized.");
+
+                    _avroDeserializer = new StringAvroDeserializer(_schemaRegistryClient);
+                }
+                finally
+                {
+                    _semaphore.Release();
+                }
+            }
+
+            return _avroDeserializer;
         }
     }
 }

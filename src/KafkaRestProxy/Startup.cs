@@ -25,6 +25,7 @@ using SergeSavel.KafkaRestProxy.Common.Exceptions;
 using SergeSavel.KafkaRestProxy.Consumer;
 using SergeSavel.KafkaRestProxy.Producer;
 using SergeSavel.KafkaRestProxy.Proxy;
+using SergeSavel.KafkaRestProxy.SchemaRegistry;
 
 namespace SergeSavel.KafkaRestProxy
 {
@@ -55,7 +56,7 @@ namespace SergeSavel.KafkaRestProxy
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo {Title = "KafkaRestProxy", Version = "v1"});
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "KafkaRestProxy", Version = "v1" });
             });
 
             services.AddHealthChecks();
@@ -64,6 +65,7 @@ namespace SergeSavel.KafkaRestProxy
             services.AddAdminClient(Configuration);
             services.AddConsumer(Configuration);
             services.AddProducer(Configuration);
+            services.AddSchemaRegistry(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -12,20 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace SergeSavel.KafkaRestProxy.Consumer.Contract
+namespace SergeSavel.KafkaRestProxy.SchemaRegistry
 {
-    public class Consumer
+    public static class SchemaRegistryExtensions
     {
-        public Guid Id { get; init; }
-
-        public DateTime ExpiresAt { get; init; }
-
-        public string Creator { get; init; }
-
-        public string KeyType { get; init; }
-
-        public string ValueType { get; init; }
+        public static void AddSchemaRegistry(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddSingleton(SchemaRegistryConfigProvider.GetConfig(configuration));
+            services.AddSingleton<SchemaRegistryService>();
+        }
     }
 }

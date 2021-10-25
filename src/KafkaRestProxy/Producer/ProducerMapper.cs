@@ -13,35 +13,28 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Text;
 using Confluent.Kafka;
 using SergeSavel.KafkaRestProxy.Producer.Contract;
-using SergeSavel.KafkaRestProxy.Producer.Requests;
 
 namespace SergeSavel.KafkaRestProxy.Producer
 {
     public static class ProducerMapper
     {
-        public static Message<string, string> Map(PostMessageRequest source)
+        public static Headers MapHeaders(IEnumerable<KeyValuePair<string, string>> source)
         {
-            var result = new Message<string, string>
-            {
-                Key = source.Key,
-                Value = source.Value
-            };
+            var result = new Headers();
 
-            if (source.Headers != null)
-            {
-                result.Headers = new Headers();
-                foreach (var (key, stringValue) in source.Headers)
+            if (source != null)
+                foreach (var (key, stringValue) in source)
                     if (key != null)
                     {
                         byte[] value = null;
                         if (stringValue != null)
                             value = Encoding.UTF8.GetBytes(stringValue);
-                        result.Headers.Add(key, value);
+                        result.Add(key, value);
                     }
-            }
 
             return result;
         }

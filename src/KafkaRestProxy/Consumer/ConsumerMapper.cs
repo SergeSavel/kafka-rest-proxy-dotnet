@@ -29,7 +29,9 @@ namespace SergeSavel.KafkaRestProxy.Consumer
             {
                 Id = source.Id,
                 ExpiresAt = source.ExpiresAt,
-                Creator = source.Creator
+                Creator = source.Creator,
+                KeyType = Enum.GetName(source.KeyType),
+                ValueType = Enum.GetName(source.ValueType)
             };
         }
 
@@ -51,7 +53,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer
             };
         }
 
-        private static string MapHeaderBytes(byte[] bytes)
+        public static string MapHeaderBytes(byte[] bytes)
         {
             if (bytes == null) return null;
             return Encoding.UTF8.GetString(bytes);

@@ -12,20 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Confluent.Kafka;
 
-namespace SergeSavel.KafkaRestProxy.Consumer.Contract
+namespace SergeSavel.KafkaRestProxy.Producer
 {
-    public class Consumer
+    public class RawSerializer : ISerializer<byte[]>
     {
-        public Guid Id { get; init; }
-
-        public DateTime ExpiresAt { get; init; }
-
-        public string Creator { get; init; }
-
-        public string KeyType { get; init; }
-
-        public string ValueType { get; init; }
+        public byte[] Serialize(byte[] data, SerializationContext context)
+        {
+            return data;
+        }
     }
 }

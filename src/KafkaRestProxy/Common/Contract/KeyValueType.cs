@@ -12,20 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-
-namespace SergeSavel.KafkaRestProxy.Consumer.Contract
+namespace SergeSavel.KafkaRestProxy.Common.Contract
 {
-    public class Consumer
+    public enum KeyValueType
     {
-        public Guid Id { get; init; }
-
-        public DateTime ExpiresAt { get; init; }
-
-        public string Creator { get; init; }
-
-        public string KeyType { get; init; }
-
-        public string ValueType { get; init; }
+        Null,
+        Ignore,
+        Bytes,
+        String,
+        AvroAsXml
     }
 }
