@@ -18,7 +18,7 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
 {
     public class AdminClientCleaner : ClientCleaner<AdminClientWrapper>
     {
-        public AdminClientCleaner(ClientProvider<AdminClientWrapper> provider) : base(provider)
+        public AdminClientCleaner(AdminClientProvider provider) : base(provider)
         {
         }
     }
