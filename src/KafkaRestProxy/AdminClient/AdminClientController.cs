@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SergeSavel.KafkaRestProxy.AdminClient.Contract;
 using SergeSavel.KafkaRestProxy.AdminClient.Requests;
 using SergeSavel.KafkaRestProxy.AdminClient.Responses;
 
@@ -28,64 +29,123 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
     [Authorize]
     public class AdminClientController : ControllerBase
     {
-        private readonly AdminClientService _adminClientService;
+        private readonly AdminClientService _service;
 
-        public AdminClientController(AdminClientService adminClientService)
+        public AdminClientController(AdminClientService service)
         {
-            _adminClientService = adminClientService;
+            _service = service;
         }
 
         [HttpGet]
-        public Metadata GetMetadata(bool verbose, [Range(0, int.MaxValue)] int timeout)
+        public ICollection<Responses.AdminClient> ListClients()
         {
-            return _adminClientService.GetMetadata(verbose, timeout);
+            return _service.ListClients();
         }
 
-        [HttpGet("topics")]
-        public TopicsMetadata GetTopicsMetadata(bool verbose, [Range(0, int.MaxValue)] int timeout)
+        [HttpGet("{clientId:guid}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public Responses.AdminClient GetClient(Guid clientId)
         {
-            return _adminClientService.GetTopicsMetadata(verbose, timeout);
+            return _service.GetClient(clientId);
         }
 
-        [HttpPost("topics")]
+        [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<ActionResult<bool>> CreateTopicAsync(CreateTopicRequest request,
-            [Range(0, int.MaxValue)] int timeout)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<AdminClientWithToken> CreateClient([Required] CreateAdminClientRequest request)
         {
-            await _adminClientService.CreateTopic(request, timeout);
-
-            return CreatedAtAction(nameof(GetTopicMetadata), new {topic = request.Name, timeout}, true);
+            var client = _service.CreateClient(request, User.Identity?.Name);
+            return CreatedAtAction(nameof(GetClient), new { clientId = client.Id }, client);
         }
 
-        [HttpGet("topics/{topic}")]
-        public TopicMetadata GetTopicMetadata(string topic, bool verbose,
-            [Range(0, int.MaxValue)] int timeout)
+        [HttpDelete("{clientId:guid}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public IActionResult RemoveClient(Guid clientId, Guid token)
         {
-            return _adminClientService.GetTopicMetadata(topic, verbose, timeout);
+            _service.RemoveClient(clientId, token);
+            return NoContent();
         }
 
-        [HttpGet("topics/{topic}/config")]
-        public async Task<ResourceConfig> GetTopicConfigAsync(string topic, [Range(0, int.MaxValue)] int timeout)
+        [HttpGet("{clientId:guid}/metadata")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public Metadata GetMetadata(Guid clientId, Guid token, [Range(0, int.MaxValue)] int timeoutMs)
         {
-            return await _adminClientService.GetTopicConfigAsync(topic, timeout);
+            return _service.GetMetadata(clientId, token, timeoutMs);
         }
 
-        [HttpGet("brokers")]
-        public BrokersMetadata GetBrokersMetadata([Range(0, int.MaxValue)] int timeout)
+        [HttpGet("{clientId:guid}/brokers")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public BrokersMetadata GetBrokersMetadata(Guid clientId, Guid token, [Range(0, int.MaxValue)] int timeoutMs)
         {
-            return _adminClientService.GetBrokersMetadata(timeout);
+            return _service.GetBrokersMetadata(clientId, token, timeoutMs);
         }
 
-        [HttpGet("brokers/{brokerId}")]
-        public BrokerMetadata GetBrokerMetadata(int brokerId, [Range(0, int.MaxValue)] int timeout)
+        [HttpGet("{clientId:guid}/brokers/{brokerId:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public BrokerMetadata GetBrokerMetadata(Guid clientId, Guid token, int brokerId,
+            [Range(0, int.MaxValue)] int timeoutMs)
         {
-            return _adminClientService.GetBrokerMetadata(brokerId, timeout);
+            return _service.GetBrokerMetadata(clientId, token, brokerId, timeoutMs);
         }
 
-        [HttpGet("brokers/{brokerId}/config")]
-        public async Task<ResourceConfig> GetTBrokerConfigAsync(int brokerId, [Range(0, int.MaxValue)] int timeout)
+        [HttpGet("{clientId:guid}/topics")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public TopicsMetadata GetTopicsMetadata(Guid clientId, Guid token, [Range(0, int.MaxValue)] int timeoutMs)
         {
-            return await _adminClientService.GetBrokerConfigAsync(brokerId, timeout);
+            return _service.GetTopicsMetadata(clientId, token, timeoutMs);
+        }
+
+        [HttpGet("{clientId:guid}/topics/{topic}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public TopicMetadata GetTopicMetadata(Guid clientId, Guid token, string topic,
+            [Range(0, int.MaxValue)] int timeoutMs)
+        {
+            return _service.GetTopicMetadata(clientId, token, topic, timeoutMs);
+        }
+
+        [HttpPost("{clientId:guid}/topics")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<ActionResult<bool>> CreateTopicAsync(Guid clientId, Guid token, CreateTopicRequest request,
+            [Range(0, int.MaxValue)] int timeoutMs)
+        {
+            await _service.CreateTopicAsync(clientId, token, request, timeoutMs);
+            return CreatedAtAction(nameof(GetTopicMetadata), new { topic = request.Topic, timeout = timeoutMs }, true);
+        }
+
+        [HttpGet("{clientId:guid}/topics/{topic}/config")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<ResourceConfig> GetTopicConfigAsync(Guid clientId, Guid token, string topic,
+            [Range(0, int.MaxValue)] int timeoutMs)
+        {
+            return await _service.GetTopicConfigAsync(clientId, token, topic, timeoutMs);
+        }
+
+        [HttpGet("{clientId:guid}/brokers/{brokerId:int}/config")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<ResourceConfig> GetBrokerConfigAsync(Guid clientId, Guid token, int brokerId,
+            [Range(0, int.MaxValue)] int timeoutMs)
+        {
+            return await _service.GetBrokerConfigAsync(clientId, token, brokerId, timeoutMs);
         }
     }
 }

@@ -12,19 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+using SergeSavel.KafkaRestProxy.Common;
 
 namespace SergeSavel.KafkaRestProxy.AdminClient
 {
-    public static class AdminClientExtensions
+    public class AdminClientCleaner : ClientCleaner<AdminClientWrapper>
     {
-        public static void AddAdminClient(this IServiceCollection services, IConfiguration configuration)
+        public AdminClientCleaner(ClientProvider<AdminClientWrapper> provider) : base(provider)
         {
-            services.AddSingleton(AdminClientConfigProvider.GetConfig(configuration));
-            services.AddSingleton<AdminClientService>();
-            services.AddSingleton<AdminClientProvider>();
-            services.AddHostedService<AdminClientCleaner>();
         }
     }
 }

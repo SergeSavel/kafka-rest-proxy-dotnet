@@ -16,194 +16,126 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Confluent.Kafka;
-using Confluent.Kafka.Admin;
-using SergeSavel.KafkaRestProxy.AdminClient.Contract;
-using SergeSavel.KafkaRestProxy.AdminClient.Exceptions;
+using Microsoft.Extensions.Logging;
 using SergeSavel.KafkaRestProxy.AdminClient.Requests;
 using SergeSavel.KafkaRestProxy.AdminClient.Responses;
-using SergeSavel.KafkaRestProxy.Producer;
-using BrokerMetadata = SergeSavel.KafkaRestProxy.AdminClient.Responses.BrokerMetadata;
-using Metadata = SergeSavel.KafkaRestProxy.AdminClient.Responses.Metadata;
-using TopicMetadata = SergeSavel.KafkaRestProxy.AdminClient.Responses.TopicMetadata;
 
 namespace SergeSavel.KafkaRestProxy.AdminClient
 {
-    public class AdminClientService : IDisposable
+    public class AdminClientService
     {
-        private readonly IAdminClient _adminClient;
+        private readonly ILogger<AdminClientService> _logger;
+        private readonly AdminClientProvider _provider;
 
-        public AdminClientService(ProducerService producerService, AdminClientConfig adminClientConfig)
+        public AdminClientService(ILogger<AdminClientService> logger, AdminClientProvider provider)
         {
-            //_adminClient = new AdminClientBuilder(adminClientConfig).Build();
-            _adminClient = new DependentAdminClientBuilder(producerService.Handle).Build();
+            _logger = logger;
+            _provider = provider;
         }
 
-        public void Dispose()
+        public ICollection<Responses.AdminClient> ListClients()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            var wrappers = _provider.ListClients();
+            return wrappers
+                .Select(MapAdminClient)
+                .ToList();
         }
 
-        public Metadata GetMetadata(bool verbose, int timeoutMs)
+        public Responses.AdminClient GetClient(Guid clientId)
         {
-            var kafkaMetadata = GetKafkaMetadata(timeoutMs);
-            return AdminClientMapper.Map(kafkaMetadata, verbose);
+            var wrapper = _provider.GetClient(clientId);
+            return MapAdminClient(wrapper);
         }
 
-        public TopicsMetadata GetTopicsMetadata(bool verbose, int timeoutMs)
+        public AdminClientWithToken CreateClient(CreateAdminClientRequest request, string owner)
         {
-            var kafkaMetadata = GetKafkaMetadata(timeoutMs);
-            return AdminClientMapper.MapTopics(kafkaMetadata, verbose);
+            var wrapper = _provider.CreateClient(request.Name, request.Config,
+                TimeSpan.FromMilliseconds(request.RetentionMs), owner);
+            return MapAdminClientWithToken(wrapper);
         }
 
-        public TopicMetadata GetTopicMetadata(string topic, bool verbose, int timeoutMs)
+        public void RemoveClient(Guid clientId, Guid token)
         {
-            var kafkaMetadata = GetKafkaMetadata(topic, timeoutMs);
-
-            var topicMetadata = kafkaMetadata.Topics[0];
-
-            if (topicMetadata.Error.Code == ErrorCode.UnknownTopicOrPart)
-                throw new TopicNotFoundException(topic);
-
-            return AdminClientMapper.Map(topicMetadata, kafkaMetadata, verbose);
+            var wrapper = _provider.GetClient(clientId, token);
+            _provider.RemoveClient(wrapper.Id);
         }
 
-        public async Task CreateTopic(CreateTopicRequest request, int timeoutMs)
+        public Metadata GetMetadata(Guid clientId, Guid token, int timeoutMs)
         {
-            var topicSpecification = new TopicSpecification
+            var wrapper = _provider.GetClient(clientId, token);
+            wrapper.UpdateExpiration();
+            return wrapper.GetMetadata(TimeSpan.FromMilliseconds(timeoutMs));
+        }
+
+        public BrokersMetadata GetBrokersMetadata(Guid clientId, Guid token, int timeoutMs)
+        {
+            var wrapper = _provider.GetClient(clientId, token);
+            wrapper.UpdateExpiration();
+            return wrapper.GetBrokersMetadata(TimeSpan.FromMilliseconds(timeoutMs));
+        }
+
+        public BrokerMetadata GetBrokerMetadata(Guid clientId, Guid token, int brokerId, int timeoutMs)
+        {
+            var wrapper = _provider.GetClient(clientId, token);
+            wrapper.UpdateExpiration();
+            return wrapper.GetBrokerMetadata(brokerId, TimeSpan.FromMilliseconds(timeoutMs));
+        }
+
+        public TopicsMetadata GetTopicsMetadata(Guid clientId, Guid token, int timeoutMs)
+        {
+            var wrapper = _provider.GetClient(clientId, token);
+            wrapper.UpdateExpiration();
+            return wrapper.GetTopicsMetadata(TimeSpan.FromMilliseconds(timeoutMs));
+        }
+
+        public TopicMetadata GetTopicMetadata(Guid clientId, Guid token, string topic, int timeoutMs)
+        {
+            var wrapper = _provider.GetClient(clientId, token);
+            wrapper.UpdateExpiration();
+            return wrapper.GetTopicMetadata(topic, TimeSpan.FromMilliseconds(timeoutMs));
+        }
+
+        public async Task CreateTopicAsync(Guid clientId, Guid token, CreateTopicRequest request, int timeoutMs)
+        {
+            var wrapper = _provider.GetClient(clientId, token);
+            wrapper.UpdateExpiration();
+            await wrapper.CreateTopicAsync(request.Topic, request.NumPartitions, request.ReplicationFactor,
+                request.Config, TimeSpan.FromMilliseconds(timeoutMs));
+        }
+
+        public async Task<ResourceConfig> GetTopicConfigAsync(Guid clientId, Guid token, string topic, int timeoutMs)
+        {
+            var wrapper = _provider.GetClient(clientId, token);
+            wrapper.UpdateExpiration();
+            return await wrapper.GetTopicConfigAsync(topic, TimeSpan.FromMilliseconds(timeoutMs));
+        }
+
+        public async Task<ResourceConfig> GetBrokerConfigAsync(Guid clientId, Guid token, int brokerId, int timeoutMs)
+        {
+            var wrapper = _provider.GetClient(clientId, token);
+            wrapper.UpdateExpiration();
+            return await wrapper.GetBrokerConfigAsync(brokerId, TimeSpan.FromMilliseconds(timeoutMs));
+        }
+
+        private static Responses.AdminClient MapAdminClient(AdminClientWrapper wrapper)
+        {
+            return new Responses.AdminClient
             {
-                Name = request.Name,
-                NumPartitions = request.NumPartitions ?? -1,
-                ReplicationFactor = request.ReplicationFactor ?? -1,
-                Configs = request.Config
+                Id = wrapper.Id,
+                ExpiresAt = wrapper.ExpiresAt,
+                Owner = wrapper.Owner
             };
+        }
 
-            var options = new CreateTopicsOptions
+        private static AdminClientWithToken MapAdminClientWithToken(AdminClientWrapper wrapper)
+        {
+            return new AdminClientWithToken
             {
-                RequestTimeout = TimeSpan.FromMilliseconds(timeoutMs)
+                Id = wrapper.Id,
+                ExpiresAt = wrapper.ExpiresAt,
+                Owner = wrapper.Owner,
+                Token = wrapper.Token
             };
-
-            try
-            {
-                await _adminClient.CreateTopicsAsync(new[] { topicSpecification }, options);
-            }
-            catch (KafkaException e)
-            {
-                throw new AdminClientException("Unable to create topic.", e);
-            }
-        }
-
-        public BrokersMetadata GetBrokersMetadata(int timeoutMs)
-        {
-            var kafkaMetadata = GetKafkaMetadata(timeoutMs);
-            return AdminClientMapper.MapBrokers(kafkaMetadata);
-        }
-
-        public BrokerMetadata GetBrokerMetadata(int brokerId, int timeoutMs)
-        {
-            var kafkaMetadata = GetKafkaMetadata(timeoutMs);
-
-            var result = kafkaMetadata.Brokers
-                .Where(brokerMetadata => brokerMetadata.BrokerId == brokerId)
-                .Select(brokerMetadata => AdminClientMapper.Map(brokerMetadata, kafkaMetadata))
-                .FirstOrDefault();
-
-            if (result == null)
-                throw new BrokerNotFoundException(brokerId);
-
-            return result;
-        }
-
-        private Confluent.Kafka.Metadata GetKafkaMetadata(int timeoutMs)
-        {
-            var timeout = TimeSpan.FromMilliseconds(timeoutMs);
-
-            Confluent.Kafka.Metadata result;
-            try
-            {
-                result = _adminClient.GetMetadata(timeout);
-            }
-            catch (KafkaException e)
-            {
-                throw new AdminClientException("Unable to get metadata.", e);
-            }
-
-            return result;
-        }
-
-        private Confluent.Kafka.Metadata GetKafkaMetadata(string topic, int timeoutMs)
-        {
-            var timeout = TimeSpan.FromMilliseconds(timeoutMs);
-
-            Confluent.Kafka.Metadata result;
-            try
-            {
-                result = _adminClient.GetMetadata(topic, timeout);
-            }
-            catch (KafkaException e)
-            {
-                throw new AdminClientException("Unable to get metadata.", e);
-            }
-
-            return result;
-        }
-
-        public async Task<ResourceConfig> GetTopicConfigAsync(string topic, int timeoutMs)
-        {
-            var resource = new ConfigResource
-            {
-                Name = topic,
-                Type = ResourceType.Topic
-            };
-
-            var options = new DescribeConfigsOptions
-            {
-                RequestTimeout = TimeSpan.FromMilliseconds(timeoutMs)
-            };
-
-            ICollection<DescribeConfigsResult> result;
-            try
-            {
-                result = await _adminClient.DescribeConfigsAsync(new[] { resource }, options);
-            }
-            catch (KafkaException e)
-            {
-                throw new AdminClientException("Unable to get topic config.", e);
-            }
-
-            return AdminClientMapper.Map(result.First());
-        }
-
-        public async Task<ResourceConfig> GetBrokerConfigAsync(int brokerId, int timeoutMs)
-        {
-            var resource = new ConfigResource
-            {
-                Name = brokerId.ToString(),
-                Type = ResourceType.Broker
-            };
-
-            var options = new DescribeConfigsOptions
-            {
-                RequestTimeout = TimeSpan.FromMilliseconds(timeoutMs)
-            };
-
-            ICollection<DescribeConfigsResult> result;
-            try
-            {
-                result = await _adminClient.DescribeConfigsAsync(new[] { resource }, options);
-            }
-            catch (KafkaException e)
-            {
-                throw new AdminClientException("Unable to get broker config.", e);
-            }
-
-            return AdminClientMapper.Map(result.First());
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing) _adminClient.Dispose();
         }
     }
 }

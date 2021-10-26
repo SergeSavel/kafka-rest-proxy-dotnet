@@ -19,7 +19,7 @@ namespace SergeSavel.KafkaRestProxy.AdminClient.Requests
 {
     public class CreateTopicRequest
     {
-        [Required] public string Name { get; init; }
+        [Required] public string Topic { get; init; }
 
         [Range(1, 100000)] public int? NumPartitions { get; init; }
 
