@@ -19,9 +19,8 @@ namespace SergeSavel.KafkaRestProxy.AdminClient.Responses
     public class AdminClient
     {
         public Guid Id { get; init; }
-
+        public string Name { get; init; }
         public DateTime ExpiresAt { get; init; }
-
         public string Owner { get; init; }
     }
 }
