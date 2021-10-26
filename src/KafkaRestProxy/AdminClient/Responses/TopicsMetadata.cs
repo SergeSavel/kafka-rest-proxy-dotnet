@@ -16,12 +16,8 @@ using System.Collections.Generic;
 
 namespace SergeSavel.KafkaRestProxy.AdminClient.Responses
 {
-    public class TopicsMetadata
+    public class TopicsMetadata : MetadataBase
     {
         public ICollection<TopicMetadata> Topics { get; init; }
-
-        public int? OriginatingBrokerId { get; init; }
-
-        public string OriginatingBrokerName { get; init; }
     }
 }

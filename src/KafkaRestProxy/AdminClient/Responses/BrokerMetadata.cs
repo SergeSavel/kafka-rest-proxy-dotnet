@@ -14,16 +14,12 @@
 
 namespace SergeSavel.KafkaRestProxy.AdminClient.Responses
 {
-    public class BrokerMetadata
+    public class BrokerMetadata : MetadataBase
     {
         public int Id { get; init; }
 
         public string Host { get; init; }
 
         public int Port { get; init; }
-
-        public int? OriginatingBrokerId { get; init; }
-
-        public string OriginatingBrokerName { get; init; }
     }
 }

@@ -17,17 +17,13 @@ using SergeSavel.KafkaRestProxy.Common.Contract;
 
 namespace SergeSavel.KafkaRestProxy.AdminClient.Responses
 {
-    public class TopicMetadata
+    public class TopicMetadata : MetadataBase
     {
         public string Topic { get; init; }
 
         public ICollection<PartitionMetadata> Partitions { get; init; }
 
         public Error Error { get; init; }
-
-        public int? OriginatingBrokerId { get; init; }
-
-        public string OriginatingBrokerName { get; init; }
 
         public class PartitionMetadata
         {
