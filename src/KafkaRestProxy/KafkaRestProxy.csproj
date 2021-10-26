@@ -8,7 +8,7 @@
         <FileVersion>1.1.0</FileVersion>
         <PublishSingleFile>true</PublishSingleFile>
         <SelfContained>true</SelfContained>
-        <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
         <PublishTrimmed>true</PublishTrimmed>
         <TrimMode>link</TrimMode>
         <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
