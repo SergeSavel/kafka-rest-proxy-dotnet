@@ -173,7 +173,8 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
             return Map(results.First());
         }
 
-        private static BrokerMetadata Map(BrokerMetadata source, Metadata metadata = null)
+        private static BrokerMetadata Map(Confluent.Kafka.BrokerMetadata source,
+            Confluent.Kafka.Metadata metadata = null)
         {
             return new BrokerMetadata
             {
@@ -185,7 +186,7 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
             };
         }
 
-        private static TopicMetadata Map(TopicMetadata source, Metadata metadata = null)
+        private static TopicMetadata Map(Confluent.Kafka.TopicMetadata source, Confluent.Kafka.Metadata metadata = null)
         {
             return new TopicMetadata
             {
