@@ -26,18 +26,18 @@ namespace SergeSavel.KafkaRestProxy.Producer
     [Authorize]
     public class ProducerController : ControllerBase
     {
-        private readonly ProducerService _producerService;
+        private readonly ProducerService _service;
 
-        public ProducerController(ProducerService producerService)
+        public ProducerController(ProducerService service)
         {
-            _producerService = producerService;
+            _service = service;
         }
 
         [HttpPost("produce")]
         public async Task<ActionResult<DeliveryResult>> PostMessage([Required] string topic,
             [Range(0, int.MaxValue)] int? partition, [Required] PostMessageRequest request)
         {
-            var result = await _producerService.PostMessage(topic, partition, request).ConfigureAwait(false);
+            var result = await _service.PostMessage(topic, partition, request).ConfigureAwait(false);
 
             return Ok(result);
         }
