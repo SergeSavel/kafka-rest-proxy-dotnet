@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.IO;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
@@ -56,7 +59,10 @@ namespace SergeSavel.KafkaRestProxy
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "KafkaRestProxy", Version = "v1" });
+                c.SwaggerDoc("v3", new OpenApiInfo { Title = "KafkaRestProxy", Version = "v3" });
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
             });
 
             services.AddHealthChecks();
@@ -75,7 +81,7 @@ namespace SergeSavel.KafkaRestProxy
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "KafkaRestProxy v1"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v3/swagger.json", "KafkaRestProxy v3"));
             }
 
             app.UseRouting();
