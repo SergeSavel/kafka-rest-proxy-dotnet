@@ -17,10 +17,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SergeSavel.KafkaRestProxy.Admin.Contract;
-using SergeSavel.KafkaRestProxy.Admin.Requests;
+using SergeSavel.KafkaRestProxy.AdminClient.Contract;
+using SergeSavel.KafkaRestProxy.AdminClient.Requests;
+using SergeSavel.KafkaRestProxy.AdminClient.Responses;
 
-namespace SergeSavel.KafkaRestProxy.Admin
+namespace SergeSavel.KafkaRestProxy.AdminClient
 {
     [ApiController]
     [Route("admin")]

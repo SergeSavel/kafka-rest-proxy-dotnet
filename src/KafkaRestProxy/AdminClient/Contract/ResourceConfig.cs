@@ -12,23 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Confluent.Kafka;
-using Microsoft.Extensions.Configuration;
-using SergeSavel.KafkaRestProxy.Common;
+using System.Collections.Generic;
 
-namespace SergeSavel.KafkaRestProxy.Admin
+namespace SergeSavel.KafkaRestProxy.AdminClient.Contract
 {
-    public static class AdminClientConfigProvider
+    public class ResourceConfig
     {
-        public static AdminClientConfig GetConfig(IConfiguration configuration = null)
+        public string ResourceType { get; init; }
+
+        public string ResourceName { get; init; }
+
+        public IDictionary<string, ConfigEntryValue> Entries { get; init; }
+
+        public class ConfigEntryValue
         {
-            var clientConfig = ClientConfigProvider.GetConfig(configuration);
+            public string Value { get; init; }
 
-            var result = new AdminClientConfig(clientConfig);
+            public bool IsDefault { get; init; }
 
-            configuration?.Bind("Kafka:AdminClient", result);
+            public bool IsReadOnly { get; init; }
 
-            return result;
+            public bool IsSensitive { get; init; }
         }
     }
 }

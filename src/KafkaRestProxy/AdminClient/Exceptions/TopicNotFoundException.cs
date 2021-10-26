@@ -1,4 +1,4 @@
-// Copyright 2021 Sergey Savelev
+﻿// Copyright 2021 Sergey Savelev
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,18 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace SergeSavel.KafkaRestProxy.Admin.Contract
+using Microsoft.AspNetCore.Http;
+using SergeSavel.KafkaRestProxy.Common.Exceptions;
+
+namespace SergeSavel.KafkaRestProxy.AdminClient.Exceptions
 {
-    public class BrokerMetadata
+    public class TopicNotFoundException : HttpResponseException
     {
-        public int Id { get; init; }
-
-        public string Host { get; init; }
-
-        public int Port { get; init; }
-
-        public int? OriginatingBrokerId { get; init; }
-
-        public string OriginatingBrokerName { get; init; }
+        public TopicNotFoundException(string topic)
+        {
+            StatusCode = StatusCodes.Status404NotFound;
+            Value = $"Topic '{topic}' not found.";
+        }
     }
 }

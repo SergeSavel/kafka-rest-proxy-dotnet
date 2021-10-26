@@ -16,7 +16,7 @@ using Confluent.Kafka;
 using Microsoft.AspNetCore.Http;
 using KafkaException = SergeSavel.KafkaRestProxy.Common.Exceptions.KafkaException;
 
-namespace SergeSavel.KafkaRestProxy.Admin.Exceptions
+namespace SergeSavel.KafkaRestProxy.AdminClient.Exceptions
 {
     public class AdminClientException : KafkaException
     {

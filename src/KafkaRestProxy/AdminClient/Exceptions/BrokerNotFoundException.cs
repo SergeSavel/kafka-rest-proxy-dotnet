@@ -1,4 +1,4 @@
-// Copyright 2021 Sergey Savelev
+﻿// Copyright 2021 Sergey Savelev
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,18 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
+using SergeSavel.KafkaRestProxy.Common.Exceptions;
 
-namespace SergeSavel.KafkaRestProxy.Admin.Contract
+namespace SergeSavel.KafkaRestProxy.AdminClient.Exceptions
 {
-    public class Metadata
+    public class BrokerNotFoundException : HttpResponseException
     {
-        public ICollection<BrokerMetadata> Brokers { get; init; }
-
-        public ICollection<TopicMetadata> Topics { get; init; }
-
-        public int? OriginatingBrokerId { get; init; }
-
-        public string OriginatingBrokerName { get; init; }
+        public BrokerNotFoundException(int brokerId)
+        {
+            StatusCode = StatusCodes.Status404NotFound;
+            Value = $"Broker '{brokerId}' not fpund.";
+        }
     }
 }

@@ -13,26 +13,18 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
-namespace SergeSavel.KafkaRestProxy.Admin.Contract
+namespace SergeSavel.KafkaRestProxy.AdminClient.Requests
 {
-    public class ResourceConfig
+    public class CreateTopicRequest
     {
-        public string ResourceType { get; init; }
+        [Required] public string Name { get; init; }
 
-        public string ResourceName { get; init; }
+        [Range(1, 100000)] public int? NumPartitions { get; init; }
 
-        public IDictionary<string, ConfigEntryValue> Entries { get; init; }
+        public short? ReplicationFactor { get; init; }
 
-        public class ConfigEntryValue
-        {
-            public string Value { get; init; }
-
-            public bool IsDefault { get; init; }
-
-            public bool IsReadOnly { get; init; }
-
-            public bool IsSensitive { get; init; }
-        }
+        public Dictionary<string, string> Config { get; init; }
     }
 }

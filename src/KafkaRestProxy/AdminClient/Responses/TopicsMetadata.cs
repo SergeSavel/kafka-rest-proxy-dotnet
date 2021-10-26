@@ -12,17 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Microsoft.AspNetCore.Http;
-using SergeSavel.KafkaRestProxy.Common.Exceptions;
+using System.Collections.Generic;
 
-namespace SergeSavel.KafkaRestProxy.Admin.Exceptions
+namespace SergeSavel.KafkaRestProxy.AdminClient.Responses
 {
-    public class TopicNotFoundException : HttpResponseException
+    public class TopicsMetadata
     {
-        public TopicNotFoundException(string topic)
-        {
-            StatusCode = StatusCodes.Status404NotFound;
-            Value = $"Topic '{topic}' not found.";
-        }
+        public ICollection<TopicMetadata> Topics { get; init; }
+
+        public int? OriginatingBrokerId { get; init; }
+
+        public string OriginatingBrokerName { get; init; }
     }
 }

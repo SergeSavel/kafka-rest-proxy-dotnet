@@ -12,34 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using SergeSavel.KafkaRestProxy.Common.Contract;
-
-namespace SergeSavel.KafkaRestProxy.Admin.Contract
+namespace SergeSavel.KafkaRestProxy.AdminClient.Responses
 {
-    public class TopicMetadata
+    public class BrokerMetadata
     {
-        public string Topic { get; init; }
+        public int Id { get; init; }
 
-        public ICollection<PartitionMetadata> Partitions { get; init; }
+        public string Host { get; init; }
 
-        public Error Error { get; init; }
+        public int Port { get; init; }
 
         public int? OriginatingBrokerId { get; init; }
 
         public string OriginatingBrokerName { get; init; }
-
-        public class PartitionMetadata
-        {
-            public int Partition { get; init; }
-
-            public int? Leader { get; init; }
-
-            public ICollection<int> Replicas { get; init; }
-
-            public ICollection<int> InSyncReplicas { get; init; }
-
-            public Error Error { get; init; }
-        }
     }
 }

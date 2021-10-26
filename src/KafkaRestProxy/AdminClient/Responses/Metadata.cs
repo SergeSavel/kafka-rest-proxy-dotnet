@@ -1,4 +1,4 @@
-﻿// Copyright 2021 Sergey Savelev
+// Copyright 2021 Sergey Savelev
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,13 +14,15 @@
 
 using System.Collections.Generic;
 
-namespace SergeSavel.KafkaRestProxy.Admin.Contract
+namespace SergeSavel.KafkaRestProxy.AdminClient.Responses
 {
-    public class BrokersMetadata
+    public class Metadata
     {
         public ICollection<BrokerMetadata> Brokers { get; init; }
 
-        public int OriginatingBrokerId { get; init; }
+        public ICollection<TopicMetadata> Topics { get; init; }
+
+        public int? OriginatingBrokerId { get; init; }
 
         public string OriginatingBrokerName { get; init; }
     }

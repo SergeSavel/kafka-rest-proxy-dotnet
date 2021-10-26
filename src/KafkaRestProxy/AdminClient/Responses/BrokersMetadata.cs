@@ -12,17 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Microsoft.AspNetCore.Http;
-using SergeSavel.KafkaRestProxy.Common.Exceptions;
+using System.Collections.Generic;
 
-namespace SergeSavel.KafkaRestProxy.Admin.Exceptions
+namespace SergeSavel.KafkaRestProxy.AdminClient.Responses
 {
-    public class BrokerNotFoundException : HttpResponseException
+    public class BrokersMetadata
     {
-        public BrokerNotFoundException(int brokerId)
-        {
-            StatusCode = StatusCodes.Status404NotFound;
-            Value = $"Broker '{brokerId}' not fpund.";
-        }
+        public ICollection<BrokerMetadata> Brokers { get; init; }
+
+        public int OriginatingBrokerId { get; init; }
+
+        public string OriginatingBrokerName { get; init; }
     }
 }

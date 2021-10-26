@@ -12,17 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Confluent.Kafka;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+using SergeSavel.KafkaRestProxy.Common;
 
-namespace SergeSavel.KafkaRestProxy.Admin
+namespace SergeSavel.KafkaRestProxy.AdminClient
 {
-    public static class AdminClientExtensions
+    public static class AdminClientConfigProvider
     {
-        public static void AddAdminClient(this IServiceCollection services, IConfiguration configuration)
+        public static AdminClientConfig GetConfig(IConfiguration configuration = null)
         {
-            services.AddSingleton(AdminClientConfigProvider.GetConfig(configuration));
-            services.AddSingleton<AdminClientService>(); // ???
+            var clientConfig = ClientConfigProvider.GetConfig(configuration);
+
+            var result = new AdminClientConfig(clientConfig);
+
+            configuration?.Bind("Kafka:AdminClient", result);
+
+            return result;
         }
     }
 }
