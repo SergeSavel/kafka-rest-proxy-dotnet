@@ -17,7 +17,7 @@ using System.Text;
 
 namespace SergeSavel.KafkaRestProxy.Common.Exceptions
 {
-    public class HttpResponseException : Exception
+    public abstract class HttpResponseException : Exception
     {
         public HttpResponseException(string message, Exception innerException) : base(message, innerException)
         {
