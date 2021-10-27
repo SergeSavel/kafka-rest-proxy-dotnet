@@ -25,7 +25,7 @@ namespace SergeSavel.KafkaRestProxy.AdminClient.Exceptions
         {
             StatusCode = innerException.Error.Code switch
             {
-                ErrorCode.UnknownTopicOrPart => StatusCodes.Status400BadRequest,
+                ErrorCode.UnknownTopicOrPart => StatusCodes.Status404NotFound,
                 ErrorCode.TopicAlreadyExists => StatusCodes.Status400BadRequest,
                 ErrorCode.Local_UnsupportedFeature => StatusCodes.Status400BadRequest,
                 _ => StatusCodes.Status500InternalServerError
