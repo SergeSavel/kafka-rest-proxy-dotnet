@@ -41,6 +41,7 @@ namespace SergeSavel.KafkaRestProxy.Producer
         /// <returns>Producer instances list (without tokens).</returns>
         /// <response code="200">Returns producer instances list (without tokens).</response>
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public ICollection<Responses.Producer> ListProducers()
         {
             return _service.ListProducers();
