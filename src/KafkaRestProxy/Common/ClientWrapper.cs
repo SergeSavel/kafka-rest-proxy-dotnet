@@ -18,12 +18,12 @@ namespace SergeSavel.KafkaRestProxy.Common
 {
     public abstract class ClientWrapper : IDisposable
     {
-        private readonly TimeSpan _retention;
+        private readonly TimeSpan _expirationTimeout;
 
-        protected ClientWrapper(string name, TimeSpan retention)
+        protected ClientWrapper(string name, TimeSpan expirationTimeout)
         {
             Name = name;
-            _retention = retention;
+            _expirationTimeout = expirationTimeout;
             UpdateExpiration();
         }
 
@@ -37,7 +37,7 @@ namespace SergeSavel.KafkaRestProxy.Common
 
         public void UpdateExpiration()
         {
-            ExpiresAt = DateTime.Now + _retention;
+            ExpiresAt = DateTime.Now + _expirationTimeout;
         }
     }
 }

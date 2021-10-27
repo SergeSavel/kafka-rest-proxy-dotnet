@@ -23,6 +23,6 @@ namespace SergeSavel.KafkaRestProxy.AdminClient.Requests
 
         public IReadOnlyDictionary<string, string> Config { get; init; }
 
-        [Required] [Range(1000, 86400000)] public int RetentionMs { get; init; }
+        [Required] [Range(1000, 86400000)] public int ExpirationTimeoutMs { get; init; }
     }
 }

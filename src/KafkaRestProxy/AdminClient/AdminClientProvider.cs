@@ -30,7 +30,7 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         }
 
         public AdminClientWrapper CreateClient(string name, IEnumerable<KeyValuePair<string, string>> config,
-            TimeSpan retention, string owner = null)
+            TimeSpan expirationTimeout, string owner = null)
         {
             var effectiveConfig = new Dictionary<string, string>();
             foreach (var (key, value) in _defaultConfig)
@@ -38,7 +38,7 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
             foreach (var (key, value) in config)
                 effectiveConfig.Add(key, value);
 
-            var wrapper = new AdminClientWrapper(name, effectiveConfig, retention)
+            var wrapper = new AdminClientWrapper(name, effectiveConfig, expirationTimeout)
             {
                 Owner = owner
             };

@@ -50,7 +50,7 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         public AdminClientWithToken CreateClient(CreateAdminClientRequest request, string owner)
         {
             var wrapper = _provider.CreateClient(request.Name, request.Config,
-                TimeSpan.FromMilliseconds(request.RetentionMs), owner);
+                TimeSpan.FromMilliseconds(request.ExpirationTimeoutMs), owner);
             return MapAdminClientWithToken(wrapper);
         }
 
