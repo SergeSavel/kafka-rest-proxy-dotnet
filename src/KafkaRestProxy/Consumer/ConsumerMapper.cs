@@ -16,14 +16,14 @@ using System;
 using System.Linq;
 using System.Text;
 using Confluent.Kafka;
-using SergeSavel.KafkaRestProxy.Consumer.Contract;
-using TopicPartition = SergeSavel.KafkaRestProxy.Consumer.Contract.TopicPartition;
+using SergeSavel.KafkaRestProxy.Consumer.Responses;
+using TopicPartition = SergeSavel.KafkaRestProxy.Consumer.Responses.TopicPartition;
 
 namespace SergeSavel.KafkaRestProxy.Consumer
 {
     public static class ConsumerMapper
     {
-        public static Contract.Consumer Map(ConsumerWrapper source)
+        public static Responses.Consumer Map(ConsumerWrapper source)
         {
             return new()
             {

@@ -14,7 +14,7 @@
 
 using System;
 
-namespace SergeSavel.KafkaRestProxy.Consumer.Contract
+namespace SergeSavel.KafkaRestProxy.Consumer.Responses
 {
     public class Consumer
     {

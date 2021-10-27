@@ -18,8 +18,8 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SergeSavel.KafkaRestProxy.Consumer.Contract;
 using SergeSavel.KafkaRestProxy.Consumer.Requests;
+using SergeSavel.KafkaRestProxy.Consumer.Responses;
 
 namespace SergeSavel.KafkaRestProxy.Consumer
 {
@@ -36,7 +36,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer
         }
 
         [HttpGet]
-        public ICollection<Contract.Consumer> ListConsumers()
+        public ICollection<Responses.Consumer> ListConsumers()
         {
             return _consumerService.ListConsumers();
         }
@@ -44,10 +44,10 @@ namespace SergeSavel.KafkaRestProxy.Consumer
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<Contract.Consumer> CreateConsumer([Required] CreateConsumerRequest request)
+        public ActionResult<Responses.Consumer> CreateConsumer([Required] CreateConsumerRequest request)
         {
             var consumer = _consumerService.CreateConsumer(request, User.Identity?.Name);
-            return CreatedAtAction(nameof(GetConsumer), new {consumerId = consumer.Id}, consumer);
+            return CreatedAtAction(nameof(GetConsumer), new { consumerId = consumer.Id }, consumer);
         }
 
         [HttpDelete("{consumerId}")]
@@ -63,7 +63,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer
         [HttpGet("{consumerId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public Contract.Consumer GetConsumer(Guid consumerId)
+        public Responses.Consumer GetConsumer(Guid consumerId)
         {
             return _consumerService.GetConsumer(consumerId);
         }
@@ -81,7 +81,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer
 
             var consumerAssignment = _consumerService.AssignConsumer(request);
 
-            return CreatedAtAction(nameof(GetConsumerAssignment), new {consumerId}, consumerAssignment);
+            return CreatedAtAction(nameof(GetConsumerAssignment), new { consumerId }, consumerAssignment);
         }
 
         [HttpGet("{consumerId}/assignment")]

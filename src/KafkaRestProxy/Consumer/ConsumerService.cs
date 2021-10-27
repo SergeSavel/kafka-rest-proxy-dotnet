@@ -19,11 +19,11 @@ using System.Linq;
 using System.Threading;
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
-using SergeSavel.KafkaRestProxy.Consumer.Contract;
 using SergeSavel.KafkaRestProxy.Consumer.Requests;
+using SergeSavel.KafkaRestProxy.Consumer.Responses;
 using SergeSavel.KafkaRestProxy.SchemaRegistry;
 using ConsumeException = SergeSavel.KafkaRestProxy.Consumer.Exceptions.ConsumeException;
-using TopicPartition = SergeSavel.KafkaRestProxy.Consumer.Contract.TopicPartition;
+using TopicPartition = SergeSavel.KafkaRestProxy.Consumer.Responses.TopicPartition;
 
 namespace SergeSavel.KafkaRestProxy.Consumer
 {
@@ -62,14 +62,14 @@ namespace SergeSavel.KafkaRestProxy.Consumer
             }
         }
 
-        public ICollection<Contract.Consumer> ListConsumers()
+        public ICollection<Responses.Consumer> ListConsumers()
         {
             return ConsumerProvider.ListConsumers()
                 .Select(ConsumerMapper.Map)
                 .ToList();
         }
 
-        public Contract.Consumer CreateConsumer(CreateConsumerRequest request, string creator)
+        public Responses.Consumer CreateConsumer(CreateConsumerRequest request, string creator)
         {
             var config = _consumerConfig.ToDictionary(kv => kv.Key, kv => kv.Value);
 
@@ -84,7 +84,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer
             return ConsumerMapper.Map(wrapper);
         }
 
-        public Contract.Consumer GetConsumer(Guid consumerId)
+        public Responses.Consumer GetConsumer(Guid consumerId)
         {
             var wrapper = ConsumerProvider.GetConsumer(consumerId);
 

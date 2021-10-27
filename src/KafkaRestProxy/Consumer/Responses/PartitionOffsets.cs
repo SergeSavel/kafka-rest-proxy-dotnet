@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace SergeSavel.KafkaRestProxy.Consumer.Contract
+namespace SergeSavel.KafkaRestProxy.Consumer.Responses
 {
     public class PartitionOffsets
     {

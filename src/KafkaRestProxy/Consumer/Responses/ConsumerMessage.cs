@@ -14,7 +14,7 @@
 
 using System.Collections.Generic;
 
-namespace SergeSavel.KafkaRestProxy.Consumer.Contract
+namespace SergeSavel.KafkaRestProxy.Consumer.Responses
 {
     public class ConsumerMessage
     {
