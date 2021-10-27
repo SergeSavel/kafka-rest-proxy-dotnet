@@ -31,7 +31,7 @@ namespace SergeSavel.KafkaRestProxy.Common
             foreach (var item in items) item.Dispose();
         }
 
-        protected IList<TClientWrapper> ListItems()
+        public IList<TClientWrapper> ListItems()
         {
             return _wrappers.Values.ToList();
         }
@@ -45,30 +45,32 @@ namespace SergeSavel.KafkaRestProxy.Common
             }
         }
 
-        protected TClientWrapper GetItem(Guid id)
+        public TClientWrapper GetItem(Guid id, Guid? token = null)
         {
-            if (!_wrappers.TryGetValue(id, out var consumerWrapper))
-                throw new ClientNotFoundException(id);
-            return consumerWrapper;
+            if (!_wrappers.TryGetValue(id, out var matchedWrapper)) throw new ClientNotFoundException(id);
+            if (token != null && matchedWrapper.Token != token) throw new InvalidTokenException(id);
+            return matchedWrapper;
         }
 
-        protected void TryGetItem(Guid id, out TClientWrapper wrapper)
+        public bool TryGetItem(Guid id, out TClientWrapper wrapper, Guid? token = null)
         {
-            _wrappers.TryGetValue(id, out wrapper);
-        }
+            if (!_wrappers.TryGetValue(id, out var matchedWrapper))
+            {
+                wrapper = null;
+                return false;
+            }
 
-        protected bool RemoveItem(Guid id)
-        {
-            if (!_wrappers.TryRemove(id, out var wrapper)) return false;
-            Task.Run(() => wrapper.Dispose());
+            if (token != null && matchedWrapper.Token != token) throw new InvalidTokenException(id);
+            wrapper = matchedWrapper;
             return true;
         }
 
-        public void RemoveExpiredItems()
+        public void RemoveItem(Guid id, Guid? token = null)
         {
-            foreach (var wrapper in _wrappers.Values)
-                if (wrapper.IsExpired)
-                    RemoveItem(wrapper.Id);
+            if (!_wrappers.TryGetValue(id, out var matchedWrapper)) return;
+            if (token != null && matchedWrapper.Token != token) throw new InvalidTokenException(id);
+            if (_wrappers.TryRemove(id, out matchedWrapper))
+                Task.Run(() => matchedWrapper.Dispose());
         }
     }
 }

@@ -16,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using Confluent.Kafka;
 using SergeSavel.KafkaRestProxy.Common;
-using SergeSavel.KafkaRestProxy.Common.Exceptions;
 
 namespace SergeSavel.KafkaRestProxy.AdminClient
 {
@@ -46,27 +45,6 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
             AddItem(wrapper);
 
             return wrapper;
-        }
-
-        public ICollection<AdminClientWrapper> ListClients()
-        {
-            return ListItems();
-        }
-
-        public AdminClientWrapper GetClient(Guid id, Guid? token = null)
-        {
-            var wrapper = GetItem(id);
-            if (token != null && wrapper.Token != token)
-                throw new InvalidTokenException(id);
-            return wrapper;
-        }
-
-        public void RemoveClient(Guid id, Guid? token = null)
-        {
-            var wrapper = GetItem(id);
-            if (token != null && wrapper.Token != token)
-                throw new InvalidTokenException(id);
-            RemoveItem(id);
         }
     }
 }

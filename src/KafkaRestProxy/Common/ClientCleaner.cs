@@ -39,7 +39,14 @@ namespace SergeSavel.KafkaRestProxy.Common
             {
                 var stopwatch = Stopwatch.StartNew();
 
-                _provider.RemoveExpiredItems();
+                foreach (var item in _provider.ListItems())
+                    if (item.IsExpired)
+                    {
+                        _logger.LogInformation(
+                            "Removing expired item of type '{ItemType}' and Id '{ItemId}'", item.GetType(),
+                            item.Id);
+                        _provider.RemoveItem(item.Id);
+                    }
 
                 var remainingMs = PeriodMs - stopwatch.ElapsedMilliseconds;
                 if (remainingMs > 0)

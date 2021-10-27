@@ -40,8 +40,6 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
             _adminClient = new AdminClientBuilder(configs).Build();
         }
 
-        public Guid Token { get; } = Guid.NewGuid();
-
         public Metadata GetMetadata(TimeSpan timeout)
         {
             var metadata = _adminClient.GetMetadata(timeout);

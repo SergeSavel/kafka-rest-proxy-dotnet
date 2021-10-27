@@ -35,7 +35,7 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
 
         public ICollection<Responses.AdminClient> ListClients()
         {
-            var wrappers = _provider.ListClients();
+            var wrappers = _provider.ListItems();
             return wrappers
                 .Select(MapAdminClient)
                 .ToList();
@@ -43,7 +43,7 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
 
         public Responses.AdminClient GetClient(Guid clientId)
         {
-            var wrapper = _provider.GetClient(clientId);
+            var wrapper = _provider.GetItem(clientId);
             return MapAdminClient(wrapper);
         }
 
@@ -56,48 +56,48 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
 
         public void RemoveClient(Guid clientId, Guid token)
         {
-            var wrapper = _provider.GetClient(clientId, token);
-            _provider.RemoveClient(wrapper.Id);
+            var wrapper = _provider.GetItem(clientId, token);
+            _provider.RemoveItem(wrapper.Id);
         }
 
         public Metadata GetMetadata(Guid clientId, Guid token, int timeoutMs)
         {
-            var wrapper = _provider.GetClient(clientId, token);
+            var wrapper = _provider.GetItem(clientId, token);
             wrapper.UpdateExpiration();
             return wrapper.GetMetadata(TimeSpan.FromMilliseconds(timeoutMs));
         }
 
         public BrokersMetadata GetBrokersMetadata(Guid clientId, Guid token, int timeoutMs)
         {
-            var wrapper = _provider.GetClient(clientId, token);
+            var wrapper = _provider.GetItem(clientId, token);
             wrapper.UpdateExpiration();
             return wrapper.GetBrokersMetadata(TimeSpan.FromMilliseconds(timeoutMs));
         }
 
         public BrokerMetadata GetBrokerMetadata(Guid clientId, Guid token, int brokerId, int timeoutMs)
         {
-            var wrapper = _provider.GetClient(clientId, token);
+            var wrapper = _provider.GetItem(clientId, token);
             wrapper.UpdateExpiration();
             return wrapper.GetBrokerMetadata(brokerId, TimeSpan.FromMilliseconds(timeoutMs));
         }
 
         public TopicsMetadata GetTopicsMetadata(Guid clientId, Guid token, int timeoutMs)
         {
-            var wrapper = _provider.GetClient(clientId, token);
+            var wrapper = _provider.GetItem(clientId, token);
             wrapper.UpdateExpiration();
             return wrapper.GetTopicsMetadata(TimeSpan.FromMilliseconds(timeoutMs));
         }
 
         public TopicMetadata GetTopicMetadata(Guid clientId, Guid token, string topic, int timeoutMs)
         {
-            var wrapper = _provider.GetClient(clientId, token);
+            var wrapper = _provider.GetItem(clientId, token);
             wrapper.UpdateExpiration();
             return wrapper.GetTopicMetadata(topic, TimeSpan.FromMilliseconds(timeoutMs));
         }
 
         public async Task CreateTopicAsync(Guid clientId, Guid token, CreateTopicRequest request, int timeoutMs)
         {
-            var wrapper = _provider.GetClient(clientId, token);
+            var wrapper = _provider.GetItem(clientId, token);
             wrapper.UpdateExpiration();
             await wrapper.CreateTopicAsync(request.Topic, request.NumPartitions, request.ReplicationFactor,
                 request.Config, TimeSpan.FromMilliseconds(timeoutMs));
@@ -105,14 +105,14 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
 
         public async Task<ResourceConfig> GetTopicConfigAsync(Guid clientId, Guid token, string topic, int timeoutMs)
         {
-            var wrapper = _provider.GetClient(clientId, token);
+            var wrapper = _provider.GetItem(clientId, token);
             wrapper.UpdateExpiration();
             return await wrapper.GetTopicConfigAsync(topic, TimeSpan.FromMilliseconds(timeoutMs));
         }
 
         public async Task<ResourceConfig> GetBrokerConfigAsync(Guid clientId, Guid token, int brokerId, int timeoutMs)
         {
-            var wrapper = _provider.GetClient(clientId, token);
+            var wrapper = _provider.GetItem(clientId, token);
             wrapper.UpdateExpiration();
             return await wrapper.GetBrokerConfigAsync(brokerId, TimeSpan.FromMilliseconds(timeoutMs));
         }
