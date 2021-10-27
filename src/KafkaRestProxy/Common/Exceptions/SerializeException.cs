@@ -12,19 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+using System;
 
-namespace SergeSavel.KafkaRestProxy.Producer
+namespace SergeSavel.KafkaRestProxy.Common.Exceptions
 {
-    public static class ProducerExtensions
+    public class SerializeException : HttpResponseException
     {
-        public static void AddProducer(this IServiceCollection services, IConfiguration configuration)
+        public SerializeException(string message) : base(message)
         {
-            services.AddSingleton(ProducerConfigProvider.GetConfig(configuration));
-            services.AddSingleton<ProducerService>();
-            services.AddSingleton<ProducerProvider>();
-            services.AddHostedService<ProducerCleaner>();
+            StatusCode = 400;
+        }
+
+        public SerializeException(string message, Exception innerException) : base(message, innerException)
+        {
+            StatusCode = 400;
         }
     }
 }

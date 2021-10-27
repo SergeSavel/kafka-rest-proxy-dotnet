@@ -12,19 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace SergeSavel.KafkaRestProxy.Producer
+namespace SergeSavel.KafkaRestProxy.Producer.Responses
 {
-    public static class ProducerExtensions
+    public class DeliveryResult
     {
-        public static void AddProducer(this IServiceCollection services, IConfiguration configuration)
-        {
-            services.AddSingleton(ProducerConfigProvider.GetConfig(configuration));
-            services.AddSingleton<ProducerService>();
-            services.AddSingleton<ProducerProvider>();
-            services.AddHostedService<ProducerCleaner>();
-        }
+        public string Status { get; init; }
+
+        public string Topic { get; init; }
+
+        public int Partition { get; init; }
+
+        public long Offset { get; init; }
+
+        public long Timestamp { get; init; }
     }
 }

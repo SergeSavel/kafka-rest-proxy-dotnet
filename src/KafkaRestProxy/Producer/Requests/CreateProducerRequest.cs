@@ -13,21 +13,16 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using SergeSavel.KafkaRestProxy.Common.Contract;
-using SergeSavel.KafkaRestProxy.Producer.Contract;
+using System.ComponentModel.DataAnnotations;
 
 namespace SergeSavel.KafkaRestProxy.Producer.Requests
 {
-    public class PostMessageRequest : IMessage
+    public class CreateProducerRequest
     {
-        public KeyValueType KeyType { get; init; } = KeyValueTypeDefaults.Key;
-        public string KeySchema { get; init; }
-        public string Key { get; init; }
+        [Required] public string Name { get; init; }
 
-        public KeyValueType ValueType { get; init; } = KeyValueTypeDefaults.Value;
-        public string ValueSchema { get; init; }
-        public string Value { get; init; }
+        public IReadOnlyDictionary<string, string> Config { get; init; }
 
-        public IReadOnlyDictionary<string, string> Headers { get; init; }
+        [Required] [Range(1000, 86400000)] public int ExpirationTimeoutMs { get; init; }
     }
 }
