@@ -16,7 +16,7 @@ using SergeSavel.KafkaRestProxy.Common.Mappers;
 
 namespace SergeSavel.KafkaRestProxy.Common.Exceptions
 {
-    public class KafkaException : HttpResponseException
+    public abstract class KafkaException : HttpResponseException
     {
         protected KafkaException(string message, Confluent.Kafka.KafkaException innerException) : base(message,
             innerException)
