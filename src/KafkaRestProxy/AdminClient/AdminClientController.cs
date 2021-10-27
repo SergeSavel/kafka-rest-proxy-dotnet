@@ -50,7 +50,6 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         /// <param name="clientId">Instance Id.</param>
         /// <returns>Instance info (without token).</returns>
         /// <response code="200">Returns admin client instances info (without token).</response>
-        /// <response code="403">Invalid token.</response>
         /// <response code="404">Instance not found.</response>
         [HttpGet("{clientId:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
