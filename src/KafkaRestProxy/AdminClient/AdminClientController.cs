@@ -84,7 +84,7 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult RemoveClient(Guid clientId, Guid token)
+        public IActionResult RemoveClient(Guid clientId, string token)
         {
             _service.RemoveClient(clientId, token);
             return NoContent();
@@ -98,11 +98,13 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         /// <response code="200">Returns cluster metadata.</response>
         /// <response code="403">Invalid token.</response>
         /// <response code="404">Instance not found.</response>
+        /// <response code="500">Returns error details.</response>
         [HttpGet("{clientId:guid}/metadata")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public Metadata GetMetadata(Guid clientId, Guid token, [Range(0, int.MaxValue)] int timeout)
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public Metadata GetMetadata(Guid clientId, string token, [Range(0, int.MaxValue)] int timeout)
         {
             return _service.GetMetadata(clientId, token, timeout);
         }
@@ -115,11 +117,13 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         /// <response code="200">Returns brokers metadata.</response>
         /// <response code="403">Invalid token.</response>
         /// <response code="404">Instance not found.</response>
+        /// <response code="500">Returns error details.</response>
         [HttpGet("{clientId:guid}/brokers")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public BrokersMetadata GetBrokersMetadata(Guid clientId, Guid token, [Range(0, int.MaxValue)] int timeout)
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public BrokersMetadata GetBrokersMetadata(Guid clientId, string token, [Range(0, int.MaxValue)] int timeout)
         {
             return _service.GetBrokersMetadata(clientId, token, timeout);
         }
@@ -132,7 +136,8 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         /// <returns>Broker metadata.</returns>
         /// <response code="200">Returns broker metadata.</response>
         /// <response code="403">Invalid token.</response>
-        /// <response code="404">Instance/broker not found.</response>
+        /// <response code="500">Returns error details.</response>
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("{clientId:guid}/brokers/{brokerId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]

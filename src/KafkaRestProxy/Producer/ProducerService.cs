@@ -54,13 +54,13 @@ namespace SergeSavel.KafkaRestProxy.Producer
             return MapProducerWithToken(wrapper);
         }
 
-        public void RemoveProducer(Guid producerId, Guid token)
+        public void RemoveProducer(Guid producerId, string token)
         {
             var wrapper = _provider.GetItem(producerId, token);
             _provider.RemoveItem(wrapper.Id);
         }
 
-        public async Task<DeliveryResult> ProduceAsync(Guid producerId, Guid token, string topic, int? partition,
+        public async Task<DeliveryResult> ProduceAsync(Guid producerId, string token, string topic, int? partition,
             PostMessageRequest request)
         {
             var wrapper = _provider.GetItem(producerId, token);

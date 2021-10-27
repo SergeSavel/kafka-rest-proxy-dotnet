@@ -33,7 +33,7 @@ namespace SergeSavel.KafkaRestProxy.Common
         public DateTime ExpiresAt { get; private set; }
         public bool IsExpired => DateTime.Now >= ExpiresAt;
 
-        public Guid Token { get; } = Guid.NewGuid();
+        public string Token { get; } = Guid.NewGuid().ToString();
 
         public abstract void Dispose();
 

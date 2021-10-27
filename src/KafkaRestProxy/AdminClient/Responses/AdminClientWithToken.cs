@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-
 namespace SergeSavel.KafkaRestProxy.AdminClient.Responses
 {
     public class AdminClientWithToken : AdminClient
     {
-        public Guid Token { get; init; }
+        public string Token { get; init; }
     }
 }

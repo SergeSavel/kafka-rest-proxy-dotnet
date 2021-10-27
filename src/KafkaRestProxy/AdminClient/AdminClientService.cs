@@ -54,48 +54,48 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
             return MapAdminClientWithToken(wrapper);
         }
 
-        public void RemoveClient(Guid clientId, Guid token)
+        public void RemoveClient(Guid clientId, string token)
         {
             var wrapper = _provider.GetItem(clientId, token);
             _provider.RemoveItem(wrapper.Id);
         }
 
-        public Metadata GetMetadata(Guid clientId, Guid token, int timeoutMs)
+        public Metadata GetMetadata(Guid clientId, string token, int timeoutMs)
         {
             var wrapper = _provider.GetItem(clientId, token);
             wrapper.UpdateExpiration();
             return wrapper.GetMetadata(TimeSpan.FromMilliseconds(timeoutMs));
         }
 
-        public BrokersMetadata GetBrokersMetadata(Guid clientId, Guid token, int timeoutMs)
+        public BrokersMetadata GetBrokersMetadata(Guid clientId, string token, int timeoutMs)
         {
             var wrapper = _provider.GetItem(clientId, token);
             wrapper.UpdateExpiration();
             return wrapper.GetBrokersMetadata(TimeSpan.FromMilliseconds(timeoutMs));
         }
 
-        public BrokerMetadata GetBrokerMetadata(Guid clientId, Guid token, int brokerId, int timeoutMs)
+        public BrokerMetadata GetBrokerMetadata(Guid clientId, string token, int brokerId, int timeoutMs)
         {
             var wrapper = _provider.GetItem(clientId, token);
             wrapper.UpdateExpiration();
             return wrapper.GetBrokerMetadata(brokerId, TimeSpan.FromMilliseconds(timeoutMs));
         }
 
-        public TopicsMetadata GetTopicsMetadata(Guid clientId, Guid token, int timeoutMs)
+        public TopicsMetadata GetTopicsMetadata(Guid clientId, string token, int timeoutMs)
         {
             var wrapper = _provider.GetItem(clientId, token);
             wrapper.UpdateExpiration();
             return wrapper.GetTopicsMetadata(TimeSpan.FromMilliseconds(timeoutMs));
         }
 
-        public TopicMetadata GetTopicMetadata(Guid clientId, Guid token, string topic, int timeoutMs)
+        public TopicMetadata GetTopicMetadata(Guid clientId, string token, string topic, int timeoutMs)
         {
             var wrapper = _provider.GetItem(clientId, token);
             wrapper.UpdateExpiration();
             return wrapper.GetTopicMetadata(topic, TimeSpan.FromMilliseconds(timeoutMs));
         }
 
-        public async Task CreateTopicAsync(Guid clientId, Guid token, CreateTopicRequest request, int timeoutMs)
+        public async Task CreateTopicAsync(Guid clientId, string token, CreateTopicRequest request, int timeoutMs)
         {
             var wrapper = _provider.GetItem(clientId, token);
             wrapper.UpdateExpiration();
@@ -103,14 +103,14 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
                 request.Config, TimeSpan.FromMilliseconds(timeoutMs));
         }
 
-        public async Task<ResourceConfig> GetTopicConfigAsync(Guid clientId, Guid token, string topic, int timeoutMs)
+        public async Task<ResourceConfig> GetTopicConfigAsync(Guid clientId, string token, string topic, int timeoutMs)
         {
             var wrapper = _provider.GetItem(clientId, token);
             wrapper.UpdateExpiration();
             return await wrapper.GetTopicConfigAsync(topic, TimeSpan.FromMilliseconds(timeoutMs));
         }
 
-        public async Task<ResourceConfig> GetBrokerConfigAsync(Guid clientId, Guid token, int brokerId, int timeoutMs)
+        public async Task<ResourceConfig> GetBrokerConfigAsync(Guid clientId, string token, int brokerId, int timeoutMs)
         {
             var wrapper = _provider.GetItem(clientId, token);
             wrapper.UpdateExpiration();

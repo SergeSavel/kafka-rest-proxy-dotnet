@@ -45,14 +45,14 @@ namespace SergeSavel.KafkaRestProxy.Common
             }
         }
 
-        public TClientWrapper GetItem(Guid id, Guid? token = null)
+        public TClientWrapper GetItem(Guid id, string token = null)
         {
             if (!_wrappers.TryGetValue(id, out var matchedWrapper)) throw new ClientNotFoundException(id);
-            if (token != null && matchedWrapper.Token != token) throw new InvalidTokenException(id);
+            if (token != null && !token.Equals(matchedWrapper.Token)) throw new InvalidTokenException(id);
             return matchedWrapper;
         }
 
-        public bool TryGetItem(Guid id, out TClientWrapper wrapper, Guid? token = null)
+        public bool TryGetItem(Guid id, out TClientWrapper wrapper, string token = null)
         {
             if (!_wrappers.TryGetValue(id, out var matchedWrapper))
             {
@@ -60,15 +60,15 @@ namespace SergeSavel.KafkaRestProxy.Common
                 return false;
             }
 
-            if (token != null && matchedWrapper.Token != token) throw new InvalidTokenException(id);
+            if (token != null && !token.Equals(matchedWrapper.Token)) throw new InvalidTokenException(id);
             wrapper = matchedWrapper;
             return true;
         }
 
-        public void RemoveItem(Guid id, Guid? token = null)
+        public void RemoveItem(Guid id, string token = null)
         {
             if (!_wrappers.TryGetValue(id, out var matchedWrapper)) return;
-            if (token != null && matchedWrapper.Token != token) throw new InvalidTokenException(id);
+            if (token != null && !token.Equals(matchedWrapper.Token)) throw new InvalidTokenException(id);
             if (_wrappers.TryRemove(id, out matchedWrapper))
                 Task.Run(() => matchedWrapper.Dispose());
         }
