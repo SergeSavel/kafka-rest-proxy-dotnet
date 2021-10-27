@@ -64,6 +64,7 @@ namespace SergeSavel.KafkaRestProxy.Producer
             PostMessageRequest request)
         {
             var wrapper = _provider.GetItem(producerId, token);
+            wrapper.UpdateExpiration();
             return await wrapper.ProduceAsync(topic, partition, request).ConfigureAwait(false);
         }
 
