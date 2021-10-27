@@ -46,8 +46,7 @@ namespace SergeSavel.KafkaRestProxy.Producer
         private AvroSerializer<GenericRecord> _avroSerializer;
 
         public ProducerWrapper(string name, IEnumerable<KeyValuePair<string, string>> config,
-            ISchemaRegistryClient schemaRegistryClient,
-            TimeSpan expirationTimeout) : base(name, expirationTimeout)
+            ISchemaRegistryClient schemaRegistryClient, TimeSpan expirationTimeout) : base(name, expirationTimeout)
         {
             _schemaRegistryClient = schemaRegistryClient;
             _producer = new ProducerBuilder<byte[], byte[]>(config)
