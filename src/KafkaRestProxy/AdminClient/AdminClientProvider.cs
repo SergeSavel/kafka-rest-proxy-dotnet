@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using Confluent.Kafka;
+using Microsoft.Extensions.Logging;
 using SergeSavel.KafkaRestProxy.Common;
 
 namespace SergeSavel.KafkaRestProxy.AdminClient
@@ -22,9 +23,11 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
     public class AdminClientProvider : ClientProvider<AdminClientWrapper>
     {
         private readonly AdminClientConfig _defaultConfig;
+        private readonly ILogger<AdminClientProvider> _logger;
 
-        public AdminClientProvider(AdminClientConfig defaultConfig)
+        public AdminClientProvider(ILogger<AdminClientProvider> logger, AdminClientConfig defaultConfig)
         {
+            _logger = logger;
             _defaultConfig = defaultConfig;
         }
 
