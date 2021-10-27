@@ -16,14 +16,14 @@ using System;
 
 namespace SergeSavel.KafkaRestProxy.Common.Exceptions
 {
-    public class SerializeException : HttpResponseException
+    public class SerdeException : HttpResponseException
     {
-        public SerializeException(string message) : base(message)
+        public SerdeException(string message) : base(message)
         {
             StatusCode = 400;
         }
 
-        public SerializeException(string message, Exception innerException) : base(message, innerException)
+        public SerdeException(string message, Exception innerException) : base(message, innerException)
         {
             StatusCode = 400;
         }

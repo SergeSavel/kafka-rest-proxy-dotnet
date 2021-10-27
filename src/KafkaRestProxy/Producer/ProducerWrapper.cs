@@ -120,7 +120,7 @@ namespace SergeSavel.KafkaRestProxy.Producer
                     }
                     catch (Exception e)
                     {
-                        throw new SerializeException("An error occured while parsing generic record.", e);
+                        throw new SerdeException("An error occured while parsing generic record.", e);
                     }
 
                     result = await GetAvroSerializer().SerializeAsync(genericRecord, serializationContext);
@@ -141,7 +141,7 @@ namespace SergeSavel.KafkaRestProxy.Producer
                 try
                 {
                     if (_schemaRegistryClient == null)
-                        throw new BadRequestException("SchemaRegistry Client not initialized.");
+                        throw new SerdeException("SchemaRegistry Client not initialized.");
 
                     _avroSerializer = new AvroSerializer<GenericRecord>(_schemaRegistryClient);
                 }
