@@ -25,10 +25,12 @@ using Confluent.SchemaRegistry;
 using Confluent.SchemaRegistry.Serdes;
 using SergeSavel.KafkaRestProxy.Common;
 using SergeSavel.KafkaRestProxy.Common.Contract;
+using SergeSavel.KafkaRestProxy.Common.Exceptions;
 using SergeSavel.KafkaRestProxy.Common.Extensions;
 using SergeSavel.KafkaRestProxy.Producer.Contract;
 using SergeSavel.KafkaRestProxy.Producer.Exceptions;
 using SergeSavel.KafkaRestProxy.Producer.Responses;
+using KafkaException = Confluent.Kafka.KafkaException;
 
 namespace SergeSavel.KafkaRestProxy.Producer
 {
