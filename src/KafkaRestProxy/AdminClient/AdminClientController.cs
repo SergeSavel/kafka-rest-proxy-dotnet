@@ -186,12 +186,16 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         /// <param name="request">New topic config.</param>
         /// <param name="timeout">Operation timeout (ms).</param>
         /// <response code="201">Topic successfully created.</response>
+        /// <response code="400">Topic already exists.</response>
         /// <response code="403">Invalid token.</response>
         /// <response code="404">Instance not found.</response>
+        /// <response code="500">An error occured while creating the topic.</response>
         [HttpPost("{clientId:guid}/topics")]
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<bool>> CreateTopicAsync(Guid clientId, Guid token, CreateTopicRequest request,
             [Range(0, int.MaxValue)] int timeout)
         {
@@ -206,8 +210,10 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         /// <param name="timeout">Operation timeout (ms).</param>
         /// <returns>Topic config.</returns>
         /// <response code="200">Returns topic config.</response>
+        /// <response code="400">Unsupported feature.</response>
         /// <response code="403">Invalid token.</response>
         /// <response code="404">Instance/topic not found.</response>
+        /// <response code="500">An error occured while fetching topic config.</response>
         [HttpGet("{clientId:guid}/topics/{topic}/config")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -225,8 +231,10 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         /// <param name="timeout">Operation timeout (ms).</param>
         /// <returns>Broker config.</returns>
         /// <response code="200">Returns broker config.</response>
+        /// <response code="400">Unsupported feature.</response>
         /// <response code="403">Invalid token.</response>
         /// <response code="404">Instance/broker not found.</response>
+        /// <response code="500">An error occured while fetching broker config.</response>
         [HttpGet("{clientId:guid}/brokers/{brokerId:int}/config")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
