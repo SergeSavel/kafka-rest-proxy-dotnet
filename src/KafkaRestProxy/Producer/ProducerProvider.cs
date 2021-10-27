@@ -44,7 +44,6 @@ namespace SergeSavel.KafkaRestProxy.Producer
             foreach (var (key, value) in config)
                 effectiveConfig.Add(key, value);
 
-
             var wrapper = new ProducerWrapper(name, effectiveConfig, _schemaRegistryService.Client, expirationTimeout)
             {
                 Owner = owner
