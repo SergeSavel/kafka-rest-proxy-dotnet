@@ -21,7 +21,7 @@ namespace SergeSavel.KafkaRestProxy.Producer.Requests
     {
         [Required] public string Name { get; init; }
 
-        public IReadOnlyDictionary<string, string> Config { get; init; }
+        [Required] public IReadOnlyDictionary<string, string> Config { get; init; }
 
         [Required] [Range(1000, 86400000)] public int ExpirationTimeoutMs { get; init; }
     }
