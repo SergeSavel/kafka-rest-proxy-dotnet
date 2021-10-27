@@ -26,6 +26,7 @@ namespace SergeSavel.KafkaRestProxy.Producer
 {
     [ApiController]
     [Route("producer")]
+    [Produces("application/json")]
     [Authorize]
     public class ProducerController : ControllerBase
     {
@@ -36,12 +37,21 @@ namespace SergeSavel.KafkaRestProxy.Producer
             _service = service;
         }
 
+        /// <summary> List alive producer instances.</summary>
+        /// <returns>Producer instances list (without tokens).</returns>
+        /// <response code="200">Returns producer instances list (without tokens).</response>
         [HttpGet]
         public ICollection<Responses.Producer> ListProducers()
         {
             return _service.ListProducers();
         }
 
+        /// <summary>Get producer instance info by Id.</summary>
+        /// <param name="producerId">Producer instance Id.</param>
+        /// <returns>Instance info (without token).</returns>
+        /// <response code="200">Returns producer instances info (without token).</response>
+        /// <response code="403">Invalid token.</response>
+        /// <response code="404">Instance not found.</response>
         [HttpGet("{producerId:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -51,6 +61,11 @@ namespace SergeSavel.KafkaRestProxy.Producer
             return _service.GetProducer(producerId);
         }
 
+        /// <summary>Create new producer instance.</summary>
+        /// <param name="request">New instance config.</param>
+        /// <returns>New instance info (with token)</returns>
+        /// <response code="200">Returns new instance info (with token).</response>
+        /// <response code="400">Invalid instance config.</response>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -60,6 +75,12 @@ namespace SergeSavel.KafkaRestProxy.Producer
             return CreatedAtAction(nameof(GetProducer), new { producerId = producer.Id }, producer);
         }
 
+        /// <summary>Remove producer instance.</summary>
+        /// <param name="producerId">Producer instance Id.</param>
+        /// <param name="token">Security token obtained while creating current instance.</param>
+        /// <response code="204">Instance successfully removed.</response>
+        /// <response code="403">Invalid token.</response>
+        /// <response code="404">Instance not found.</response>
         [HttpDelete("{producerId:guid}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -70,14 +91,30 @@ namespace SergeSavel.KafkaRestProxy.Producer
             return NoContent();
         }
 
+        /// <summary>Post new message.</summary>
+        /// <param name="producerId">Producer instance Id.</param>
+        /// <param name="token">Security token obtained while creating current instance.</param>
+        /// <param name="topic">Topic.</param>
+        /// <param name="partition">Partition (optional).</param>
+        /// <param name="request">New message.</param>
+        /// <returns>Delivery result.</returns>
+        /// <response code="200">Returns delivery result.</response>
+        /// <response code="400">An error occured during data serialization.</response>
+        /// <response code="403">Invalid token.</response>
+        /// <response code="404">Instance not found.</response>
+        /// <response code="500">An error occured while posting the message.</response>
         [HttpPost("{producerId:guid}")]
-        public async Task<ActionResult<DeliveryResult>> PostMessage(Guid producerId, Guid token,
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<DeliveryResult>> ProduceAsync(Guid producerId, Guid token,
             [Required] string topic,
             [Range(0, int.MaxValue)] int? partition, [Required] PostMessageRequest request)
         {
             var result = await _service.ProduceAsync(producerId, token, topic, partition, request)
                 .ConfigureAwait(false);
-
             return Ok(result);
         }
     }
