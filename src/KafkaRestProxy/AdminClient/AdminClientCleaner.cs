@@ -12,13 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Microsoft.Extensions.Logging;
 using SergeSavel.KafkaRestProxy.Common;
 
 namespace SergeSavel.KafkaRestProxy.AdminClient
 {
     public class AdminClientCleaner : ClientCleaner<AdminClientWrapper>
     {
-        public AdminClientCleaner(AdminClientProvider provider) : base(provider)
+        public AdminClientCleaner(ILogger<AdminClientCleaner> logger, AdminClientProvider provider) : base(logger,
+            provider)
         {
         }
     }

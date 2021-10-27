@@ -16,6 +16,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace SergeSavel.KafkaRestProxy.Common
 {
@@ -23,10 +24,12 @@ namespace SergeSavel.KafkaRestProxy.Common
     {
         private const long PeriodMs = 10000;
 
+        private readonly ILogger _logger;
         private readonly ClientProvider<TClientWrapper> _provider;
 
-        public ClientCleaner(ClientProvider<TClientWrapper> provider)
+        public ClientCleaner(ILogger logger, ClientProvider<TClientWrapper> provider)
         {
+            _logger = logger;
             _provider = provider;
         }
 
