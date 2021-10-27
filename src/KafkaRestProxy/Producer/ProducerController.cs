@@ -103,7 +103,7 @@ namespace SergeSavel.KafkaRestProxy.Producer
         /// <response code="403">Invalid token.</response>
         /// <response code="404">Instance not found.</response>
         /// <response code="500">An error occured while posting the message.</response>
-        [HttpPost("{producerId:guid}")]
+        [HttpPost("{producerId:guid}/produce")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
