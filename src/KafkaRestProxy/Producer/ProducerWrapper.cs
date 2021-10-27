@@ -25,12 +25,10 @@ using Confluent.SchemaRegistry;
 using Confluent.SchemaRegistry.Serdes;
 using SergeSavel.KafkaRestProxy.Common;
 using SergeSavel.KafkaRestProxy.Common.Contract;
-using SergeSavel.KafkaRestProxy.Common.Exceptions;
 using SergeSavel.KafkaRestProxy.Common.Extensions;
 using SergeSavel.KafkaRestProxy.Producer.Contract;
 using SergeSavel.KafkaRestProxy.Producer.Exceptions;
 using SergeSavel.KafkaRestProxy.Producer.Responses;
-using KafkaException = Confluent.Kafka.KafkaException;
 
 namespace SergeSavel.KafkaRestProxy.Producer
 {
@@ -120,7 +118,7 @@ namespace SergeSavel.KafkaRestProxy.Producer
                     }
                     catch (Exception e)
                     {
-                        throw new SerdeException("An error occured while parsing generic record.", e);
+                        throw new SerializationException("An error occured while parsing generic record.", e);
                     }
 
                     result = await GetAvroSerializer().SerializeAsync(genericRecord, serializationContext);
@@ -141,7 +139,7 @@ namespace SergeSavel.KafkaRestProxy.Producer
                 try
                 {
                     if (_schemaRegistryClient == null)
-                        throw new SerdeException("SchemaRegistry Client not initialized.");
+                        throw new SerializationException("SchemaRegistry Client not initialized.");
 
                     _avroSerializer = new AvroSerializer<GenericRecord>(_schemaRegistryClient);
                 }
