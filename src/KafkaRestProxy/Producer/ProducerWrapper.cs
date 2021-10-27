@@ -187,7 +187,7 @@ namespace SergeSavel.KafkaRestProxy.Producer
             {
                 _producer.Flush(TimeSpan.FromSeconds(10));
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 // ignore
             }
