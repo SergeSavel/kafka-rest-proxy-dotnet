@@ -142,7 +142,8 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public BrokerMetadata GetBrokerMetadata(Guid clientId, Guid token, int brokerId,
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public BrokerMetadata GetBrokerMetadata(Guid clientId, string token, int brokerId,
             [Range(0, int.MaxValue)] int timeout)
         {
             return _service.GetBrokerMetadata(clientId, token, brokerId, timeout);
@@ -156,11 +157,13 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         /// <response code="200">Returns topics metadata.</response>
         /// <response code="403">Invalid token.</response>
         /// <response code="404">Instance not found.</response>
+        /// <response code="500">Returns error details.</response>
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpGet("{clientId:guid}/topics")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public TopicsMetadata GetTopicsMetadata(Guid clientId, Guid token, [Range(0, int.MaxValue)] int timeout)
+        public TopicsMetadata GetTopicsMetadata(Guid clientId, string token, [Range(0, int.MaxValue)] int timeout)
         {
             return _service.GetTopicsMetadata(clientId, token, timeout);
         }
@@ -174,11 +177,13 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         /// <response code="200">Returns broker metadata.</response>
         /// <response code="403">Invalid token.</response>
         /// <response code="404">Instance/topic not found.</response>
+        /// <response code="500">Returns error details.</response>
         [HttpGet("{clientId:guid}/topics/{topic}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public TopicMetadata GetTopicMetadata(Guid clientId, Guid token, string topic,
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public TopicMetadata GetTopicMetadata(Guid clientId, string token, string topic,
             [Range(0, int.MaxValue)] int timeout)
         {
             return _service.GetTopicMetadata(clientId, token, topic, timeout);
@@ -193,14 +198,14 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         /// <response code="400">Topic already exists.</response>
         /// <response code="403">Invalid token.</response>
         /// <response code="404">Instance not found.</response>
-        /// <response code="500">An error occured while creating the topic.</response>
+        /// <response code="500">Returns error details.</response>
         [HttpPost("{clientId:guid}/topics")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<bool>> CreateTopicAsync(Guid clientId, Guid token, CreateTopicRequest request,
+        public async Task<ActionResult<bool>> CreateTopicAsync(Guid clientId, string token, CreateTopicRequest request,
             [Range(0, int.MaxValue)] int timeout)
         {
             await _service.CreateTopicAsync(clientId, token, request, timeout);
@@ -217,12 +222,12 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         /// <response code="400">Unsupported feature.</response>
         /// <response code="403">Invalid token.</response>
         /// <response code="404">Instance/topic not found.</response>
-        /// <response code="500">An error occured while fetching topic config.</response>
+        /// <response code="500">Returns error details.</response>
         [HttpGet("{clientId:guid}/topics/{topic}/config")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ResourceConfig> GetTopicConfigAsync(Guid clientId, Guid token, string topic,
+        public async Task<ResourceConfig> GetTopicConfigAsync(Guid clientId, string token, string topic,
             [Range(0, int.MaxValue)] int timeout)
         {
             return await _service.GetTopicConfigAsync(clientId, token, topic, timeout);
@@ -238,12 +243,12 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         /// <response code="400">Unsupported feature.</response>
         /// <response code="403">Invalid token.</response>
         /// <response code="404">Instance/broker not found.</response>
-        /// <response code="500">An error occured while fetching broker config.</response>
+        /// <response code="500">Returns error details.</response>
         [HttpGet("{clientId:guid}/brokers/{brokerId:int}/config")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ResourceConfig> GetBrokerConfigAsync(Guid clientId, Guid token, int brokerId,
+        public async Task<ResourceConfig> GetBrokerConfigAsync(Guid clientId, string token, int brokerId,
             [Range(0, int.MaxValue)] int timeout)
         {
             return await _service.GetBrokerConfigAsync(clientId, token, brokerId, timeout);
