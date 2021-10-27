@@ -32,12 +32,12 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
     {
         private readonly IAdminClient _adminClient;
 
-        public AdminClientWrapper(string name, IDictionary<string, string> configs, TimeSpan expirationTimeout) : base(
+        public AdminClientWrapper(string name, IDictionary<string, string> config, TimeSpan expirationTimeout) : base(
             name,
             expirationTimeout)
         {
             // Username
-            _adminClient = new AdminClientBuilder(configs).Build();
+            _adminClient = new AdminClientBuilder(config).Build();
         }
 
         public Metadata GetMetadata(TimeSpan timeout)
