@@ -24,7 +24,7 @@ namespace SergeSavel.KafkaRestProxy.Common
     {
         private const long PeriodMs = 10000;
 
-        private readonly ILogger _logger;
+        protected readonly ILogger _logger;
         private readonly ClientProvider<TClientWrapper> _provider;
 
         public ClientCleaner(ILogger logger, ClientProvider<TClientWrapper> provider)
