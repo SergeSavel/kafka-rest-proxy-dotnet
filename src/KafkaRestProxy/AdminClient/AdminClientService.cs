@@ -123,6 +123,7 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
             {
                 Id = wrapper.Id,
                 Name = wrapper.Name,
+                User = wrapper.User,
                 ExpiresAt = wrapper.ExpiresAt,
                 Owner = wrapper.Owner
             };
@@ -134,6 +135,7 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
             {
                 Id = wrapper.Id,
                 Name = wrapper.Name,
+                User = wrapper.User,
                 ExpiresAt = wrapper.ExpiresAt,
                 Owner = wrapper.Owner,
                 Token = wrapper.Token

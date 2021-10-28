@@ -20,6 +20,7 @@ namespace SergeSavel.KafkaRestProxy.AdminClient.Responses
     {
         public Guid Id { get; init; }
         public string Name { get; init; }
+        public string User { get; init; }
         public DateTime ExpiresAt { get; init; }
         public string Owner { get; init; }
     }

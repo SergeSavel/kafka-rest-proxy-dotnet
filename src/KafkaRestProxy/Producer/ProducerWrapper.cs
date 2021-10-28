@@ -45,8 +45,9 @@ namespace SergeSavel.KafkaRestProxy.Producer
         private readonly SemaphoreSlim _semaphore = new(1);
         private AvroSerializer<GenericRecord> _avroSerializer;
 
-        public ProducerWrapper(string name, IEnumerable<KeyValuePair<string, string>> config,
-            ISchemaRegistryClient schemaRegistryClient, TimeSpan expirationTimeout) : base(name, expirationTimeout)
+        public ProducerWrapper(string name, IDictionary<string, string> config,
+            ISchemaRegistryClient schemaRegistryClient, TimeSpan expirationTimeout) : base(name, config,
+            expirationTimeout)
         {
             _schemaRegistryClient = schemaRegistryClient;
             _producer = new ProducerBuilder<byte[], byte[]>(config)

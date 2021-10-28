@@ -37,9 +37,9 @@ namespace SergeSavel.KafkaRestProxy.Consumer
         private readonly SemaphoreSlim _semaphore = new(1);
         private IDeserializer<string> _avroDeserializer;
 
-        public ConsumerWrapper(string name, IEnumerable<KeyValuePair<string, string>> config, KeyValueType keyType,
-            KeyValueType valueType,
-            ISchemaRegistryClient schemaRegistryClient, TimeSpan expirationTimeout) : base(name, expirationTimeout)
+        public ConsumerWrapper(string name, IDictionary<string, string> config, KeyValueType keyType,
+            KeyValueType valueType, ISchemaRegistryClient schemaRegistryClient, TimeSpan expirationTimeout) : base(name,
+            config, expirationTimeout)
         {
             _schemaRegistryClient = schemaRegistryClient;
             KeyType = keyType;

@@ -74,6 +74,7 @@ namespace SergeSavel.KafkaRestProxy.Producer
             {
                 Id = source.Id,
                 Name = source.Name,
+                User = source.User,
                 ExpiresAt = source.ExpiresAt,
                 Owner = source.Owner
             };
@@ -85,6 +86,7 @@ namespace SergeSavel.KafkaRestProxy.Producer
             {
                 Id = source.Id,
                 Name = source.Name,
+                User = source.User,
                 ExpiresAt = source.ExpiresAt,
                 Owner = source.Owner,
                 Token = source.Token

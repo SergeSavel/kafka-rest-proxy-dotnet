@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 
 namespace SergeSavel.KafkaRestProxy.Common
 {
@@ -20,9 +21,10 @@ namespace SergeSavel.KafkaRestProxy.Common
     {
         private readonly TimeSpan _expirationTimeout;
 
-        protected ClientWrapper(string name, TimeSpan expirationTimeout)
+        protected ClientWrapper(string name, IDictionary<string, string> config, TimeSpan expirationTimeout)
         {
             Name = name;
+            User = GetUserFromConfig(config);
             _expirationTimeout = expirationTimeout;
             UpdateExpiration();
         }
@@ -32,7 +34,7 @@ namespace SergeSavel.KafkaRestProxy.Common
         public string Owner { get; init; }
         public DateTime ExpiresAt { get; private set; }
         public bool IsExpired => DateTime.Now >= ExpiresAt;
-
+        public string User { get; }
         public string Token { get; } = Guid.NewGuid().ToString();
 
         public abstract void Dispose();
@@ -40,6 +42,11 @@ namespace SergeSavel.KafkaRestProxy.Common
         public void UpdateExpiration()
         {
             ExpiresAt = DateTime.Now + _expirationTimeout;
+        }
+
+        private string GetUserFromConfig(IDictionary<string, string> config)
+        {
+            return config["sasl.username"];
         }
     }
 }

@@ -33,10 +33,8 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         private readonly IAdminClient _adminClient;
 
         public AdminClientWrapper(string name, IDictionary<string, string> config, TimeSpan expirationTimeout) : base(
-            name,
-            expirationTimeout)
+            name, config, expirationTimeout)
         {
-            // Username
             _adminClient = new AdminClientBuilder(config).Build();
         }
 

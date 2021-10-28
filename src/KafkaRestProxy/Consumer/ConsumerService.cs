@@ -97,6 +97,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer
             {
                 Id = source.Id,
                 Name = source.Name,
+                User = source.User,
                 KeyType = Enum.GetName(source.KeyType),
                 ValueType = Enum.GetName(source.ValueType),
                 ExpiresAt = source.ExpiresAt,
