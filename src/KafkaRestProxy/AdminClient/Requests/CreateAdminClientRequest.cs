@@ -20,9 +20,7 @@ namespace SergeSavel.KafkaRestProxy.AdminClient.Requests
     public class CreateAdminClientRequest
     {
         [Required] public string Name { get; init; }
-
         [Required] public IReadOnlyDictionary<string, string> Config { get; init; }
-
         [Required] [Range(1000, 86400000)] public int ExpirationTimeoutMs { get; init; }
     }
 }
