@@ -84,7 +84,7 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult RemoveClient(Guid clientId, string token)
+        public IActionResult RemoveClient(Guid clientId, [Required] string token)
         {
             _service.RemoveClient(clientId, token);
             return NoContent();
@@ -104,7 +104,7 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public Metadata GetMetadata(Guid clientId, string token, [Range(0, int.MaxValue)] int timeout)
+        public Metadata GetMetadata(Guid clientId, [Required] string token, [Range(0, int.MaxValue)] int timeout)
         {
             return _service.GetMetadata(clientId, token, timeout);
         }
@@ -143,7 +143,7 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public BrokerMetadata GetBrokerMetadata(Guid clientId, string token, int brokerId,
+        public BrokerMetadata GetBrokerMetadata(Guid clientId, [Required] string token, int brokerId,
             [Range(0, int.MaxValue)] int timeout)
         {
             return _service.GetBrokerMetadata(clientId, token, brokerId, timeout);
@@ -163,7 +163,8 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public TopicsMetadata GetTopicsMetadata(Guid clientId, string token, [Range(0, int.MaxValue)] int timeout)
+        public TopicsMetadata GetTopicsMetadata(Guid clientId, [Required] string token,
+            [Range(0, int.MaxValue)] int timeout)
         {
             return _service.GetTopicsMetadata(clientId, token, timeout);
         }
@@ -183,7 +184,7 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public TopicMetadata GetTopicMetadata(Guid clientId, string token, string topic,
+        public TopicMetadata GetTopicMetadata(Guid clientId, [Required] string token, string topic,
             [Range(0, int.MaxValue)] int timeout)
         {
             return _service.GetTopicMetadata(clientId, token, topic, timeout);
@@ -205,7 +206,8 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<bool>> CreateTopicAsync(Guid clientId, string token, CreateTopicRequest request,
+        public async Task<ActionResult<bool>> CreateTopicAsync(Guid clientId, [Required] string token,
+            CreateTopicRequest request,
             [Range(0, int.MaxValue)] int timeout)
         {
             await _service.CreateTopicAsync(clientId, token, request, timeout);
@@ -227,7 +229,7 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ResourceConfig> GetTopicConfigAsync(Guid clientId, string token, string topic,
+        public async Task<ResourceConfig> GetTopicConfigAsync(Guid clientId, [Required] string token, string topic,
             [Range(0, int.MaxValue)] int timeout)
         {
             return await _service.GetTopicConfigAsync(clientId, token, topic, timeout);
@@ -248,7 +250,7 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ResourceConfig> GetBrokerConfigAsync(Guid clientId, string token, int brokerId,
+        public async Task<ResourceConfig> GetBrokerConfigAsync(Guid clientId, [Required] string token, int brokerId,
             [Range(0, int.MaxValue)] int timeout)
         {
             return await _service.GetBrokerConfigAsync(clientId, token, brokerId, timeout);

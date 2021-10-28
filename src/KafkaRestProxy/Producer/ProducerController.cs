@@ -84,7 +84,7 @@ namespace SergeSavel.KafkaRestProxy.Producer
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult RemoveProducer(Guid producerId, string token)
+        public IActionResult RemoveProducer(Guid producerId, [Required] string token)
         {
             _service.RemoveProducer(producerId, token);
             return NoContent();
@@ -108,7 +108,7 @@ namespace SergeSavel.KafkaRestProxy.Producer
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<DeliveryResult>> ProduceAsync(Guid producerId, string token,
+        public async Task<ActionResult<DeliveryResult>> ProduceAsync(Guid producerId, [Required] string token,
             [Required] string topic,
             [Range(0, int.MaxValue)] int? partition, [Required] PostMessageRequest request)
         {
