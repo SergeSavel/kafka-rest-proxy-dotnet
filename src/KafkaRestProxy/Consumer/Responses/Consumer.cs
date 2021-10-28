@@ -19,13 +19,10 @@ namespace SergeSavel.KafkaRestProxy.Consumer.Responses
     public class Consumer
     {
         public Guid Id { get; init; }
-
+        public string Name { get; init; }
         public DateTime ExpiresAt { get; init; }
-
-        public string Creator { get; init; }
-
         public string KeyType { get; init; }
-
         public string ValueType { get; init; }
+        public string Owner { get; init; }
     }
 }

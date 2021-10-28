@@ -13,143 +13,47 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Confluent.Kafka;
-using Confluent.SchemaRegistry;
+using Microsoft.Extensions.Logging;
+using SergeSavel.KafkaRestProxy.Common;
 using SergeSavel.KafkaRestProxy.Common.Contract;
-using SergeSavel.KafkaRestProxy.Common.Exceptions;
-using SergeSavel.KafkaRestProxy.Consumer.Exceptions;
+using SergeSavel.KafkaRestProxy.SchemaRegistry;
 
 namespace SergeSavel.KafkaRestProxy.Consumer
 {
-    public class ConsumerProvider : IDisposable
+    public class ConsumerProvider : ClientProvider<ConsumerWrapper>
     {
-        private readonly ConcurrentDictionary<Guid, ConsumerWrapper> _consumers = new();
-        private readonly ISchemaRegistryClient _schemaRegistryClient;
-        private readonly SemaphoreSlim _semaphore = new(1);
+        private readonly ConsumerConfig _defaultConfig;
+        private readonly ILogger<ConsumerProvider> _logger;
+        private readonly SchemaRegistryService _schemaRegistryService;
 
-        private IDeserializer<string> _avroDeserializer;
-
-        public ConsumerProvider(ISchemaRegistryClient schemaRegistryClient)
+        public ConsumerProvider(ILogger<ConsumerProvider> logger, ConsumerConfig defaultConfig,
+            SchemaRegistryService schemaRegistryService)
         {
-            _schemaRegistryClient = schemaRegistryClient;
+            _logger = logger;
+            _defaultConfig = defaultConfig;
+            _schemaRegistryService = schemaRegistryService;
         }
 
-        public void Dispose()
+        public ConsumerWrapper CreateConsumer(string name, IEnumerable<KeyValuePair<string, string>> config,
+            KeyValueType keyType, KeyValueType valueType, TimeSpan expirationTimeout, string owner = null)
         {
-            var wrappers = ListConsumers();
-            foreach (var wrapper in wrappers)
-                try
-                {
-                    wrapper.Dispose();
-                }
-                catch (ObjectDisposedException)
-                {
-                }
-        }
+            var effectiveConfig = new Dictionary<string, string>();
+            foreach (var (key, value) in _defaultConfig)
+                effectiveConfig.Add(key, value);
+            foreach (var (key, value) in config)
+                effectiveConfig.Add(key, value);
 
-        public ConsumerWrapper CreateConsumer(IDictionary<string, string> consumerConfig, TimeSpan expirationTimeout,
-            KeyValueType keyType, KeyValueType valueType, string creator = null)
-        {
-            var keyDeserializer = GetDeserializer(keyType);
-            var valueDeserializer = GetDeserializer(valueType);
-
-            var consumerWrapper =
-                new ConsumerWrapper(consumerConfig, expirationTimeout, keyDeserializer, valueDeserializer)
-                {
-                    Creator = creator,
-                    KeyType = keyType,
-                    ValueType = valueType
-                };
-
-            if (!_consumers.TryAdd(consumerWrapper.Id, consumerWrapper))
+            var wrapper = new ConsumerWrapper(name, effectiveConfig, keyType, valueType, _schemaRegistryService.Client,
+                expirationTimeout)
             {
-                consumerWrapper.Dispose();
-                throw new Exception("Unable to register consumer.");
-            }
-
-            return consumerWrapper;
-        }
-
-        public ConsumerWrapper GetConsumer(Guid id)
-        {
-            if (!_consumers.TryGetValue(id, out var consumerWrapper))
-                throw new ConsumerNotFoundException(id);
-            return consumerWrapper;
-        }
-
-        public void TryGetConsumer(Guid id, out ConsumerWrapper consumerWrapper)
-        {
-            _consumers.TryGetValue(id, out consumerWrapper);
-        }
-
-        public ICollection<ConsumerWrapper> ListConsumers()
-        {
-            return _consumers.Values.ToList();
-        }
-
-        public bool RemoveConsumer(Guid id)
-        {
-            if (!_consumers.TryRemove(id, out var consumerWrapper)) return false;
-
-            Task.Run(() =>
-            {
-                try
-                {
-                    consumerWrapper.Consumer.Close();
-                }
-                finally
-                {
-                    consumerWrapper.Dispose();
-                }
-            });
-
-            return true;
-        }
-
-        public void RemoveExpiredConsumers()
-        {
-            foreach (var consumerWrapper in _consumers.Values)
-                if (consumerWrapper.IsExpired)
-                    RemoveConsumer(consumerWrapper.Id);
-        }
-
-        private IDeserializer<string> GetDeserializer(KeyValueType keyValueType)
-        {
-            return keyValueType switch
-            {
-                KeyValueType.Null => StringDeserializers.Null,
-                KeyValueType.Ignore => StringDeserializers.Ignore,
-                KeyValueType.Bytes => StringDeserializers.Base64,
-                KeyValueType.String => StringDeserializers.Utf8,
-                KeyValueType.AvroAsXml => GetAvroDeserializer(),
-                _ => throw new ArgumentException("Unexpected key/value type: ")
+                Owner = owner
             };
-        }
 
-        private IDeserializer<string> GetAvroDeserializer()
-        {
-            if (_avroDeserializer == null)
-            {
-                _semaphore.Wait(TimeSpan.FromSeconds(10));
-                try
-                {
-                    if (_schemaRegistryClient == null)
-                        throw new BadRequestException("SchemaRegistry Client not initialized.");
+            AddItem(wrapper);
 
-                    _avroDeserializer = new StringAvroDeserializer(_schemaRegistryClient);
-                }
-                finally
-                {
-                    _semaphore.Release();
-                }
-            }
-
-            return _avroDeserializer;
+            return wrapper;
         }
     }
 }
