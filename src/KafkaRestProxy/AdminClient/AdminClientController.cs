@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SergeSavel.KafkaRestProxy.AdminClient.Requests;
 using SergeSavel.KafkaRestProxy.AdminClient.Responses;
+using SergeSavel.KafkaRestProxy.Common.Responses;
 
 namespace SergeSavel.KafkaRestProxy.AdminClient
 {
@@ -175,7 +176,7 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         /// <param name="topic">Topic name.</param>
         /// <param name="timeout">Operation timeout (ms).</param>
         /// <returns>Topic metadata.</returns>
-        /// <response code="200">Returns broker metadata.</response>
+        /// <response code="200">Returns topic metadata.</response>
         /// <response code="403">Invalid token.</response>
         /// <response code="404">Instance/topic not found.</response>
         /// <response code="500">Returns error details.</response>

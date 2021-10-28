@@ -12,13 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Linq;
 using Confluent.Kafka;
 using Error = SergeSavel.KafkaRestProxy.Common.Contract.Error;
+using TopicMetadata = SergeSavel.KafkaRestProxy.Common.Responses.TopicMetadata;
 
 namespace SergeSavel.KafkaRestProxy.Common.Mappers
 {
     public static class CommonMapper
     {
+        public static TopicMetadata Map(Confluent.Kafka.TopicMetadata source, Metadata metadata = null)
+        {
+            return new TopicMetadata
+            {
+                Topic = source.Topic,
+                Partitions = source.Partitions.Select(Map).ToArray(),
+                Error = Map(source.Error),
+                OriginatingBrokerId = metadata?.OriginatingBrokerId,
+                OriginatingBrokerName = metadata?.OriginatingBrokerName
+            };
+        }
+
+        public static TopicMetadata.PartitionMetadata Map(PartitionMetadata source)
+        {
+            return new TopicMetadata.PartitionMetadata
+            {
+                Partition = source.PartitionId,
+                Leader = source.Leader,
+                Replicas = source.Replicas,
+                InSyncReplicas = source.InSyncReplicas,
+                Error = Map(source.Error)
+            };
+        }
+
         public static Error Map(Confluent.Kafka.Error source)
         {
             if (source.Code == ErrorCode.NoError)
@@ -26,7 +52,7 @@ namespace SergeSavel.KafkaRestProxy.Common.Mappers
 
             return new Error
             {
-                Code = (int) source.Code,
+                Code = (int)source.Code,
                 Reason = source.Reason,
                 IsBrokerError = source.IsBrokerError,
                 IsLocalError = source.IsLocalError,

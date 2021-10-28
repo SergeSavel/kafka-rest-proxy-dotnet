@@ -18,6 +18,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SergeSavel.KafkaRestProxy.Common.Responses;
 using SergeSavel.KafkaRestProxy.Consumer.Requests;
 using SergeSavel.KafkaRestProxy.Consumer.Responses;
 
@@ -175,6 +176,27 @@ namespace SergeSavel.KafkaRestProxy.Consumer
             [Required] [Range(0, int.MaxValue)] int partition, [Range(0, int.MaxValue)] int? timeout)
         {
             return _service.GetPartitionOffsets(consumerId, token, topic, partition, timeout);
+        }
+
+        /// <summary>Get topic metadata.</summary>
+        /// <param name="consumerId">Consumer instance Id.</param>
+        /// <param name="token">Security token obtained while creating current instance.</param>
+        /// <param name="topic">Topic name.</param>
+        /// <param name="timeout">Operation timeout (ms).</param>
+        /// <returns>Topic metadata.</returns>
+        /// <response code="200">Returns topic metadata.</response>
+        /// <response code="403">Invalid token.</response>
+        /// <response code="404">Instance/topic not found.</response>
+        /// <response code="500">Returns error details.</response>
+        [HttpGet("{consumerId:guid}/metadata")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public TopicMetadata GetTopicMetadata(Guid consumerId, [Required] string token, string topic,
+            [Range(0, int.MaxValue)] int timeout)
+        {
+            return _service.GetTopicMetadata(consumerId, token, topic, timeout);
         }
     }
 }

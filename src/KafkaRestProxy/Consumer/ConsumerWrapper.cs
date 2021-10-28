@@ -22,8 +22,10 @@ using Confluent.SchemaRegistry;
 using SergeSavel.KafkaRestProxy.Common;
 using SergeSavel.KafkaRestProxy.Common.Contract;
 using SergeSavel.KafkaRestProxy.Common.Exceptions;
+using SergeSavel.KafkaRestProxy.Common.Mappers;
 using SergeSavel.KafkaRestProxy.Consumer.Responses;
 using KafkaException = Confluent.Kafka.KafkaException;
+using TopicMetadata = SergeSavel.KafkaRestProxy.Common.Responses.TopicMetadata;
 using TopicPartition = SergeSavel.KafkaRestProxy.Consumer.Responses.TopicPartition;
 using TopicPartitionOffset = SergeSavel.KafkaRestProxy.Consumer.Requests.TopicPartitionOffset;
 
@@ -36,6 +38,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer
 
         private readonly SemaphoreSlim _semaphore = new(1);
         private IDeserializer<string> _avroDeserializer;
+        private IAdminClient _dependentAdminClient;
 
         public ConsumerWrapper(string name, IDictionary<string, string> config, KeyValueType keyType,
             KeyValueType valueType, ISchemaRegistryClient schemaRegistryClient, TimeSpan expirationTimeout) : base(name,
@@ -146,6 +149,16 @@ namespace SergeSavel.KafkaRestProxy.Consumer
             };
         }
 
+        public TopicMetadata GetTopicMetadata(string topic, TimeSpan timeout)
+        {
+            var adminClient = GetAdminClient();
+            var metadata = adminClient.GetMetadata(topic, timeout);
+            var topicMetadata = metadata.Topics[0];
+            if (topicMetadata.Error.Code == ErrorCode.UnknownTopicOrPart)
+                throw new TopicNotFoundException(topic);
+            return CommonMapper.Map(topicMetadata, metadata);
+        }
+
         private IDeserializer<string> GetDeserializer(KeyValueType keyValueType)
         {
             return keyValueType switch
@@ -178,6 +191,24 @@ namespace SergeSavel.KafkaRestProxy.Consumer
             }
 
             return _avroDeserializer;
+        }
+
+        private IAdminClient GetAdminClient()
+        {
+            if (_dependentAdminClient == null)
+            {
+                _semaphore.Wait(TimeSpan.FromSeconds(10));
+                try
+                {
+                    _dependentAdminClient = new DependentAdminClientBuilder(_consumer.Handle).Build();
+                }
+                finally
+                {
+                    _semaphore.Release();
+                }
+            }
+
+            return _dependentAdminClient;
         }
 
         private static TopicPartition Map(Confluent.Kafka.TopicPartition source)
@@ -241,6 +272,15 @@ namespace SergeSavel.KafkaRestProxy.Consumer
             try
             {
                 _consumer.Close();
+            }
+            catch (Exception)
+            {
+                // ignore
+            }
+
+            try
+            {
+                _dependentAdminClient?.Dispose();
             }
             catch (Exception)
             {

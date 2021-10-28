@@ -13,9 +13,8 @@
 // limitations under the License.
 
 using Microsoft.AspNetCore.Http;
-using SergeSavel.KafkaRestProxy.Common.Exceptions;
 
-namespace SergeSavel.KafkaRestProxy.AdminClient.Exceptions
+namespace SergeSavel.KafkaRestProxy.Common.Exceptions
 {
     public class TopicNotFoundException : HttpResponseException
     {

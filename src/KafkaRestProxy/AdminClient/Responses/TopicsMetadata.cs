@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using SergeSavel.KafkaRestProxy.Common.Responses;
 
 namespace SergeSavel.KafkaRestProxy.AdminClient.Responses
 {

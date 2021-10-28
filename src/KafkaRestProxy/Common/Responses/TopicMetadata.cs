@@ -13,9 +13,10 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using SergeSavel.KafkaRestProxy.AdminClient.Responses;
 using SergeSavel.KafkaRestProxy.Common.Contract;
 
-namespace SergeSavel.KafkaRestProxy.AdminClient.Responses
+namespace SergeSavel.KafkaRestProxy.Common.Responses
 {
     public class TopicMetadata : MetadataBase
     {

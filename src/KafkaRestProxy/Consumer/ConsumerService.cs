@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SergeSavel.KafkaRestProxy.Common.Responses;
 using SergeSavel.KafkaRestProxy.Consumer.Requests;
 using SergeSavel.KafkaRestProxy.Consumer.Responses;
 
@@ -89,6 +90,13 @@ namespace SergeSavel.KafkaRestProxy.Consumer
             return timeoutMs.HasValue
                 ? wrapper.QueryWatermarkOffsets(topic, partition, TimeSpan.FromMilliseconds(timeoutMs.Value))
                 : wrapper.GetWatermarkOffsets(topic, partition);
+        }
+
+        public TopicMetadata GetTopicMetadata(Guid clientId, string token, string topic, int timeoutMs)
+        {
+            var wrapper = _provider.GetItem(clientId, token);
+            wrapper.UpdateExpiration();
+            return wrapper.GetTopicMetadata(topic, TimeSpan.FromMilliseconds(timeoutMs));
         }
 
         private static Responses.Consumer MapConsumer(ConsumerWrapper source)
