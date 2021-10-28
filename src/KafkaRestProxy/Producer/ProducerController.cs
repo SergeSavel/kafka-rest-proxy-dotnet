@@ -51,11 +51,9 @@ namespace SergeSavel.KafkaRestProxy.Producer
         /// <param name="producerId">Producer instance Id.</param>
         /// <returns>Instance info (without token).</returns>
         /// <response code="200">Returns producer instances info (without token).</response>
-        /// <response code="403">Invalid token.</response>
         /// <response code="404">Instance not found.</response>
         [HttpGet("{producerId:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public Responses.Producer GetProducer(Guid producerId)
         {
