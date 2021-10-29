@@ -36,9 +36,9 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         {
             var effectiveConfig = new Dictionary<string, string>();
             foreach (var (key, value) in _defaultConfig)
-                effectiveConfig.Add(key, value);
+                effectiveConfig[key] = value;
             foreach (var (key, value) in config)
-                effectiveConfig.Add(key, value);
+                effectiveConfig[key] = value;
 
             var wrapper = new AdminClientWrapper(name, effectiveConfig, expirationTimeout)
             {

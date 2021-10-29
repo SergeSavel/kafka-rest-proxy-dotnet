@@ -41,9 +41,9 @@ namespace SergeSavel.KafkaRestProxy.Consumer
         {
             var effectiveConfig = new Dictionary<string, string>();
             foreach (var (key, value) in _defaultConfig)
-                effectiveConfig.Add(key, value);
+                effectiveConfig[key] = value;
             foreach (var (key, value) in config)
-                effectiveConfig.Add(key, value);
+                effectiveConfig[key] = value;
 
             var wrapper = new ConsumerWrapper(name, effectiveConfig, keyType, valueType, _schemaRegistryService.Client,
                 expirationTimeout)
