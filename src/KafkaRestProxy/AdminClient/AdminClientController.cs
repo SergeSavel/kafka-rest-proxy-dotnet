@@ -19,9 +19,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SergeSavel.KafkaRestProxy.AdminClient.Exceptions;
 using SergeSavel.KafkaRestProxy.AdminClient.Requests;
 using SergeSavel.KafkaRestProxy.AdminClient.Responses;
-using SergeSavel.KafkaRestProxy.Common.Responses;
 
 namespace SergeSavel.KafkaRestProxy.AdminClient
 {
@@ -94,6 +94,7 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         /// <summary>Get cluster metadata.</summary>
         /// <param name="clientId">Admin client instance Id.</param>
         /// <param name="token">Security token obtained while creating current instance.</param>
+        /// <param name="topic">(optional) Topic name.</param>
         /// <param name="timeout">Operation timeout (ms).</param>
         /// <returns>All cluster metadata.</returns>
         /// <response code="200">Returns cluster metadata.</response>
@@ -105,93 +106,15 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public Metadata GetMetadata(Guid clientId, [Required] string token, [Range(0, int.MaxValue)] int timeout)
-        {
-            return _service.GetMetadata(clientId, token, timeout);
-        }
-
-        /// <summary>Get brokers metadata</summary>
-        /// <param name="clientId">Admin client instance Id.</param>
-        /// <param name="token">Security token obtained while creating current instance.</param>
-        /// <param name="timeout">Operation timeout (ms).</param>
-        /// <returns>Brokers metadata.</returns>
-        /// <response code="200">Returns brokers metadata.</response>
-        /// <response code="403">Invalid token.</response>
-        /// <response code="404">Instance not found.</response>
-        /// <response code="500">Returns error details.</response>
-        [HttpGet("{clientId:guid}/brokers")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public BrokersMetadata GetBrokersMetadata(Guid clientId, string token, [Range(0, int.MaxValue)] int timeout)
-        {
-            return _service.GetBrokersMetadata(clientId, token, timeout);
-        }
-
-        /// <summary>Get broker metadata.</summary>
-        /// <param name="clientId">Admin client instance Id.</param>
-        /// <param name="token">Security token obtained while creating current instance.</param>
-        /// <param name="brokerId">Broker Id.</param>
-        /// <param name="timeout">Operation timeout (ms).</param>
-        /// <returns>Broker metadata.</returns>
-        /// <response code="200">Returns broker metadata.</response>
-        /// <response code="403">Invalid token.</response>
-        /// <response code="500">Returns error details.</response>
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [HttpGet("{clientId:guid}/brokers/{brokerId:int}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public BrokerMetadata GetBrokerMetadata(Guid clientId, [Required] string token, int brokerId,
+        public Metadata GetMetadata(Guid clientId, [Required] string token, string topic,
             [Range(0, int.MaxValue)] int timeout)
         {
-            return _service.GetBrokerMetadata(clientId, token, brokerId, timeout);
+            return topic == null
+                ? _service.GetMetadata(clientId, token, timeout)
+                : _service.GetMetadata(clientId, token, topic, timeout);
         }
 
-        /// <summary>Get topics metadata.</summary>
-        /// <param name="clientId">Admin client instance Id.</param>
-        /// <param name="token">Security token obtained while creating current instance.</param>
-        /// <param name="timeout">Operation timeout (ms).</param>
-        /// <returns>Topics metadata.</returns>
-        /// <response code="200">Returns topics metadata.</response>
-        /// <response code="403">Invalid token.</response>
-        /// <response code="404">Instance not found.</response>
-        /// <response code="500">Returns error details.</response>
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [HttpGet("{clientId:guid}/topics")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public TopicsMetadata GetTopicsMetadata(Guid clientId, [Required] string token,
-            [Range(0, int.MaxValue)] int timeout)
-        {
-            return _service.GetTopicsMetadata(clientId, token, timeout);
-        }
-
-        /// <summary>Get topic metadata.</summary>
-        /// <param name="clientId">Admin client instance Id.</param>
-        /// <param name="token">Security token obtained while creating current instance.</param>
-        /// <param name="topic">Topic name.</param>
-        /// <param name="timeout">Operation timeout (ms).</param>
-        /// <returns>Topic metadata.</returns>
-        /// <response code="200">Returns topic metadata.</response>
-        /// <response code="403">Invalid token.</response>
-        /// <response code="404">Instance/topic not found.</response>
-        /// <response code="500">Returns error details.</response>
-        [HttpGet("{clientId:guid}/topics/{topic}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public TopicMetadata GetTopicMetadata(Guid clientId, [Required] string token, string topic,
-            [Range(0, int.MaxValue)] int timeout)
-        {
-            return _service.GetTopicMetadata(clientId, token, topic, timeout);
-        }
-
-        /// <summary></summary>
+        /// <summary>Create new topic.</summary>
         /// <param name="clientId">Admin client instance Id.</param>
         /// <param name="token">Security token obtained while creating current instance.</param>
         /// <param name="request">New topic config.</param>
@@ -201,60 +124,49 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         /// <response code="403">Invalid token.</response>
         /// <response code="404">Instance not found.</response>
         /// <response code="500">Returns error details.</response>
-        [HttpPost("{clientId:guid}/topics")]
+        [HttpPost("{clientId:guid}/metadata")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<bool>> CreateTopicAsync(Guid clientId, [Required] string token,
-            CreateTopicRequest request,
-            [Range(0, int.MaxValue)] int timeout)
+            CreateTopicRequest request, [Range(0, int.MaxValue)] int timeout)
         {
             await _service.CreateTopicAsync(clientId, token, request, timeout);
-            return CreatedAtAction(nameof(GetTopicMetadata), new { topic = request.Topic, timeout }, true);
+            return CreatedAtAction(nameof(GetMetadata), new { clientId, token, request.Topic, timeout }, true);
         }
 
-        /// <summary>Get topic config.</summary>
+        /// <summary>
+        /// Get broker/topic config.
+        /// Either "broker" or "topic" parameter must be provided, not both.
+        /// </summary>
         /// <param name="clientId">Admin client instance Id.</param>
         /// <param name="token">Security token obtained while creating current instance.</param>
+        /// <param name="broker">Broker Id.</param>
         /// <param name="topic">Topic name.</param>
         /// <param name="timeout">Operation timeout (ms).</param>
         /// <returns>Topic config.</returns>
         /// <response code="200">Returns topic config.</response>
-        /// <response code="400">Unsupported feature.</response>
+        /// <response code="400">Invalid query parameters.</response>
         /// <response code="403">Invalid token.</response>
-        /// <response code="404">Instance/topic not found.</response>
+        /// <response code="404">Instance/topic/broker not found.</response>
         /// <response code="500">Returns error details.</response>
-        [HttpGet("{clientId:guid}/topics/{topic}/config")]
+        [HttpGet("{clientId:guid}/config")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ResourceConfig> GetTopicConfigAsync(Guid clientId, [Required] string token, string topic,
-            [Range(0, int.MaxValue)] int timeout)
+        public async Task<ResourceConfig> GetConfigAsync(Guid clientId, [Required] string token, int? broker,
+            string topic, [Range(0, int.MaxValue)] int timeout)
         {
-            return await _service.GetTopicConfigAsync(clientId, token, topic, timeout);
-        }
-
-        /// <summary>Get broker config.</summary>
-        /// <param name="clientId">Admin client instance Id.</param>
-        /// <param name="token">Security token obtained while creating current instance.</param>
-        /// <param name="brokerId">Broker Id.</param>
-        /// <param name="timeout">Operation timeout (ms).</param>
-        /// <returns>Broker config.</returns>
-        /// <response code="200">Returns broker config.</response>
-        /// <response code="400">Unsupported feature.</response>
-        /// <response code="403">Invalid token.</response>
-        /// <response code="404">Instance/broker not found.</response>
-        /// <response code="500">Returns error details.</response>
-        [HttpGet("{clientId:guid}/brokers/{brokerId:int}/config")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ResourceConfig> GetBrokerConfigAsync(Guid clientId, [Required] string token, int brokerId,
-            [Range(0, int.MaxValue)] int timeout)
-        {
-            return await _service.GetBrokerConfigAsync(clientId, token, brokerId, timeout);
+            if (broker.HasValue && topic != null)
+                throw new InvalidParametersException("\"broker\" and \"topic\" parameters must not be both provided.");
+            if (broker.HasValue)
+                return await _service.GetBrokerConfigAsync(clientId, token, broker.Value, timeout);
+            if (topic != null)
+                return await _service.GetTopicConfigAsync(clientId, token, topic, timeout);
+            throw new InvalidParametersException("Either \"broker\" or \"topic\" parameter must be provided.");
         }
     }
 }

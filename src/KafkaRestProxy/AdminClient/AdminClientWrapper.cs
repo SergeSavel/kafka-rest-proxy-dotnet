@@ -21,12 +21,9 @@ using Confluent.Kafka.Admin;
 using SergeSavel.KafkaRestProxy.AdminClient.Exceptions;
 using SergeSavel.KafkaRestProxy.AdminClient.Responses;
 using SergeSavel.KafkaRestProxy.Common;
-using SergeSavel.KafkaRestProxy.Common.Exceptions;
 using SergeSavel.KafkaRestProxy.Common.Mappers;
 using BrokerMetadata = SergeSavel.KafkaRestProxy.AdminClient.Responses.BrokerMetadata;
-using KafkaException = Confluent.Kafka.KafkaException;
 using Metadata = SergeSavel.KafkaRestProxy.AdminClient.Responses.Metadata;
-using TopicMetadata = SergeSavel.KafkaRestProxy.Common.Responses.TopicMetadata;
 
 namespace SergeSavel.KafkaRestProxy.AdminClient
 {
@@ -45,50 +42,23 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
             var metadata = _adminClient.GetMetadata(timeout);
             return new Metadata
             {
-                Brokers = metadata.Brokers.Select(brokerMetadata => Map(brokerMetadata)).ToArray(),
-                Topics = metadata.Topics.Select(topicMetadata => CommonMapper.Map(topicMetadata)).ToArray(),
+                Brokers = metadata.Brokers?.Select(brokerMetadata => Map(brokerMetadata)).ToArray(),
+                Topics = metadata.Topics?.Select(topicMetadata => CommonMapper.Map(topicMetadata)).ToArray(),
                 OriginatingBrokerId = metadata.OriginatingBrokerId,
                 OriginatingBrokerName = metadata.OriginatingBrokerName
             };
         }
 
-        public TopicsMetadata GetTopicsMetadata(TimeSpan timeout)
-        {
-            var metadata = _adminClient.GetMetadata(timeout);
-            return new TopicsMetadata
-            {
-                Topics = metadata.Topics.Select(topicMetadata => CommonMapper.Map(topicMetadata)).ToArray(),
-                OriginatingBrokerId = metadata.OriginatingBrokerId,
-                OriginatingBrokerName = metadata.OriginatingBrokerName
-            };
-        }
-
-        public TopicMetadata GetTopicMetadata(string topic, TimeSpan timeout)
+        public Metadata GetMetadata(string topic, TimeSpan timeout)
         {
             var metadata = _adminClient.GetMetadata(topic, timeout);
-            var topicMetadata = metadata.Topics[0];
-            if (topicMetadata.Error.Code == ErrorCode.UnknownTopicOrPart)
-                throw new TopicNotFoundException(topic);
-            return CommonMapper.Map(topicMetadata, metadata);
-        }
-
-        public BrokersMetadata GetBrokersMetadata(TimeSpan timeout)
-        {
-            var metadata = _adminClient.GetMetadata(timeout);
-            return new BrokersMetadata
+            return new Metadata
             {
-                Brokers = metadata.Brokers.Select(brokerMetadata => Map(brokerMetadata)).ToArray(),
+                Brokers = metadata.Brokers?.Select(brokerMetadata => Map(brokerMetadata)).ToArray(),
+                Topics = metadata.Topics?.Select(topicMetadata => CommonMapper.Map(topicMetadata)).ToArray(),
                 OriginatingBrokerId = metadata.OriginatingBrokerId,
                 OriginatingBrokerName = metadata.OriginatingBrokerName
             };
-        }
-
-        public BrokerMetadata GetBrokerMetadata(int brokerId, TimeSpan timeout)
-        {
-            var metadata = _adminClient.GetMetadata(timeout);
-            var brokerMetadata = metadata.Brokers.Find(brokerMetadata => brokerMetadata.BrokerId == brokerId);
-            if (brokerMetadata == null) throw new BrokerNotFoundException(brokerId);
-            return Map(brokerMetadata, metadata);
         }
 
         public async Task CreateTopicAsync(string topic, int? numPartitions, short? replicationFactor,
