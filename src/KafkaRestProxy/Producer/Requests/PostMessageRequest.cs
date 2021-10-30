@@ -28,6 +28,6 @@ namespace SergeSavel.KafkaRestProxy.Producer.Requests
         public string ValueSchema { get; init; }
         public string Value { get; init; }
 
-        public IReadOnlyDictionary<string, string> Headers { get; init; }
+        public IDictionary<string, string> Headers { get; init; }
     }
 }

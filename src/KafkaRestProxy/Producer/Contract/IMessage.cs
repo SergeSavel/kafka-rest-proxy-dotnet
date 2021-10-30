@@ -25,6 +25,6 @@ namespace SergeSavel.KafkaRestProxy.Producer.Contract
         KeyValueType ValueType { get; }
         string ValueSchema { get; }
         string Value { get; }
-        IReadOnlyDictionary<string, string> Headers { get; }
+        IDictionary<string, string> Headers { get; }
     }
 }

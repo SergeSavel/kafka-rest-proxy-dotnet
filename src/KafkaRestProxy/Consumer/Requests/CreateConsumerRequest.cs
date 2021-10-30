@@ -21,7 +21,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer.Requests
     public class CreateConsumerRequest
     {
         [Required] public string Name { get; init; }
-        [Required] public IReadOnlyDictionary<string, string> Config { get; init; }
+        [Required] public Dictionary<string, string> Config { get; init; }
         [Required] [Range(1000, 86400000)] public int ExpirationTimeoutMs { get; init; }
         public KeyValueType KeyType { get; init; } = KeyValueTypeDefaults.Key;
         public KeyValueType ValueType { get; init; } = KeyValueTypeDefaults.Value;
