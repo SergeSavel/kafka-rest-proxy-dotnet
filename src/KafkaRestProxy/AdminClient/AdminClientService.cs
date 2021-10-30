@@ -60,40 +60,42 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
             _provider.RemoveItem(wrapper.Id);
         }
 
-        public Metadata GetMetadata(Guid clientId, string token, int timeoutMs)
+        public Metadata GetMetadata(Guid clientId, string token, TimeSpan timeout)
         {
             var wrapper = _provider.GetItem(clientId, token);
             wrapper.UpdateExpiration();
-            return wrapper.GetMetadata(TimeSpan.FromMilliseconds(timeoutMs));
+            return wrapper.GetMetadata(timeout);
         }
 
-        public Metadata GetMetadata(Guid clientId, string token, string topic, int timeoutMs)
+        public Metadata GetMetadata(Guid clientId, string token, string topic, TimeSpan timeout)
         {
             var wrapper = _provider.GetItem(clientId, token);
             wrapper.UpdateExpiration();
-            return wrapper.GetMetadata(topic, TimeSpan.FromMilliseconds(timeoutMs));
+            return wrapper.GetMetadata(topic, timeout);
         }
 
-        public async Task CreateTopicAsync(Guid clientId, string token, CreateTopicRequest request, int timeoutMs)
+        public async Task CreateTopicAsync(Guid clientId, string token, CreateTopicRequest request, TimeSpan timeout)
         {
             var wrapper = _provider.GetItem(clientId, token);
             wrapper.UpdateExpiration();
             await wrapper.CreateTopicAsync(request.Topic, request.NumPartitions, request.ReplicationFactor,
-                request.Config, TimeSpan.FromMilliseconds(timeoutMs));
+                request.Config, timeout);
         }
 
-        public async Task<ResourceConfig> GetTopicConfigAsync(Guid clientId, string token, string topic, int timeoutMs)
+        public async Task<ResourceConfig> GetTopicConfigAsync(Guid clientId, string token, string topic,
+            TimeSpan timeout)
         {
             var wrapper = _provider.GetItem(clientId, token);
             wrapper.UpdateExpiration();
-            return await wrapper.GetTopicConfigAsync(topic, TimeSpan.FromMilliseconds(timeoutMs));
+            return await wrapper.GetTopicConfigAsync(topic, timeout);
         }
 
-        public async Task<ResourceConfig> GetBrokerConfigAsync(Guid clientId, string token, int brokerId, int timeoutMs)
+        public async Task<ResourceConfig> GetBrokerConfigAsync(Guid clientId, string token, int brokerId,
+            TimeSpan timeout)
         {
             var wrapper = _provider.GetItem(clientId, token);
             wrapper.UpdateExpiration();
-            return await wrapper.GetBrokerConfigAsync(brokerId, TimeSpan.FromMilliseconds(timeoutMs));
+            return await wrapper.GetBrokerConfigAsync(brokerId, timeout);
         }
 
         private static Responses.AdminClient MapAdminClient(AdminClientWrapper wrapper)

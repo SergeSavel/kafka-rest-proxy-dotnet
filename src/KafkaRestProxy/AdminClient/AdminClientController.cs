@@ -107,11 +107,11 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public Metadata GetMetadata(Guid clientId, [Required] string token, string topic,
-            [Range(0, int.MaxValue)] int timeout)
+            [Required] [Range(0, int.MaxValue)] int timeout)
         {
             return topic == null
-                ? _service.GetMetadata(clientId, token, timeout)
-                : _service.GetMetadata(clientId, token, topic, timeout);
+                ? _service.GetMetadata(clientId, token, TimeSpan.FromMilliseconds(timeout))
+                : _service.GetMetadata(clientId, token, topic, TimeSpan.FromMilliseconds(timeout));
         }
 
         /// <summary>Create new topic.</summary>
@@ -131,9 +131,9 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<bool>> CreateTopicAsync(Guid clientId, [Required] string token,
-            CreateTopicRequest request, [Range(0, int.MaxValue)] int timeout)
+            [Required] CreateTopicRequest request, [Required] [Range(0, int.MaxValue)] int timeout)
         {
-            await _service.CreateTopicAsync(clientId, token, request, timeout);
+            await _service.CreateTopicAsync(clientId, token, request, TimeSpan.FromMilliseconds(timeout));
             return CreatedAtAction(nameof(GetMetadata), new { clientId, token, request.Topic, timeout }, true);
         }
 
@@ -158,14 +158,15 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ResourceConfig> GetConfigAsync(Guid clientId, [Required] string token, int? broker,
-            string topic, [Range(0, int.MaxValue)] int timeout)
+            string topic, [Required] [Range(0, int.MaxValue)] int timeout)
         {
             if (broker.HasValue && topic != null)
                 throw new InvalidParametersException("\"broker\" and \"topic\" parameters must not be both provided.");
             if (broker.HasValue)
-                return await _service.GetBrokerConfigAsync(clientId, token, broker.Value, timeout);
+                return await _service.GetBrokerConfigAsync(clientId, token, broker.Value,
+                    TimeSpan.FromMilliseconds(timeout));
             if (topic != null)
-                return await _service.GetTopicConfigAsync(clientId, token, topic, timeout);
+                return await _service.GetTopicConfigAsync(clientId, token, topic, TimeSpan.FromMilliseconds(timeout));
             throw new InvalidParametersException("Either \"broker\" or \"topic\" parameter must be provided.");
         }
     }
