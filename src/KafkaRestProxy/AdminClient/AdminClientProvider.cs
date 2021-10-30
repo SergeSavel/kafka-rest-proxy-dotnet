@@ -14,9 +14,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
 using SergeSavel.KafkaRestProxy.Common;
+using SergeSavel.KafkaRestProxy.Common.Exceptions;
 
 namespace SergeSavel.KafkaRestProxy.AdminClient
 {
@@ -31,23 +33,48 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
             _defaultConfig = defaultConfig;
         }
 
-        public AdminClientWrapper CreateClient(string name, IEnumerable<KeyValuePair<string, string>> config,
+        public AdminClientWrapper CreateClient(string name, IDictionary<string, string> config,
             TimeSpan expirationTimeout, string owner = null)
         {
+            var effectiveConfig = GetEffectiveConfig(config);
+            var wrapper = new AdminClientWrapper(name, effectiveConfig, expirationTimeout)
+            {
+                Owner = owner
+            };
+            AddItem(wrapper);
+            return wrapper;
+        }
+
+        private IDictionary<string, string> GetEffectiveConfig(IDictionary<string, string> config)
+        {
+            //ValidateStrictParameter(config, "bootstrap.servers");
             var effectiveConfig = new Dictionary<string, string>();
             foreach (var (key, value) in _defaultConfig)
                 effectiveConfig[key] = value;
             foreach (var (key, value) in config)
                 effectiveConfig[key] = value;
+            return effectiveConfig;
+        }
 
-            var wrapper = new AdminClientWrapper(name, effectiveConfig, expirationTimeout)
+        private void ValidateStrictParameter(IDictionary<string, string> config, string parameterName)
+        {
+            var defaultValue = _defaultConfig.Get(parameterName);
+            if (defaultValue != null)
             {
-                Owner = owner
-            };
-
-            AddItem(wrapper);
-
-            return wrapper;
+                var value = config
+                    .Where(kv => string.Equals(kv.Key, parameterName, StringComparison.OrdinalIgnoreCase))
+                    .Select(kv => kv.Value)
+                    .FirstOrDefault();
+                if (value != null)
+                {
+                    var defaultList = defaultValue
+                        .Split(",", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                    var list = value
+                        .Split(",", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                    if (!defaultList.SequenceEqual(list, StringComparer.OrdinalIgnoreCase))
+                        throw new ConfigConflictException(parameterName);
+                }
+            }
         }
     }
 }
