@@ -64,7 +64,7 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
         /// <summary>Create new admin client instance.</summary>
         /// <param name="request">New instance config.</param>
         /// <returns>New instance info (with token)</returns>
-        /// <response code="200">Returns new instance info (with token).</response>
+        /// <response code="201">Returns new instance info (with token).</response>
         /// <response code="400">Invalid instance config.</response>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -91,7 +91,7 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
             return NoContent();
         }
 
-        /// <summary>Get cluster metadata.</summary>
+        /// <summary>Get metadata.</summary>
         /// <param name="clientId">Admin client instance Id.</param>
         /// <param name="token">Security token obtained while creating current instance.</param>
         /// <param name="topic">(optional) Topic name.</param>
