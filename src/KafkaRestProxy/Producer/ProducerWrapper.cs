@@ -90,7 +90,6 @@ namespace SergeSavel.KafkaRestProxy.Producer
             }
 
             var deliveryResult = Map(producerDeliveryResult);
-
             return deliveryResult;
         }
 
