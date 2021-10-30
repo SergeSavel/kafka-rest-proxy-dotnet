@@ -15,11 +15,12 @@
 using Microsoft.Extensions.Logging;
 using SergeSavel.KafkaRestProxy.Common;
 
-namespace SergeSavel.KafkaRestProxy.Consumer
+namespace SergeSavel.KafkaRestProxy.AdminClient
 {
-    public class ConsumerCleaner : ClientCleaner<ConsumerWrapper>
+    public class AdminClientKiller : ClientKiller<AdminClientWrapper>
     {
-        public ConsumerCleaner(ILogger<ConsumerCleaner> logger, ConsumerProvider provider) : base(logger, provider)
+        public AdminClientKiller(ILogger<AdminClientKiller> logger, AdminClientProvider provider) : base(logger,
+            provider)
         {
         }
     }

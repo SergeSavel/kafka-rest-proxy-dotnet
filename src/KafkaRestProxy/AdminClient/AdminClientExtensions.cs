@@ -24,7 +24,7 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
             services.AddSingleton(AdminClientConfigProvider.GetConfig(configuration));
             services.AddSingleton<AdminClientService>();
             services.AddSingleton<AdminClientProvider>();
-            services.AddHostedService<AdminClientCleaner>();
+            services.AddHostedService<AdminClientKiller>();
         }
     }
 }

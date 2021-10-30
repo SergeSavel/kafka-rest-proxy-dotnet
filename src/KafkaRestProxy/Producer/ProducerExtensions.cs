@@ -24,7 +24,7 @@ namespace SergeSavel.KafkaRestProxy.Producer
             services.AddSingleton(ProducerConfigProvider.GetConfig(configuration));
             services.AddSingleton<ProducerService>();
             services.AddSingleton<ProducerProvider>();
-            services.AddHostedService<ProducerCleaner>();
+            services.AddHostedService<ProducerKiller>();
         }
     }
 }

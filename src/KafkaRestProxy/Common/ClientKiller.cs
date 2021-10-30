@@ -20,14 +20,14 @@ using Microsoft.Extensions.Logging;
 
 namespace SergeSavel.KafkaRestProxy.Common
 {
-    public abstract class ClientCleaner<TClientWrapper> : BackgroundService where TClientWrapper : ClientWrapper
+    public abstract class ClientKiller<TClientWrapper> : BackgroundService where TClientWrapper : ClientWrapper
     {
         private const long PeriodMs = 10000;
 
         protected readonly ILogger _logger;
         private readonly ClientProvider<TClientWrapper> _provider;
 
-        public ClientCleaner(ILogger logger, ClientProvider<TClientWrapper> provider)
+        public ClientKiller(ILogger logger, ClientProvider<TClientWrapper> provider)
         {
             _logger = logger;
             _provider = provider;
