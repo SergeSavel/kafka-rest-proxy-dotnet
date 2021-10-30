@@ -24,6 +24,7 @@ using SergeSavel.KafkaRestProxy.Common.Contract;
 using SergeSavel.KafkaRestProxy.Common.Exceptions;
 using SergeSavel.KafkaRestProxy.Common.Mappers;
 using SergeSavel.KafkaRestProxy.Consumer.Responses;
+using ConsumeException = SergeSavel.KafkaRestProxy.Consumer.Exceptions.ConsumeException;
 using KafkaException = Confluent.Kafka.KafkaException;
 using TopicMetadata = SergeSavel.KafkaRestProxy.Common.Responses.TopicMetadata;
 using TopicPartition = SergeSavel.KafkaRestProxy.Consumer.Responses.TopicPartition;
@@ -68,7 +69,14 @@ namespace SergeSavel.KafkaRestProxy.Consumer
 
         public void Assign(IEnumerable<TopicPartitionOffset> assignment)
         {
-            _consumer.Assign(assignment.Select(Map));
+            try
+            {
+                _consumer.Assign(assignment.Select(Map));
+            }
+            catch (KafkaException e)
+            {
+                throw new ConsumeException("Unable to assign consumer.", e);
+            }
         }
 
         public ConsumerMessage Consume(CancellationToken cancellationToken = default)
@@ -78,9 +86,9 @@ namespace SergeSavel.KafkaRestProxy.Consumer
             {
                 consumeResult = _consumer.Consume(cancellationToken);
             }
-            catch (ConsumeException e)
+            catch (Confluent.Kafka.ConsumeException e)
             {
-                throw new Exceptions.ConsumeException("Unable to receive message.", e);
+                throw new ConsumeException("Unable to receive message.", e);
             }
 
             return Map(consumeResult);
@@ -93,9 +101,9 @@ namespace SergeSavel.KafkaRestProxy.Consumer
             {
                 consumeResult = _consumer.Consume(timeout);
             }
-            catch (ConsumeException e)
+            catch (Confluent.Kafka.ConsumeException e)
             {
-                throw new Exceptions.ConsumeException("Unable to receive message.", e);
+                throw new ConsumeException("Unable to receive message.", e);
             }
 
             return Map(consumeResult);
@@ -111,10 +119,19 @@ namespace SergeSavel.KafkaRestProxy.Consumer
             }
             catch (KafkaException e)
             {
-                throw new Exceptions.ConsumeException("Unable to get partition offsets.", e);
+                throw new ConsumeException("Unable to get partition offsets.", e);
             }
 
-            var position = _consumer.Position(topicPartition);
+            Offset position;
+            try
+            {
+                position = _consumer.Position(topicPartition);
+            }
+            catch (KafkaException e)
+            {
+                throw new ConsumeException("Unable to get consumer position.", e);
+            }
+
             return new PartitionOffsets
             {
                 Topic = topicPartition.Topic,
@@ -135,10 +152,19 @@ namespace SergeSavel.KafkaRestProxy.Consumer
             }
             catch (KafkaException e)
             {
-                throw new Exceptions.ConsumeException("Unable to query partition offsets.", e);
+                throw new ConsumeException("Unable to query partition offsets.", e);
             }
 
-            var position = _consumer.Position(topicPartition);
+            Offset position;
+            try
+            {
+                position = _consumer.Position(topicPartition);
+            }
+            catch (KafkaException e)
+            {
+                throw new ConsumeException("Unable to get consumer position.", e);
+            }
+
             return new PartitionOffsets
             {
                 Topic = topicPartition.Topic,
@@ -152,7 +178,16 @@ namespace SergeSavel.KafkaRestProxy.Consumer
         public TopicMetadata GetTopicMetadata(string topic, TimeSpan timeout)
         {
             var adminClient = GetAdminClient();
-            var metadata = adminClient.GetMetadata(topic, timeout);
+            Metadata metadata;
+            try
+            {
+                metadata = adminClient.GetMetadata(topic, timeout);
+            }
+            catch (KafkaException e)
+            {
+                throw new ConsumeException("Unable to get topic metadata.", e);
+            }
+
             var topicMetadata = metadata.Topics[0];
             if (topicMetadata.Error.Code == ErrorCode.UnknownTopicOrPart)
                 throw new TopicNotFoundException(topic);

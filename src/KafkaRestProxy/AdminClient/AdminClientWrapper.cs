@@ -39,7 +39,16 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
 
         public Metadata GetMetadata(TimeSpan timeout)
         {
-            var metadata = _adminClient.GetMetadata(timeout);
+            Confluent.Kafka.Metadata metadata;
+            try
+            {
+                metadata = _adminClient.GetMetadata(timeout);
+            }
+            catch (KafkaException e)
+            {
+                throw new AdminClientException("Unable to get metadata.", e);
+            }
+
             return new Metadata
             {
                 Brokers = metadata.Brokers?.Select(brokerMetadata => Map(brokerMetadata)).ToArray(),
@@ -51,7 +60,16 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
 
         public Metadata GetMetadata(string topic, TimeSpan timeout)
         {
-            var metadata = _adminClient.GetMetadata(topic, timeout);
+            Confluent.Kafka.Metadata metadata;
+            try
+            {
+                metadata = _adminClient.GetMetadata(topic, timeout);
+            }
+            catch (KafkaException e)
+            {
+                throw new AdminClientException("Unable to get topic metadata.", e);
+            }
+
             return new Metadata
             {
                 Brokers = metadata.Brokers?.Select(brokerMetadata => Map(brokerMetadata)).ToArray(),
