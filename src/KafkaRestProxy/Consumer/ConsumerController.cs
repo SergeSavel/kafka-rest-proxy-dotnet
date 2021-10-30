@@ -102,7 +102,6 @@ namespace SergeSavel.KafkaRestProxy.Consumer
         /// <response code="403">Invalid token.</response>
         /// <response code="404">Instance not found.</response>
         [HttpPost("{consumerId:guid}/assignment")]
-        [HttpPut("{consumerId:guid}/assignment")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
