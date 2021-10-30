@@ -71,12 +71,12 @@ namespace SergeSavel.KafkaRestProxy.Consumer
             _consumer.Assign(assignment.Select(Map));
         }
 
-        public ConsumerMessage Consume()
+        public ConsumerMessage Consume(CancellationToken cancellationToken = default)
         {
             ConsumeResult<string, string> consumeResult;
             try
             {
-                consumeResult = _consumer.Consume();
+                consumeResult = _consumer.Consume(cancellationToken);
             }
             catch (ConsumeException e)
             {

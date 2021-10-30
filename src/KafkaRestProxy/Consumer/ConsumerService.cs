@@ -73,22 +73,20 @@ namespace SergeSavel.KafkaRestProxy.Consumer
             return wrapper.GetAssignment();
         }
 
-        public ConsumerMessage Consume(Guid consumerId, string token, int? timeoutMs)
+        public ConsumerMessage Consume(Guid consumerId, string token, TimeSpan timeout)
         {
             var wrapper = _provider.GetItem(consumerId, token);
             wrapper.UpdateExpiration();
-            return timeoutMs.HasValue
-                ? wrapper.Consume(TimeSpan.FromMilliseconds(timeoutMs.Value))
-                : wrapper.Consume();
+            return wrapper.Consume(timeout);
         }
 
         public PartitionOffsets GetPartitionOffsets(Guid consumerId, string token, string topic, int partition,
-            int? timeoutMs)
+            TimeSpan? timeout)
         {
             var wrapper = _provider.GetItem(consumerId, token);
             wrapper.UpdateExpiration();
-            return timeoutMs.HasValue
-                ? wrapper.QueryWatermarkOffsets(topic, partition, TimeSpan.FromMilliseconds(timeoutMs.Value))
+            return timeout.HasValue
+                ? wrapper.QueryWatermarkOffsets(topic, partition, timeout.Value)
                 : wrapper.GetWatermarkOffsets(topic, partition);
         }
 

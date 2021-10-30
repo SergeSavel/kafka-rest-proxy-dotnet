@@ -98,7 +98,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer
         /// <param name="token">Security token obtained while creating current instance.</param>
         /// <param name="request">The set of partitions (with offset) to consume from.</param>
         /// <returns>The current partition assignment.</returns>
-        /// <response code="201">Successful assignment.</response>
+        /// <response code="201">Returns the current partition assignment.</response>
         /// <response code="403">Invalid token.</response>
         /// <response code="404">Instance not found.</response>
         [HttpPost("{consumerId:guid}/assignment")]
@@ -136,18 +136,23 @@ namespace SergeSavel.KafkaRestProxy.Consumer
         /// <param name="token">Security token obtained while creating current instance.</param>
         /// <param name="timeout">(optional) The maximum period of time (ms) the call may block.</param>
         /// <returns>Consume result (new message, if exists).</returns>
-        /// <response code="200">Returns consume result (new message, if exists).</response>
+        /// <response code="200">Returns consume result (new message).</response>
+        /// <response code="204">No new messages.</response>
         /// <response code="403">Invalid token.</response>
         /// <response code="404">Instance not found.</response>
         /// <response code="500">Returns error details.</response>
         [HttpGet("{consumerId:guid}/consume")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ConsumerMessage Consume(Guid consumerId, [Required] string token, [Range(0, int.MaxValue)] int? timeout)
+        public ActionResult<ConsumerMessage> Consume(Guid consumerId, [Required] string token,
+            [Required] [Range(0, int.MaxValue)] int timeout)
         {
-            return _service.Consume(consumerId, token, timeout);
+            var consumerMessage = _service.Consume(consumerId, token, TimeSpan.FromMilliseconds(timeout));
+            if (consumerMessage == null) return NoContent();
+            return new ActionResult<ConsumerMessage>(consumerMessage);
         }
 
         /// <summary>
@@ -174,7 +179,8 @@ namespace SergeSavel.KafkaRestProxy.Consumer
         public PartitionOffsets GetPartitionOffsets(Guid consumerId, [Required] string token, [Required] string topic,
             [Required] [Range(0, int.MaxValue)] int partition, [Range(0, int.MaxValue)] int? timeout)
         {
-            return _service.GetPartitionOffsets(consumerId, token, topic, partition, timeout);
+            return _service.GetPartitionOffsets(consumerId, token, topic, partition,
+                timeout.HasValue ? TimeSpan.FromMilliseconds(timeout.Value) : null);
         }
 
         /// <summary>Get topic metadata.</summary>
@@ -192,8 +198,8 @@ namespace SergeSavel.KafkaRestProxy.Consumer
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public TopicMetadata GetTopicMetadata(Guid consumerId, [Required] string token, string topic,
-            [Range(0, int.MaxValue)] int timeout)
+        public TopicMetadata GetTopicMetadata(Guid consumerId, [Required] string token, [Required] string topic,
+            [Required] [Range(0, int.MaxValue)] int timeout)
         {
             return _service.GetTopicMetadata(consumerId, token, topic, timeout);
         }
