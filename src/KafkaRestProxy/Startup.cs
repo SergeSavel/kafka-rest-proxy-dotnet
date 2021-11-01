@@ -51,7 +51,7 @@ namespace SergeSavel.KafkaRestProxy
                 {
                     options.JsonSerializerOptions.WriteIndented =
                         Configuration.GetSection("IndentOutput").Get<bool?>() ?? true;
-                    options.JsonSerializerOptions.IgnoreNullValues = true;
+                    //options.JsonSerializerOptions.IgnoreNullValues = true;
                     options.JsonSerializerOptions.PropertyNamingPolicy = null;
                     options.JsonSerializerOptions.Converters.Add(
                         new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
