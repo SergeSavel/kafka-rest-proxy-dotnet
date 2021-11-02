@@ -14,7 +14,7 @@
 
 namespace SergeSavel.KafkaRestProxy.Common.Responses
 {
-    public class BrokerMetadata : MetadataBase
+    public class BrokerMetadata
     {
         public int Id { get; init; }
 

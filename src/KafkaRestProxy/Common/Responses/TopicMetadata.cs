@@ -13,18 +13,16 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using SergeSavel.KafkaRestProxy.AdminClient.Responses;
-using SergeSavel.KafkaRestProxy.Common.Contract;
 
 namespace SergeSavel.KafkaRestProxy.Common.Responses
 {
-    public class TopicMetadata : MetadataBase
+    public class TopicMetadata
     {
         public string Topic { get; init; }
 
         public ICollection<PartitionMetadata> Partitions { get; init; }
 
-        public Error Error { get; init; }
+        // public Error Error { get; init; }
 
         public class PartitionMetadata
         {
@@ -36,7 +34,7 @@ namespace SergeSavel.KafkaRestProxy.Common.Responses
 
             public ICollection<int> InSyncReplicas { get; init; }
 
-            public Error Error { get; init; }
+            // public Error Error { get; init; }
         }
     }
 }

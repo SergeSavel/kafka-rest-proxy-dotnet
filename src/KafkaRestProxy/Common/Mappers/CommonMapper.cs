@@ -16,35 +16,29 @@ using System.Linq;
 using Confluent.Kafka;
 using BrokerMetadata = SergeSavel.KafkaRestProxy.Common.Responses.BrokerMetadata;
 using Error = SergeSavel.KafkaRestProxy.Common.Contract.Error;
-using Metadata = Confluent.Kafka.Metadata;
 using TopicMetadata = SergeSavel.KafkaRestProxy.Common.Responses.TopicMetadata;
 
 namespace SergeSavel.KafkaRestProxy.Common.Mappers
 {
     public static class CommonMapper
     {
-        public static BrokerMetadata Map(Confluent.Kafka.BrokerMetadata source,
-            Metadata metadata = null)
+        public static BrokerMetadata Map(Confluent.Kafka.BrokerMetadata source)
         {
             return new BrokerMetadata
             {
                 Id = source.BrokerId,
                 Host = source.Host,
-                Port = source.Port,
-                OriginatingBrokerId = metadata?.OriginatingBrokerId,
-                OriginatingBrokerName = metadata?.OriginatingBrokerName
+                Port = source.Port
             };
         }
 
-        public static TopicMetadata Map(Confluent.Kafka.TopicMetadata source, Metadata metadata = null)
+        public static TopicMetadata Map(Confluent.Kafka.TopicMetadata source)
         {
             return new TopicMetadata
             {
                 Topic = source.Topic,
                 Partitions = source.Partitions.Select(Map).ToArray(),
-                Error = Map(source.Error),
-                OriginatingBrokerId = metadata?.OriginatingBrokerId,
-                OriginatingBrokerName = metadata?.OriginatingBrokerName
+                //Error = Map(source.Error)
             };
         }
 
@@ -55,8 +49,8 @@ namespace SergeSavel.KafkaRestProxy.Common.Mappers
                 Partition = source.PartitionId,
                 Leader = source.Leader,
                 Replicas = source.Replicas,
-                InSyncReplicas = source.InSyncReplicas,
-                Error = Map(source.Error)
+                InSyncReplicas = source.InSyncReplicas
+                //Error = Map(source.Error)
             };
         }
 

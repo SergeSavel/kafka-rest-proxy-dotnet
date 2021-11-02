@@ -16,10 +16,14 @@ using System.Collections.Generic;
 
 namespace SergeSavel.KafkaRestProxy.Common.Responses
 {
-    public class Metadata : MetadataBase
+    public class Metadata
     {
         public ICollection<BrokerMetadata> Brokers { get; init; }
 
         public ICollection<TopicMetadata> Topics { get; init; }
+
+        public int? OriginatingBrokerId { get; init; }
+
+        public string OriginatingBrokerName { get; init; }
     }
 }
