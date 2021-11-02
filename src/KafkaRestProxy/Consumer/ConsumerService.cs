@@ -90,11 +90,18 @@ namespace SergeSavel.KafkaRestProxy.Consumer
                 : wrapper.GetWatermarkOffsets(topic, partition);
         }
 
-        public TopicMetadata GetTopicMetadata(Guid clientId, string token, string topic, int timeoutMs)
+        public Metadata GetMetadata(Guid clientId, string token, TimeSpan timeout)
         {
             var wrapper = _provider.GetItem(clientId, token);
             wrapper.UpdateExpiration();
-            return wrapper.GetTopicMetadata(topic, TimeSpan.FromMilliseconds(timeoutMs));
+            return wrapper.GetMetadata(timeout);
+        }
+
+        public Metadata GetMetadata(Guid clientId, string token, string topic, TimeSpan timeout)
+        {
+            var wrapper = _provider.GetItem(clientId, token);
+            wrapper.UpdateExpiration();
+            return wrapper.GetMetadata(topic, timeout);
         }
 
         private static Responses.Consumer MapConsumer(ConsumerWrapper source)

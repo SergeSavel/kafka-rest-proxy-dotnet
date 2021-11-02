@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SergeSavel.KafkaRestProxy.AdminClient.Requests;
 using SergeSavel.KafkaRestProxy.AdminClient.Responses;
+using SergeSavel.KafkaRestProxy.Common.Responses;
 
 namespace SergeSavel.KafkaRestProxy.AdminClient
 {

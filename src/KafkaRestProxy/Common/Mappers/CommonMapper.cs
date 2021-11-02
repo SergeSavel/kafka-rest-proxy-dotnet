@@ -14,13 +14,28 @@
 
 using System.Linq;
 using Confluent.Kafka;
+using BrokerMetadata = SergeSavel.KafkaRestProxy.Common.Responses.BrokerMetadata;
 using Error = SergeSavel.KafkaRestProxy.Common.Contract.Error;
+using Metadata = Confluent.Kafka.Metadata;
 using TopicMetadata = SergeSavel.KafkaRestProxy.Common.Responses.TopicMetadata;
 
 namespace SergeSavel.KafkaRestProxy.Common.Mappers
 {
     public static class CommonMapper
     {
+        public static BrokerMetadata Map(Confluent.Kafka.BrokerMetadata source,
+            Metadata metadata = null)
+        {
+            return new BrokerMetadata
+            {
+                Id = source.BrokerId,
+                Host = source.Host,
+                Port = source.Port,
+                OriginatingBrokerId = metadata?.OriginatingBrokerId,
+                OriginatingBrokerName = metadata?.OriginatingBrokerName
+            };
+        }
+
         public static TopicMetadata Map(Confluent.Kafka.TopicMetadata source, Metadata metadata = null)
         {
             return new TopicMetadata

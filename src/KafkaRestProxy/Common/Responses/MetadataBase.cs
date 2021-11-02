@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace SergeSavel.KafkaRestProxy.AdminClient.Responses
+namespace SergeSavel.KafkaRestProxy.Common.Responses
 {
     public abstract class MetadataBase
     {

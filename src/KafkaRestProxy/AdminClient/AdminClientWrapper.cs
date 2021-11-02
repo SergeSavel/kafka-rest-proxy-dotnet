@@ -21,9 +21,10 @@ using Confluent.Kafka.Admin;
 using SergeSavel.KafkaRestProxy.AdminClient.Exceptions;
 using SergeSavel.KafkaRestProxy.AdminClient.Responses;
 using SergeSavel.KafkaRestProxy.Common;
+using SergeSavel.KafkaRestProxy.Common.Exceptions;
 using SergeSavel.KafkaRestProxy.Common.Mappers;
-using BrokerMetadata = SergeSavel.KafkaRestProxy.AdminClient.Responses.BrokerMetadata;
-using Metadata = SergeSavel.KafkaRestProxy.AdminClient.Responses.Metadata;
+using KafkaException = Confluent.Kafka.KafkaException;
+using Metadata = SergeSavel.KafkaRestProxy.Common.Responses.Metadata;
 
 namespace SergeSavel.KafkaRestProxy.AdminClient
 {
@@ -51,7 +52,7 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
 
             return new Metadata
             {
-                Brokers = metadata.Brokers?.Select(brokerMetadata => Map(brokerMetadata)).ToArray(),
+                Brokers = metadata.Brokers?.Select(brokerMetadata => CommonMapper.Map(brokerMetadata)).ToArray(),
                 Topics = metadata.Topics?.Select(topicMetadata => CommonMapper.Map(topicMetadata)).ToArray(),
                 OriginatingBrokerId = metadata.OriginatingBrokerId,
                 OriginatingBrokerName = metadata.OriginatingBrokerName
@@ -70,9 +71,10 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
                 throw new AdminClientException("Unable to get topic metadata.", e);
             }
 
+            if (metadata.Topics[0].Error.Code == ErrorCode.UnknownTopicOrPart) throw new TopicNotFoundException(topic);
             return new Metadata
             {
-                Brokers = metadata.Brokers?.Select(brokerMetadata => Map(brokerMetadata)).ToArray(),
+                Brokers = metadata.Brokers?.Select(brokerMetadata => CommonMapper.Map(brokerMetadata)).ToArray(),
                 Topics = metadata.Topics?.Select(topicMetadata => CommonMapper.Map(topicMetadata)).ToArray(),
                 OriginatingBrokerId = metadata.OriginatingBrokerId,
                 OriginatingBrokerName = metadata.OriginatingBrokerName
@@ -155,19 +157,6 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
             }
 
             return Map(results.First());
-        }
-
-        private static BrokerMetadata Map(Confluent.Kafka.BrokerMetadata source,
-            Confluent.Kafka.Metadata metadata = null)
-        {
-            return new BrokerMetadata
-            {
-                Id = source.BrokerId,
-                Host = source.Host,
-                Port = source.Port,
-                OriginatingBrokerId = metadata?.OriginatingBrokerId,
-                OriginatingBrokerName = metadata?.OriginatingBrokerName
-            };
         }
 
         private static ResourceConfig Map(DescribeConfigsResult source)

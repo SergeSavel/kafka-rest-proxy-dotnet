@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.Mvc;
 using SergeSavel.KafkaRestProxy.AdminClient.Exceptions;
 using SergeSavel.KafkaRestProxy.AdminClient.Requests;
 using SergeSavel.KafkaRestProxy.AdminClient.Responses;
+using SergeSavel.KafkaRestProxy.Common.Responses;
 
 namespace SergeSavel.KafkaRestProxy.AdminClient
 {
