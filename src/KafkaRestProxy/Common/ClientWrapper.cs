@@ -24,7 +24,7 @@ namespace SergeSavel.KafkaRestProxy.Common
         protected ClientWrapper(string name, IDictionary<string, string> config, TimeSpan expirationTimeout)
         {
             Name = name;
-            User = GetUserFromConfig(config);
+            User = GetUsernameFromConfig(config);
             _expirationTimeout = expirationTimeout;
             UpdateExpiration();
         }
@@ -44,9 +44,10 @@ namespace SergeSavel.KafkaRestProxy.Common
             ExpiresAt = DateTime.Now + _expirationTimeout;
         }
 
-        private string GetUserFromConfig(IDictionary<string, string> config)
+        private static string GetUsernameFromConfig(IDictionary<string, string> config)
         {
-            return config["sasl.username"];
+            if (!config.TryGetValue("sasl.username", out var username)) return null;
+            return username;
         }
     }
 }
