@@ -4,11 +4,11 @@
         <TargetFramework>net5.0</TargetFramework>
         <RootNamespace>SergeSavel.KafkaRestProxy</RootNamespace>
         <Company>Serge Savel</Company>
-        <AssemblyVersion>1.1</AssemblyVersion>
-        <FileVersion>1.1.0</FileVersion>
+        <AssemblyVersion>3.0</AssemblyVersion>
+        <FileVersion>3.0.0</FileVersion>
         <PublishSingleFile>true</PublishSingleFile>
         <SelfContained>true</SelfContained>
-        <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
         <PublishTrimmed>true</PublishTrimmed>
         <TrimMode>link</TrimMode>
         <SuppressTrimAnalysisWarnings>false</SuppressTrimAnalysisWarnings>
@@ -19,7 +19,12 @@
         <Copyright>Sergey Savelev</Copyright>
         <PackageLicenseUrl>https://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/SergeSavel/kafka-rest-proxy-dotnet</RepositoryUrl>
-        <PackageVersion>1.1.0</PackageVersion>
+        <PackageVersion>3.0.0</PackageVersion>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>$(NoWarn);1591</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>

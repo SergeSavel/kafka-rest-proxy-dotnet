@@ -12,26 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-
-namespace SergeSavel.KafkaRestProxy.Consumer.Requests
+namespace SergeSavel.KafkaRestProxy.AdminClient.Responses
 {
-    [Obsolete]
-    public class AssignConsumerRequest
+    public class AdminClientWithToken : AdminClient
     {
-        [Required] public Guid ConsumerId { get; init; }
-
-        [Required] public IReadOnlyCollection<TopicPartitionOffset> Partitions { get; init; }
-
-        public class TopicPartitionOffset
-        {
-            [Required] public string Topic { get; init; }
-
-            [Required] public int Partition { get; init; }
-
-            public long Offset { get; init; }
-        }
+        public string Token { get; init; }
     }
 }

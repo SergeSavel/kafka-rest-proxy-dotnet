@@ -1,4 +1,4 @@
-﻿// Copyright 2021 Sergey Savelev
+// Copyright 2021 Sergey Savelev
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,26 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
-namespace SergeSavel.KafkaRestProxy.Consumer.Requests
+namespace SergeSavel.KafkaRestProxy.Common.Responses
 {
-    [Obsolete]
-    public class AssignConsumerRequest
+    public class Metadata
     {
-        [Required] public Guid ConsumerId { get; init; }
+        public ICollection<BrokerMetadata> Brokers { get; init; }
 
-        [Required] public IReadOnlyCollection<TopicPartitionOffset> Partitions { get; init; }
+        public ICollection<TopicMetadata> Topics { get; init; }
 
-        public class TopicPartitionOffset
-        {
-            [Required] public string Topic { get; init; }
+        public int? OriginatingBrokerId { get; init; }
 
-            [Required] public int Partition { get; init; }
-
-            public long Offset { get; init; }
-        }
+        public string OriginatingBrokerName { get; init; }
     }
 }

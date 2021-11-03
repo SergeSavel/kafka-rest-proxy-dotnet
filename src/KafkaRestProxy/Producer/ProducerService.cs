@@ -13,178 +13,84 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Concurrent;
-using System.Threading;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using Avro;
-using Avro.Generic;
-using Confluent.Kafka;
-using Confluent.SchemaRegistry;
-using Confluent.SchemaRegistry.Serdes;
-using SergeSavel.KafkaRestProxy.Common.Contract;
-using SergeSavel.KafkaRestProxy.Common.Exceptions;
-using SergeSavel.KafkaRestProxy.Common.Extensions;
-using SergeSavel.KafkaRestProxy.Producer.Contract;
-using SergeSavel.KafkaRestProxy.Producer.Exceptions;
+using Microsoft.Extensions.Logging;
 using SergeSavel.KafkaRestProxy.Producer.Requests;
-using SergeSavel.KafkaRestProxy.SchemaRegistry;
-using KafkaException = Confluent.Kafka.KafkaException;
+using SergeSavel.KafkaRestProxy.Producer.Responses;
 
 namespace SergeSavel.KafkaRestProxy.Producer
 {
-    public class ProducerService : IDisposable
+    public class ProducerService
     {
-        private readonly IProducer<byte[], byte[]> _producer;
-        private readonly ConcurrentDictionary<string, RecordSchema> _schemaCache = new();
+        private readonly ILogger<ProducerService> _logger;
+        private readonly ProducerProvider _provider;
 
-        private readonly ISchemaRegistryClient _schemaRegistryClient;
-
-        private readonly SemaphoreSlim _semaphore = new(1);
-
-        private AvroSerializer<GenericRecord> _avroSerializer;
-
-        public ProducerService(ProducerConfig config, SchemaRegistryService schemaRegistryService)
+        public ProducerService(ILogger<ProducerService> logger, ProducerProvider provider)
         {
-            var rawSerializer = new RawSerializer();
-            _producer = new ProducerBuilder<byte[], byte[]>(config)
-                .SetKeySerializer(rawSerializer)
-                .SetValueSerializer(rawSerializer)
-                .Build();
-
-            _schemaRegistryClient = schemaRegistryService.Client;
+            _logger = logger;
+            _provider = provider;
         }
 
-        internal Handle Handle => _producer.Handle;
-
-        public void Dispose()
+        public ICollection<Responses.Producer> ListProducers()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            var wrappers = _provider.ListItems();
+            return wrappers
+                .Select(MapProducer)
+                .ToList();
         }
 
-        public async Task<DeliveryResult> PostMessage(string topic, int? partition, PostMessageRequest request)
+        public Responses.Producer GetProducer(Guid producerId)
         {
-            var headers = ProducerMapper.MapHeaders(request.Headers);
+            var wrapper = _provider.GetItem(producerId);
+            return MapProducer(wrapper);
+        }
 
-            // Can be written better.
-            var keySerializationContext = new SerializationContext(MessageComponentType.Key, topic, headers);
-            byte[] keyBytes;
-            switch (request.KeyType)
+        public ProducerWithToken CreateProducer(CreateProducerRequest request, string owner)
+        {
+            var wrapper = _provider.CreateProducer(request.Name, request.Config,
+                TimeSpan.FromMilliseconds(request.ExpirationTimeoutMs), owner);
+            return MapProducerWithToken(wrapper);
+        }
+
+        public void RemoveProducer(Guid producerId, string token)
+        {
+            var wrapper = _provider.GetItem(producerId, token);
+            _provider.RemoveItem(wrapper.Id);
+        }
+
+        public async Task<DeliveryResult> ProduceAsync(Guid producerId, string token, string topic, int? partition,
+            PostMessageRequest request)
+        {
+            var wrapper = _provider.GetItem(producerId, token);
+            wrapper.UpdateExpiration();
+            return await wrapper.ProduceAsync(topic, partition, request).ConfigureAwait(false);
+        }
+
+        private static Responses.Producer MapProducer(ProducerWrapper source)
+        {
+            return new Responses.Producer
             {
-                case KeyValueType.Null:
-                    keyBytes = Serializers.Null.Serialize(null, keySerializationContext);
-                    break;
-                case KeyValueType.String:
-                    keyBytes = Serializers.Utf8.Serialize(request.Key, keySerializationContext);
-                    break;
-                case KeyValueType.Bytes:
-                {
-                    var data = Convert.FromBase64String(request.Key);
-                    keyBytes = Serializers.ByteArray.Serialize(data, keySerializationContext);
-                    break;
-                }
-                case KeyValueType.AvroAsXml:
-                {
-                    var genericRecord =
-                        request.Key.AsGenericRecord(request.KeySchema, _schemaCache);
-                    keyBytes = await GetAvroSerializer().SerializeAsync(genericRecord, keySerializationContext)
-                        .ConfigureAwait(false);
-                    break;
-                }
-                default:
-                    throw new BadRequestException("Unexpected key serialization type: " + request.KeyType);
-            }
-
-            // Can be written better.
-            var valueSerializationContext = new SerializationContext(MessageComponentType.Value, topic, headers);
-            byte[] valueBytes;
-            switch (request.ValueType)
-            {
-                case KeyValueType.Null:
-                    valueBytes = Serializers.Null.Serialize(null, valueSerializationContext);
-                    break;
-                case KeyValueType.String:
-                    valueBytes = Serializers.Utf8.Serialize(request.Value, valueSerializationContext);
-                    break;
-                case KeyValueType.Bytes:
-                {
-                    var data = Convert.FromBase64String(request.Value);
-                    valueBytes = Serializers.ByteArray.Serialize(data, valueSerializationContext);
-                    break;
-                }
-                case KeyValueType.AvroAsXml:
-                {
-                    GenericRecord genericRecord;
-                    try
-                    {
-                        genericRecord = request.Value.AsGenericRecord(request.ValueSchema, _schemaCache);
-                    }
-                    catch (Exception e)
-                    {
-                        throw new BadRequestException("An error occured while parsing generic record.", e);
-                    }
-
-                    valueBytes = await GetAvroSerializer().SerializeAsync(genericRecord, valueSerializationContext)
-                        .ConfigureAwait(false);
-                    break;
-                }
-                default:
-                    throw new BadRequestException("Unexpected value serialization type: " + request.ValueType);
-            }
-
-            var message = new Message<byte[], byte[]>
-            {
-                Key = keyBytes,
-                Value = valueBytes,
-                Headers = headers
+                Id = source.Id,
+                Name = source.Name,
+                User = source.User,
+                ExpiresAt = source.ExpiresAt,
+                Owner = source.Owner
             };
-
-            DeliveryResult<byte[], byte[]> producerDeliveryResult;
-            try
-            {
-                producerDeliveryResult = partition.HasValue
-                    ? await _producer.ProduceAsync(new TopicPartition(topic, partition.Value), message)
-                        .ConfigureAwait(false)
-                    : await _producer.ProduceAsync(topic, message).ConfigureAwait(false);
-            }
-            catch (KafkaException e)
-            {
-                throw new ProduceException(e);
-            }
-
-            var deliveryResult = ProducerMapper.Map(producerDeliveryResult);
-
-            return deliveryResult;
         }
 
-        private AvroSerializer<GenericRecord> GetAvroSerializer()
+        private static ProducerWithToken MapProducerWithToken(ProducerWrapper source)
         {
-            if (_avroSerializer == null)
+            return new ProducerWithToken
             {
-                _semaphore.Wait(TimeSpan.FromSeconds(10));
-                try
-                {
-                    if (_schemaRegistryClient == null)
-                        throw new BadRequestException("SchemaRegistry Client not initialized.");
-
-                    _avroSerializer = new AvroSerializer<GenericRecord>(_schemaRegistryClient);
-                }
-                finally
-                {
-                    _semaphore.Release();
-                }
-            }
-
-            return _avroSerializer;
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                _producer.Flush();
-                _producer.Dispose();
-            }
+                Id = source.Id,
+                Name = source.Name,
+                User = source.User,
+                ExpiresAt = source.ExpiresAt,
+                Owner = source.Owner,
+                Token = source.Token
+            };
         }
     }
 }

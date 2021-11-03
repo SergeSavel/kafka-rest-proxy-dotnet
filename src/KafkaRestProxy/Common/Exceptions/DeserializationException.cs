@@ -13,25 +13,19 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
-namespace SergeSavel.KafkaRestProxy.Consumer.Requests
+namespace SergeSavel.KafkaRestProxy.Common.Exceptions
 {
-    [Obsolete]
-    public class AssignConsumerRequest
+    public class DeserializationException : HttpResponseException
     {
-        [Required] public Guid ConsumerId { get; init; }
-
-        [Required] public IReadOnlyCollection<TopicPartitionOffset> Partitions { get; init; }
-
-        public class TopicPartitionOffset
+        public DeserializationException(string message) : base(message)
         {
-            [Required] public string Topic { get; init; }
+            StatusCode = 500;
+        }
 
-            [Required] public int Partition { get; init; }
-
-            public long Offset { get; init; }
+        public DeserializationException(string message, Exception innerException) : base(message, innerException)
+        {
+            StatusCode = 500;
         }
     }
 }

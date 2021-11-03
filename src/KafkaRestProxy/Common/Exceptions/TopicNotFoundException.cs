@@ -12,26 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
-namespace SergeSavel.KafkaRestProxy.Consumer.Requests
+namespace SergeSavel.KafkaRestProxy.Common.Exceptions
 {
-    [Obsolete]
-    public class AssignConsumerRequest
+    public class TopicNotFoundException : HttpResponseException
     {
-        [Required] public Guid ConsumerId { get; init; }
-
-        [Required] public IReadOnlyCollection<TopicPartitionOffset> Partitions { get; init; }
-
-        public class TopicPartitionOffset
+        public TopicNotFoundException(string topic)
         {
-            [Required] public string Topic { get; init; }
-
-            [Required] public int Partition { get; init; }
-
-            public long Offset { get; init; }
+            StatusCode = StatusCodes.Status404NotFound;
+            Value = $"Topic '{topic}' not found.";
         }
     }
 }

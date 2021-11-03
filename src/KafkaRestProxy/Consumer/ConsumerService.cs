@@ -14,219 +14,121 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Threading;
-using Confluent.Kafka;
-using Microsoft.Extensions.Logging;
-using SergeSavel.KafkaRestProxy.Consumer.Contract;
+using SergeSavel.KafkaRestProxy.Common.Responses;
 using SergeSavel.KafkaRestProxy.Consumer.Requests;
-using SergeSavel.KafkaRestProxy.SchemaRegistry;
-using ConsumeException = SergeSavel.KafkaRestProxy.Consumer.Exceptions.ConsumeException;
-using TopicPartition = SergeSavel.KafkaRestProxy.Consumer.Contract.TopicPartition;
+using SergeSavel.KafkaRestProxy.Consumer.Responses;
 
 namespace SergeSavel.KafkaRestProxy.Consumer
 {
-    public class ConsumerService : IDisposable
+    public class ConsumerService
     {
-        private readonly ConsumerConfig _consumerConfig;
-        private readonly ILogger<ConsumerService> _logger;
-        private readonly IConsumer<string, string> _staticConsumer;
+        private readonly ConsumerProvider _provider;
 
-        public ConsumerService(ConsumerConfig consumerConfig, ILogger<ConsumerService> logger,
-            SchemaRegistryService schemaRegistryService)
+        public ConsumerService(ConsumerProvider provider)
         {
-            _consumerConfig = consumerConfig;
-            _logger = logger;
-            _staticConsumer = new ConsumerBuilder<string, string>(consumerConfig)
-                .Build();
-            ConsumerProvider = new ConsumerProvider(schemaRegistryService.Client);
+            _provider = provider;
         }
 
-        public ConsumerProvider ConsumerProvider { get; }
-
-        public void Dispose()
+        public ICollection<Responses.Consumer> ListConsumers()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                ConsumerProvider.Dispose();
-
-                _staticConsumer.Close();
-                _staticConsumer.Dispose();
-            }
-        }
-
-        public ICollection<Contract.Consumer> ListConsumers()
-        {
-            return ConsumerProvider.ListConsumers()
-                .Select(ConsumerMapper.Map)
+            var wrappers = _provider.ListItems();
+            return wrappers
+                .Select(MapConsumer)
                 .ToList();
         }
 
-        public Contract.Consumer CreateConsumer(CreateConsumerRequest request, string creator)
+        public Responses.Consumer GetConsumer(Guid consumerId)
         {
-            var config = _consumerConfig.ToDictionary(kv => kv.Key, kv => kv.Value);
-
-            if (request.Config != null)
-                foreach (var (key, value) in request.Config)
-                    config[key] = value;
-
-            var wrapper =
-                ConsumerProvider.CreateConsumer(config, TimeSpan.FromMilliseconds(request.ExpirationTimeoutMs),
-                    request.KeyType, request.ValueType, creator);
-
-            return ConsumerMapper.Map(wrapper);
+            var wrapper = _provider.GetItem(consumerId);
+            return MapConsumer(wrapper);
         }
 
-        public Contract.Consumer GetConsumer(Guid consumerId)
+        public ConsumerWithToken CreateConsumer(CreateConsumerRequest request, string owner)
         {
-            var wrapper = ConsumerProvider.GetConsumer(consumerId);
+            var wrapper = _provider.CreateConsumer(request.Name, request.Config, request.KeyType, request.ValueType,
+                TimeSpan.FromMilliseconds(request.ExpirationTimeoutMs), owner);
+            return MapConsumerWithToken(wrapper);
+        }
 
+        public void RemoveConsumer(Guid consumerId, string token)
+        {
+            var wrapper = _provider.GetItem(consumerId, token);
+            _provider.RemoveItem(wrapper.Id);
+        }
+
+        public ICollection<TopicPartition> GetConsumerAssignment(Guid consumerId, string token)
+        {
+            var wrapper = _provider.GetItem(consumerId, token);
             wrapper.UpdateExpiration();
-
-            return ConsumerMapper.Map(wrapper);
+            return wrapper.GetAssignment();
         }
 
-        public bool RemoveConsumer(Guid consumerId)
+        public ICollection<TopicPartition> AssignConsumer(Guid consumerId, string token,
+            IEnumerable<TopicPartitionOffset> request)
         {
-            return ConsumerProvider.RemoveConsumer(consumerId);
-        }
-
-        public ICollection<TopicPartition> AssignConsumer(AssignConsumerRequest request)
-        {
-            var wrapper = ConsumerProvider.GetConsumer(request.ConsumerId);
-
+            var wrapper = _provider.GetItem(consumerId, token);
             wrapper.UpdateExpiration();
-
-            wrapper.Consumer
-                .Assign(request.Partitions.Select(p => new TopicPartitionOffset(p.Topic, p.Partition, p.Offset)));
-
-            return GetConsumerAssignment(request.ConsumerId);
+            wrapper.Assign(request);
+            return wrapper.GetAssignment();
         }
 
-        public ICollection<TopicPartition> GetConsumerAssignment(Guid consumerId)
+        public ConsumerMessage Consume(Guid consumerId, string token, TimeSpan timeout)
         {
-            var wrapper = ConsumerProvider.GetConsumer(consumerId);
-
+            var wrapper = _provider.GetItem(consumerId, token);
             wrapper.UpdateExpiration();
-
-            var result = wrapper.Consumer.Assignment
-                .Select(ConsumerMapper.Map)
-                .ToList();
-
-            return result;
+            return wrapper.Consume(timeout);
         }
 
-        public ConsumerMessage Consume(Guid consumerId, int? timeout)
+        public PartitionOffsets GetPartitionOffsets(Guid consumerId, string token, string topic, int partition,
+            TimeSpan? timeout)
         {
-            var wrapper = ConsumerProvider.GetConsumer(consumerId);
-
+            var wrapper = _provider.GetItem(consumerId, token);
             wrapper.UpdateExpiration();
-
-            ConsumeResult<string, string> consumeResult;
-            try
-            {
-                consumeResult = timeout.HasValue
-                    ? wrapper.Consumer.Consume(timeout.Value)
-                    : wrapper.Consumer.Consume();
-            }
-            catch (KafkaException e)
-            {
-                throw new ConsumeException("Unable to receive message.", e);
-            }
-
-            return ConsumerMapper.Map(consumeResult);
+            return timeout.HasValue
+                ? wrapper.QueryWatermarkOffsets(topic, partition, timeout.Value)
+                : wrapper.GetWatermarkOffsets(topic, partition);
         }
 
-        [Obsolete]
-        public IEnumerable<ConsumerMessage> ConsumeMultiple(Guid consumerId, int? timeout, int? limit)
+        public Metadata GetMetadata(Guid clientId, string token, TimeSpan timeout)
         {
-            var wrapper = ConsumerProvider.GetConsumer(consumerId);
-
+            var wrapper = _provider.GetItem(clientId, token);
             wrapper.UpdateExpiration();
-
-            var result = new List<ConsumerMessage>(limit ?? 1);
-
-            do
-            {
-                try
-                {
-                    var consumeResult = timeout.HasValue
-                        ? wrapper.Consumer.Consume(timeout.Value)
-                        : wrapper.Consumer.Consume();
-                    if (consumeResult == null) break;
-                    result.Add(ConsumerMapper.Map(consumeResult));
-                }
-                catch (KafkaException e)
-                {
-                    throw new ConsumeException("Unable to receive message.", e);
-                }
-            } while (--limit > 0);
-
-            return result;
+            return wrapper.GetMetadata(timeout);
         }
 
-        public PartitionOffsets GetPartitionOffsets(Guid consumerId, string topic, int partition, int? timeout)
+        public Metadata GetMetadata(Guid clientId, string token, string topic, TimeSpan timeout)
         {
-            var eventId = new EventId(Thread.CurrentThread.ManagedThreadId, nameof(GetPartitionOffsets));
-
-            var wrapper = ConsumerProvider.GetConsumer(consumerId);
-
+            var wrapper = _provider.GetItem(clientId, token);
             wrapper.UpdateExpiration();
+            return wrapper.GetMetadata(topic, timeout);
+        }
 
-            Confluent.Kafka.TopicPartition topicPartition;
-            WatermarkOffsets watermarkOffsets;
-            Offset position;
-
-            try
+        private static Responses.Consumer MapConsumer(ConsumerWrapper source)
+        {
+            return new Responses.Consumer
             {
-                topicPartition = new Confluent.Kafka.TopicPartition(topic, partition);
+                Id = source.Id,
+                Name = source.Name,
+                User = source.User,
+                KeyType = Enum.GetName(source.KeyType),
+                ValueType = Enum.GetName(source.ValueType),
+                ExpiresAt = source.ExpiresAt,
+                Owner = source.Owner
+            };
+        }
 
-                if (timeout.HasValue)
-                {
-                    if (_logger.IsEnabled(LogLevel.Debug))
-                        _logger.LogDebug(eventId,
-                            "Start calling 'QueryWatermarkOffsets()'. Topic='{Topic}', Partition='{Partition}', Timeout='{Timeout}'",
-                            topic, partition, timeout);
-
-                    var stopwatch = Stopwatch.StartNew();
-
-                    watermarkOffsets =
-                        _staticConsumer.QueryWatermarkOffsets(topicPartition,
-                            TimeSpan.FromMilliseconds(timeout.Value));
-
-                    if (_logger.IsEnabled(LogLevel.Debug))
-                        _logger.LogDebug(eventId, "End calling 'QueryWatermarkOffsets()'. Took {Ms} ms",
-                            stopwatch.ElapsedMilliseconds);
-                }
-                else
-                {
-                    watermarkOffsets = _staticConsumer.GetWatermarkOffsets(topicPartition);
-                }
-            }
-            catch (KafkaException e)
+        private static ConsumerWithToken MapConsumerWithToken(ConsumerWrapper source)
+        {
+            return new ConsumerWithToken
             {
-                if (_logger.IsEnabled(LogLevel.Debug))
-                    _logger.LogDebug("Error: {Reason}", e.Error.Reason);
-
-                throw new ConsumeException("Unable to get partition offsets.", e);
-            }
-
-            position = wrapper.Consumer.Position(topicPartition);
-
-            return new PartitionOffsets
-            {
-                Topic = topicPartition.Topic,
-                Partition = topicPartition.Partition,
-                High = watermarkOffsets.High,
-                Low = watermarkOffsets.Low,
-                Current = ConsumerMapper.Map(position)
+                Id = source.Id,
+                Name = source.Name,
+                KeyType = Enum.GetName(source.KeyType),
+                ValueType = Enum.GetName(source.ValueType),
+                ExpiresAt = source.ExpiresAt,
+                Owner = source.Owner,
+                Token = source.Token
             };
         }
     }

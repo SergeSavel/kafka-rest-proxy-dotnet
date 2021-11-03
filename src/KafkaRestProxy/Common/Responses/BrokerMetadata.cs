@@ -1,4 +1,4 @@
-﻿// Copyright 2021 Sergey Savelev
+// Copyright 2021 Sergey Savelev
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,17 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using SergeSavel.KafkaRestProxy.Common.Mappers;
-
-namespace SergeSavel.KafkaRestProxy.Common.Exceptions
+namespace SergeSavel.KafkaRestProxy.Common.Responses
 {
-    public abstract class KafkaException : HttpResponseException
+    public class BrokerMetadata
     {
-        protected KafkaException(string message, Confluent.Kafka.KafkaException innerException) : base(message,
-            innerException)
-        {
-            StatusCode = 500;
-            Value = CommonMapper.Map(innerException.Error);
-        }
+        public int Id { get; init; }
+
+        public string Host { get; init; }
+
+        public int Port { get; init; }
     }
 }

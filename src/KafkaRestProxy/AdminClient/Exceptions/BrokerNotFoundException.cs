@@ -12,26 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
+using SergeSavel.KafkaRestProxy.Common.Exceptions;
 
-namespace SergeSavel.KafkaRestProxy.Consumer.Requests
+namespace SergeSavel.KafkaRestProxy.AdminClient.Exceptions
 {
-    [Obsolete]
-    public class AssignConsumerRequest
+    public class BrokerNotFoundException : HttpResponseException
     {
-        [Required] public Guid ConsumerId { get; init; }
-
-        [Required] public IReadOnlyCollection<TopicPartitionOffset> Partitions { get; init; }
-
-        public class TopicPartitionOffset
+        public BrokerNotFoundException(int brokerId)
         {
-            [Required] public string Topic { get; init; }
-
-            [Required] public int Partition { get; init; }
-
-            public long Offset { get; init; }
+            StatusCode = StatusCodes.Status404NotFound;
+            Value = $"Broker '{brokerId}' not fpund.";
         }
     }
 }

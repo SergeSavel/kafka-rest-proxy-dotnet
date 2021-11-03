@@ -12,26 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace SergeSavel.KafkaRestProxy.Consumer.Requests
+namespace SergeSavel.KafkaRestProxy.AdminClient
 {
-    [Obsolete]
-    public class AssignConsumerRequest
+    public static class AdminClientExtensions
     {
-        [Required] public Guid ConsumerId { get; init; }
-
-        [Required] public IReadOnlyCollection<TopicPartitionOffset> Partitions { get; init; }
-
-        public class TopicPartitionOffset
+        public static void AddAdminClient(this IServiceCollection services, IConfiguration configuration)
         {
-            [Required] public string Topic { get; init; }
-
-            [Required] public int Partition { get; init; }
-
-            public long Offset { get; init; }
+            services.AddSingleton(AdminClientConfigProvider.GetConfig(configuration));
+            services.AddSingleton<AdminClientService>();
+            services.AddSingleton<AdminClientProvider>();
+            services.AddHostedService<AdminClientKiller>();
         }
     }
 }

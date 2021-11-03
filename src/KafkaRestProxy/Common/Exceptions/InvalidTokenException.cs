@@ -13,25 +13,16 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
-namespace SergeSavel.KafkaRestProxy.Consumer.Requests
+namespace SergeSavel.KafkaRestProxy.Common.Exceptions
 {
-    [Obsolete]
-    public class AssignConsumerRequest
+    public class InvalidTokenException : HttpResponseException
     {
-        [Required] public Guid ConsumerId { get; init; }
-
-        [Required] public IReadOnlyCollection<TopicPartitionOffset> Partitions { get; init; }
-
-        public class TopicPartitionOffset
+        public InvalidTokenException(Guid clientId)
         {
-            [Required] public string Topic { get; init; }
-
-            [Required] public int Partition { get; init; }
-
-            public long Offset { get; init; }
+            StatusCode = StatusCodes.Status403Forbidden;
+            Value = $"Invalid token for client '{clientId}'.";
         }
     }
 }

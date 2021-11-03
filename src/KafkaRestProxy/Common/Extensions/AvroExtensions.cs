@@ -22,6 +22,7 @@ using System.Xml;
 using System.Xml.Linq;
 using Avro;
 using Avro.Generic;
+using SergeSavel.KafkaRestProxy.Common.Exceptions;
 
 namespace SergeSavel.KafkaRestProxy.Common.Extensions
 {
@@ -78,7 +79,7 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
         private static readonly XName XMapItem = MapItemString;
         private static readonly XName XKey = KeyString;
 
-        private static readonly decimal[] Scales =
+        private static readonly decimal[] XScales =
         {
             1m,
             1.0m,
@@ -133,7 +134,7 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
             1.00000000000000000000000000000000000000000000000000m
         };
 
-        // Serialization
+        #region Deserialization
 
         public static string AsXmlString(this GenericRecord record)
         {
@@ -461,7 +462,9 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
             parent.Add(element);
         }
 
-        // Deserialization
+        #endregion
+
+        #region Serialization
 
         public static GenericRecord AsGenericRecord(this string xmlString, string schemaString,
             ConcurrentDictionary<string, RecordSchema> schemaCache)
@@ -473,10 +476,10 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
 
             var rootElement = doc.Root;
             if (rootElement == null)
-                throw new InvalidOperationException("XML document doesn't have a root element.");
+                throw new SerializationException("XML document doesn't have a root element.");
 
             if (rootElement.Name.LocalName != RecordString)
-                throw new InvalidOperationException("Invalid root element name.");
+                throw new SerializationException("Invalid root element name.");
 
             RecordSchema schema;
             try
@@ -485,7 +488,7 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
             }
             catch (Exception e)
             {
-                throw new InvalidOperationException("Cannot parse record schema.", e);
+                throw new SerializationException("Cannot parse record schema.", e);
             }
 
             GenericRecord result;
@@ -495,7 +498,7 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
             }
             catch (Exception e)
             {
-                throw new InvalidOperationException("Cannot parse record.", e);
+                throw new SerializationException("Cannot parse record.", e);
             }
 
             return result;
@@ -506,7 +509,7 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
         {
             var schemaName = rootElement.Attribute(XName)?.Value;
             if (string.IsNullOrWhiteSpace(schemaName))
-                throw new InvalidOperationException("Record name not provided..");
+                throw new SerializationException("Record name not provided.");
 
             var schemaNamespace = rootElement.Attribute(XNamespace)?.Value ?? string.Empty;
 
@@ -519,7 +522,7 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
             if (schemaString == null)
             {
                 if (!schemaCache.TryGetValue(schemaFullName, out schema))
-                    throw new InvalidOperationException("Schema isn't found in local cache.");
+                    throw new SerializationException("Schema isn't found in local cache.");
             }
             else
             {
@@ -529,7 +532,7 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
                 }
                 catch (SchemaParseException e)
                 {
-                    throw new InvalidOperationException("An error occured while parsing schema: " + e.Message);
+                    throw new SerializationException("An error occured while parsing schema: " + e.Message);
                 }
 
                 schemaCache.AddOrUpdate(schemaFullName, _ => schema, (_, _) => schema);
@@ -564,7 +567,7 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
                 TimeMicrosString => ParseTimeMicros(element, schema),
                 TimestampMillisString => ParseTimestampMillis(element, schema),
                 TimestampMicrosString => ParseTimestampMicros(element, schema),
-                _ => throw new InvalidOperationException($"Invalid element: '{elementName}'.")
+                _ => throw new SerializationException($"Invalid element: '{elementName}'.")
             };
         }
 
@@ -577,11 +580,11 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
             {
                 var fieldName = childElement.Attribute(XName)?.Value;
                 if (string.IsNullOrWhiteSpace(fieldName))
-                    throw new InvalidOperationException("Element doesn't have a name.");
+                    throw new SerializationException("Element doesn't have a name.");
 
                 if (!effectiveSchema.TryGetField(fieldName, out var field))
                     if (!effectiveSchema.TryGetFieldAlias(fieldName, out field))
-                        throw new InvalidOperationException(
+                        throw new SerializationException(
                             $"Field '{fieldName}' not found in schema '{effectiveSchema.SchemaName}'.");
 
                 try
@@ -590,7 +593,7 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
                 }
                 catch (Exception e)
                 {
-                    throw new InvalidOperationException($"Cannot parse record field '{fieldName}'.", e);
+                    throw new SerializationException($"Cannot parse record field '{fieldName}'.", e);
                 }
             }
 
@@ -623,7 +626,7 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
             {
                 var keyAttribute = childElement.Attribute(XKey);
                 if (keyAttribute == null)
-                    throw new InvalidOperationException("Map item element doesn't have a 'key' attribute.");
+                    throw new SerializationException("Map item element doesn't have a 'key' attribute.");
 
                 map.Add(keyAttribute.Value,
                     ParseValue(childElement.Elements().First(), effectiveSchema.ValueSchema));
@@ -647,7 +650,7 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
 
             var actualScale = value.GetScale();
             if (targetScale > actualScale)
-                value = decimal.Multiply(value, Scales[targetScale - actualScale]);
+                value = decimal.Multiply(value, XScales[targetScale - actualScale]);
 
             return new AvroDecimal(value);
         }
@@ -714,20 +717,22 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
                         if (innerSchema is T matchedSchema)
                         {
                             if (result != null)
-                                throw new InvalidOperationException(
+                                throw new SerializationException(
                                     $"Schema '{typeof(T).Name}' presented in union more than once.");
                             result = matchedSchema;
                         }
 
                     if (result == null)
-                        throw new InvalidOperationException($"Schema '{typeof(T).Name}' not included in union.");
+                        throw new SerializationException($"Schema '{typeof(T).Name}' not included in union.");
 
                     return result;
                 }
                 default:
-                    throw new InvalidOperationException(
+                    throw new SerializationException(
                         $"Cannot convert schema '{schema.GetType()}' to '{typeof(T)}'.");
             }
         }
+
+        #endregion
     }
 }

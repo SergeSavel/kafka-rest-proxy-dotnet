@@ -23,7 +23,8 @@ namespace SergeSavel.KafkaRestProxy.Consumer
         {
             services.AddSingleton(ConsumerConfigProvider.GetConfig(configuration));
             services.AddSingleton<ConsumerService>();
-            services.AddHostedService<ConsumerRemover>();
+            services.AddSingleton<ConsumerProvider>();
+            services.AddHostedService<ConsumerKiller>();
         }
     }
 }

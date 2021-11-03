@@ -14,10 +14,11 @@
 
 using System.Collections.Generic;
 using SergeSavel.KafkaRestProxy.Common.Contract;
+using SergeSavel.KafkaRestProxy.Producer.Contract;
 
 namespace SergeSavel.KafkaRestProxy.Producer.Requests
 {
-    public class PostMessageRequest
+    public class PostMessageRequest : IMessage
     {
         public KeyValueType KeyType { get; init; } = KeyValueTypeDefaults.Key;
         public string KeySchema { get; init; }
@@ -27,6 +28,6 @@ namespace SergeSavel.KafkaRestProxy.Producer.Requests
         public string ValueSchema { get; init; }
         public string Value { get; init; }
 
-        public IReadOnlyDictionary<string, string> Headers { get; init; }
+        public IDictionary<string, string> Headers { get; init; }
     }
 }
