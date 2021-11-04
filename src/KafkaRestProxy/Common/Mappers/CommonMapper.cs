@@ -37,7 +37,7 @@ namespace SergeSavel.KafkaRestProxy.Common.Mappers
             return new TopicMetadata
             {
                 Topic = source.Topic,
-                Partitions = source.Partitions.Select(Map).ToArray(),
+                Partitions = source.Partitions.Select(Map).ToList()
                 //Error = Map(source.Error)
             };
         }
