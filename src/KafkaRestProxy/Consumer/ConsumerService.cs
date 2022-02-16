@@ -14,7 +14,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading;
+using Microsoft.Extensions.Logging;
 using SergeSavel.KafkaRestProxy.Common.Responses;
 using SergeSavel.KafkaRestProxy.Consumer.Requests;
 using SergeSavel.KafkaRestProxy.Consumer.Responses;
@@ -23,10 +26,12 @@ namespace SergeSavel.KafkaRestProxy.Consumer
 {
     public class ConsumerService
     {
+        private readonly ILogger<ConsumerService> _logger;
         private readonly ConsumerProvider _provider;
 
-        public ConsumerService(ConsumerProvider provider)
+        public ConsumerService(ILogger<ConsumerService> logger, ConsumerProvider provider)
         {
+            _logger = logger;
             _provider = provider;
         }
 
@@ -48,6 +53,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer
         {
             var wrapper = _provider.CreateConsumer(request.Name, request.Config, request.KeyType, request.ValueType,
                 TimeSpan.FromMilliseconds(request.ExpirationTimeoutMs), owner);
+            _logger.LogDebug("Created consumer '{Id}' ('{Name}')", wrapper.Id, wrapper.Name);
             return MapConsumerWithToken(wrapper);
         }
 
@@ -55,6 +61,8 @@ namespace SergeSavel.KafkaRestProxy.Consumer
         {
             var wrapper = _provider.GetItem(consumerId, token);
             _provider.RemoveItem(wrapper.Id);
+            _logger.LogDebug("Removed consumer '{Id}' ('{Name}')", wrapper.Id, wrapper.Name);
+
         }
 
         public ICollection<TopicPartition> GetConsumerAssignment(Guid consumerId, string token)
@@ -75,9 +83,19 @@ namespace SergeSavel.KafkaRestProxy.Consumer
 
         public ConsumerMessage Consume(Guid consumerId, string token, TimeSpan timeout)
         {
+            var eventId = new EventId(Thread.CurrentThread.ManagedThreadId);
+            
             var wrapper = _provider.GetItem(consumerId, token);
             wrapper.UpdateExpiration();
-            return wrapper.Consume(timeout);
+
+            _logger.LogDebug("Consume started ({Id})", wrapper.Id);
+            
+            var stopwatch = Stopwatch.StartNew();
+            var result = wrapper.Consume(timeout);
+            
+            _logger.LogDebug(eventId, "Consume took {Ms} ms", stopwatch.ElapsedMilliseconds);
+            
+            return result;
         }
 
         public PartitionOffsets GetPartitionOffsets(Guid consumerId, string token, string topic, int partition,

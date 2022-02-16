@@ -24,8 +24,8 @@ namespace SergeSavel.KafkaRestProxy.Consumer
 {
     public class ConsumerProvider : ClientProvider<ConsumerWrapper>
     {
-        private readonly ConsumerConfig _defaultConfig;
         private readonly ILogger<ConsumerProvider> _logger;
+        private readonly ConsumerConfig _defaultConfig;
         private readonly SchemaRegistryService _schemaRegistryService;
 
         public ConsumerProvider(ILogger<ConsumerProvider> logger, ConsumerConfig defaultConfig,
@@ -39,6 +39,8 @@ namespace SergeSavel.KafkaRestProxy.Consumer
         public ConsumerWrapper CreateConsumer(string name, IEnumerable<KeyValuePair<string, string>> config,
             KeyValueType keyType, KeyValueType valueType, TimeSpan expirationTimeout, string owner = null)
         {
+            _logger.LogDebug("Creating consumer '{Name}'", name);
+            
             var effectiveConfig = new Dictionary<string, string>();
             foreach (var (key, value) in _defaultConfig)
                 effectiveConfig[key] = value;
