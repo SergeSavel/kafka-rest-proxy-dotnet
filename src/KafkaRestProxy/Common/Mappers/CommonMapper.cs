@@ -12,61 +12,59 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Linq;
 using Confluent.Kafka;
 using BrokerMetadata = SergeSavel.KafkaRestProxy.Common.Responses.BrokerMetadata;
 using Error = SergeSavel.KafkaRestProxy.Common.Contract.Error;
 using TopicMetadata = SergeSavel.KafkaRestProxy.Common.Responses.TopicMetadata;
 
-namespace SergeSavel.KafkaRestProxy.Common.Mappers
+namespace SergeSavel.KafkaRestProxy.Common.Mappers;
+
+public static class CommonMapper
 {
-    public static class CommonMapper
+    public static BrokerMetadata Map(Confluent.Kafka.BrokerMetadata source)
     {
-        public static BrokerMetadata Map(Confluent.Kafka.BrokerMetadata source)
+        return new BrokerMetadata
         {
-            return new BrokerMetadata
-            {
-                Id = source.BrokerId,
-                Host = source.Host,
-                Port = source.Port
-            };
-        }
+            Id = source.BrokerId,
+            Host = source.Host,
+            Port = source.Port
+        };
+    }
 
-        public static TopicMetadata Map(Confluent.Kafka.TopicMetadata source)
+    public static TopicMetadata Map(Confluent.Kafka.TopicMetadata source)
+    {
+        return new TopicMetadata
         {
-            return new TopicMetadata
-            {
-                Topic = source.Topic,
-                Partitions = source.Partitions.Select(Map).ToList()
-                //Error = Map(source.Error)
-            };
-        }
+            Topic = source.Topic,
+            Partitions = source.Partitions.Select(Map).ToList()
+            //Error = Map(source.Error)
+        };
+    }
 
-        public static TopicMetadata.PartitionMetadata Map(PartitionMetadata source)
+    public static TopicMetadata.PartitionMetadata Map(PartitionMetadata source)
+    {
+        return new TopicMetadata.PartitionMetadata
         {
-            return new TopicMetadata.PartitionMetadata
-            {
-                Partition = source.PartitionId,
-                Leader = source.Leader,
-                Replicas = source.Replicas,
-                InSyncReplicas = source.InSyncReplicas
-                //Error = Map(source.Error)
-            };
-        }
+            Partition = source.PartitionId,
+            Leader = source.Leader,
+            Replicas = source.Replicas,
+            InSyncReplicas = source.InSyncReplicas
+            //Error = Map(source.Error)
+        };
+    }
 
-        public static Error Map(Confluent.Kafka.Error source)
+    public static Error Map(Confluent.Kafka.Error source)
+    {
+        if (source.Code == ErrorCode.NoError)
+            return null;
+
+        return new Error
         {
-            if (source.Code == ErrorCode.NoError)
-                return null;
-
-            return new Error
-            {
-                Code = (int)source.Code,
-                Reason = source.Reason,
-                IsBrokerError = source.IsBrokerError,
-                IsLocalError = source.IsLocalError,
-                IsFatal = source.IsFatal
-            };
-        }
+            Code = (int)source.Code,
+            Reason = source.Reason,
+            IsBrokerError = source.IsBrokerError,
+            IsLocalError = source.IsLocalError,
+            IsFatal = source.IsFatal
+        };
     }
 }

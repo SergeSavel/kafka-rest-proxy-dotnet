@@ -12,16 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+namespace SergeSavel.KafkaRestProxy.Producer.Responses;
 
-namespace SergeSavel.KafkaRestProxy.Producer.Responses
+public class Producer
 {
-    public class Producer
-    {
-        public Guid Id { get; init; }
-        public string Name { get; init; }
-        public string User { get; init; }
-        public DateTime ExpiresAt { get; init; }
-        public string Owner { get; init; }
-    }
+    public Guid Id { get; init; }
+    public string Name { get; init; }
+    public string User { get; init; }
+    public DateTime ExpiresAt { get; init; }
+    public string Owner { get; init; }
 }

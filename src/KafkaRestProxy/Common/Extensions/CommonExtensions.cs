@@ -14,13 +14,12 @@
 
 using Confluent.Kafka;
 
-namespace SergeSavel.KafkaRestProxy.Common.Extensions
+namespace SergeSavel.KafkaRestProxy.Common.Extensions;
+
+public static class CommonExtensions
 {
-    public static class CommonExtensions
+    public static void AddCommon(this IServiceCollection services, IConfiguration configuration)
     {
-        public static void AddCommon(this IServiceCollection services, IConfiguration configuration)
-        {
-            services.Configure<ClientConfig>(configuration.GetSection("Kafka"));
-        }
+        services.Configure<ClientConfig>(configuration.GetSection("Kafka"));
     }
 }

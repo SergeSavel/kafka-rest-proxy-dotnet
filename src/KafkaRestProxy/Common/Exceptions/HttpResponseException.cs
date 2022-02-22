@@ -12,43 +12,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Text;
 
-namespace SergeSavel.KafkaRestProxy.Common.Exceptions
+namespace SergeSavel.KafkaRestProxy.Common.Exceptions;
+
+public abstract class HttpResponseException : Exception
 {
-    public abstract class HttpResponseException : Exception
+    public HttpResponseException(string message, Exception innerException) : base(message, innerException)
     {
-        public HttpResponseException(string message, Exception innerException) : base(message, innerException)
+        var sb = new StringBuilder();
+        sb.Append(message);
+
+        while (innerException != null)
         {
-            var sb = new StringBuilder();
-            sb.Append(message);
-
-            while (innerException != null)
-            {
-                sb.AppendLine();
-                sb.Append(innerException.Message);
-                innerException = innerException.InnerException;
-            }
-
-            Value = sb.ToString();
+            sb.AppendLine();
+            sb.Append(innerException.Message);
+            innerException = innerException.InnerException;
         }
 
-        public HttpResponseException(string message) : base(message)
-        {
-            Value = message;
-        }
-
-        public HttpResponseException(Exception innerException) : base(null, innerException)
-        {
-        }
-
-        public HttpResponseException()
-        {
-        }
-
-        public int StatusCode { get; init; } = 500;
-
-        public object Value { get; init; }
+        Value = sb.ToString();
     }
+
+    public HttpResponseException(string message) : base(message)
+    {
+        Value = message;
+    }
+
+    public HttpResponseException(Exception innerException) : base(null, innerException)
+    {
+    }
+
+    public HttpResponseException()
+    {
+    }
+
+    public int StatusCode { get; init; } = 500;
+
+    public object Value { get; init; }
 }

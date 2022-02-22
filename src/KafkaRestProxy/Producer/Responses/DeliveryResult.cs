@@ -12,18 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace SergeSavel.KafkaRestProxy.Producer.Responses
+namespace SergeSavel.KafkaRestProxy.Producer.Responses;
+
+public class DeliveryResult
 {
-    public class DeliveryResult
-    {
-        public string Status { get; init; }
+    public string Status { get; init; }
 
-        public string Topic { get; init; }
+    public string Topic { get; init; }
 
-        public int Partition { get; init; }
+    public int Partition { get; init; }
 
-        public long Offset { get; init; }
+    public long Offset { get; init; }
 
-        public long Timestamp { get; init; }
-    }
+    public long Timestamp { get; init; }
 }

@@ -12,58 +12,54 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
 using Confluent.Kafka;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SergeSavel.KafkaRestProxy.Common;
 using SergeSavel.KafkaRestProxy.Common.Contract;
 using SergeSavel.KafkaRestProxy.SchemaRegistry;
 
-namespace SergeSavel.KafkaRestProxy.Consumer
+namespace SergeSavel.KafkaRestProxy.Consumer;
+
+public class ConsumerProvider : ClientProvider<ConsumerWrapper>
 {
-    public class ConsumerProvider : ClientProvider<ConsumerWrapper>
+    private readonly IDictionary<string, string> _defaultConfig;
+    private readonly ILogger<ConsumerProvider> _logger;
+    private readonly SchemaRegistryService _schemaRegistryService;
+
+    public ConsumerProvider(ILogger<ConsumerProvider> logger, IOptions<ClientConfig> clientConfigOptions,
+        IOptions<ConsumerConfig> consumerConfigOptions, SchemaRegistryService schemaRegistryService)
     {
-        private readonly ILogger<ConsumerProvider> _logger;
-        private readonly IDictionary<string, string> _defaultConfig;
-        private readonly SchemaRegistryService _schemaRegistryService;
+        _logger = logger;
+        _defaultConfig = EffectiveConfig(clientConfigOptions.Value, consumerConfigOptions.Value);
+        _schemaRegistryService = schemaRegistryService;
+    }
 
-        public ConsumerProvider(ILogger<ConsumerProvider> logger, IOptions<ClientConfig> clientConfigOptions,
-            IOptions<ConsumerConfig> consumerConfigOptions, SchemaRegistryService schemaRegistryService)
+    public ConsumerWrapper CreateConsumer(string name, IEnumerable<KeyValuePair<string, string>> config,
+        KeyValueType keyType, KeyValueType valueType, TimeSpan expirationTimeout, string owner = null)
+    {
+        _logger.LogDebug("Creating consumer '{Name}'", name);
+
+        var effectiveConfig = EffectiveConfig(_defaultConfig, config);
+
+        var wrapper = new ConsumerWrapper(name, effectiveConfig, keyType, valueType, _schemaRegistryService.Client,
+            expirationTimeout)
         {
-            _logger = logger;
-            _defaultConfig = EffectiveConfig(clientConfigOptions.Value, consumerConfigOptions.Value);
-            _schemaRegistryService = schemaRegistryService;
-        }
+            Owner = owner
+        };
 
-        public ConsumerWrapper CreateConsumer(string name, IEnumerable<KeyValuePair<string, string>> config,
-            KeyValueType keyType, KeyValueType valueType, TimeSpan expirationTimeout, string owner = null)
-        {
-            _logger.LogDebug("Creating consumer '{Name}'", name);
-            
-            var effectiveConfig = EffectiveConfig(_defaultConfig, config);
+        AddItem(wrapper);
 
-            var wrapper = new ConsumerWrapper(name, effectiveConfig, keyType, valueType, _schemaRegistryService.Client,
-                expirationTimeout)
-            {
-                Owner = owner
-            };
+        return wrapper;
+    }
 
-            AddItem(wrapper);
-
-            return wrapper;
-        }
-
-        private static IDictionary<string, string> EffectiveConfig(IEnumerable<KeyValuePair<string, string>> config1,
-            IEnumerable<KeyValuePair<string, string>> config2)
-        {
-            var effectiveConfig = new Dictionary<string, string>();
-            foreach (var (key, value) in config1)
-                effectiveConfig[key] = value;
-            foreach (var (key, value) in config2)
-                effectiveConfig[key] = value;
-            return effectiveConfig;
-        }
+    private static IDictionary<string, string> EffectiveConfig(IEnumerable<KeyValuePair<string, string>> config1,
+        IEnumerable<KeyValuePair<string, string>> config2)
+    {
+        var effectiveConfig = new Dictionary<string, string>();
+        foreach (var (key, value) in config1)
+            effectiveConfig[key] = value;
+        foreach (var (key, value) in config2)
+            effectiveConfig[key] = value;
+        return effectiveConfig;
     }
 }

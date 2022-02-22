@@ -12,18 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace SergeSavel.KafkaRestProxy.Common.Contract
+namespace SergeSavel.KafkaRestProxy.Common.Contract;
+
+public class Error
 {
-    public class Error
-    {
-        public int Code { get; init; }
+    public int Code { get; init; }
 
-        public string Reason { get; init; }
+    public string Reason { get; init; }
 
-        public bool IsBrokerError { get; init; }
+    public bool IsBrokerError { get; init; }
 
-        public bool IsLocalError { get; init; }
+    public bool IsLocalError { get; init; }
 
-        public bool IsFatal { get; init; }
-    }
+    public bool IsFatal { get; init; }
 }

@@ -15,26 +15,25 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace SergeSavel.KafkaRestProxy.Common.Exceptions
+namespace SergeSavel.KafkaRestProxy.Common.Exceptions;
+
+public class HttpResponseExceptionFilter : IActionFilter, IOrderedFilter
 {
-    public class HttpResponseExceptionFilter : IActionFilter, IOrderedFilter
+    public void OnActionExecuting(ActionExecutingContext context)
     {
-        public void OnActionExecuting(ActionExecutingContext context)
-        {
-        }
-
-        public void OnActionExecuted(ActionExecutedContext context)
-        {
-            if (context.Exception is HttpResponseException exception)
-            {
-                context.Result = new ObjectResult(exception.Value)
-                {
-                    StatusCode = exception.StatusCode
-                };
-                context.ExceptionHandled = true;
-            }
-        }
-
-        public int Order { get; } = int.MaxValue - 10;
     }
+
+    public void OnActionExecuted(ActionExecutedContext context)
+    {
+        if (context.Exception is HttpResponseException exception)
+        {
+            context.Result = new ObjectResult(exception.Value)
+            {
+                StatusCode = exception.StatusCode
+            };
+            context.ExceptionHandled = true;
+        }
+    }
+
+    public int Order { get; } = int.MaxValue - 10;
 }

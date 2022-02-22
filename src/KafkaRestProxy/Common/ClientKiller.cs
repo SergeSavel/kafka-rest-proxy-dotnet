@@ -13,45 +13,40 @@
 // limitations under the License.
 
 using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
-namespace SergeSavel.KafkaRestProxy.Common
+namespace SergeSavel.KafkaRestProxy.Common;
+
+public abstract class ClientKiller<TClientWrapper> : BackgroundService where TClientWrapper : ClientWrapper
 {
-    public abstract class ClientKiller<TClientWrapper> : BackgroundService where TClientWrapper : ClientWrapper
+    private const long PeriodMs = 10000;
+
+    protected readonly ILogger _logger;
+    private readonly ClientProvider<TClientWrapper> _provider;
+
+    public ClientKiller(ILogger logger, ClientProvider<TClientWrapper> provider)
     {
-        private const long PeriodMs = 10000;
+        _logger = logger;
+        _provider = provider;
+    }
 
-        protected readonly ILogger _logger;
-        private readonly ClientProvider<TClientWrapper> _provider;
-
-        public ClientKiller(ILogger logger, ClientProvider<TClientWrapper> provider)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        while (!stoppingToken.IsCancellationRequested)
         {
-            _logger = logger;
-            _provider = provider;
-        }
+            var stopwatch = Stopwatch.StartNew();
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                var stopwatch = Stopwatch.StartNew();
+            foreach (var item in _provider.ListItems())
+                if (item.IsExpired)
+                {
+                    _logger.LogInformation(
+                        "Removing expired item of type '{ItemType}' and Id '{ItemId}'", item.GetType(),
+                        item.Id);
+                    _provider.RemoveItem(item.Id);
+                }
 
-                foreach (var item in _provider.ListItems())
-                    if (item.IsExpired)
-                    {
-                        _logger.LogInformation(
-                            "Removing expired item of type '{ItemType}' and Id '{ItemId}'", item.GetType(),
-                            item.Id);
-                        _provider.RemoveItem(item.Id);
-                    }
-
-                var remainingMs = PeriodMs - stopwatch.ElapsedMilliseconds;
-                if (remainingMs > 0)
-                    await Task.Delay((int)remainingMs, stoppingToken);
-            }
+            var remainingMs = PeriodMs - stopwatch.ElapsedMilliseconds;
+            if (remainingMs > 0)
+                await Task.Delay((int)remainingMs, stoppingToken);
         }
     }
 }

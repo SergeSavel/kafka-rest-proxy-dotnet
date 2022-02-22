@@ -12,15 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Microsoft.Extensions.Logging;
 using SergeSavel.KafkaRestProxy.Common;
 
-namespace SergeSavel.KafkaRestProxy.Consumer
+namespace SergeSavel.KafkaRestProxy.Consumer;
+
+public class ConsumerKiller : ClientKiller<ConsumerWrapper>
 {
-    public class ConsumerKiller : ClientKiller<ConsumerWrapper>
+    public ConsumerKiller(ILogger<ConsumerKiller> logger, ConsumerProvider provider) : base(logger, provider)
     {
-        public ConsumerKiller(ILogger<ConsumerKiller> logger, ConsumerProvider provider) : base(logger, provider)
-        {
-        }
     }
 }

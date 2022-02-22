@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace SergeSavel.KafkaRestProxy.Common.Contract
+namespace SergeSavel.KafkaRestProxy.Common.Contract;
+
+public static class KeyValueTypeDefaults
 {
-    public static class KeyValueTypeDefaults
-    {
-        public const KeyValueType Key = KeyValueType.String;
-        public const KeyValueType Value = KeyValueType.String;
-    }
+    public const KeyValueType Key = KeyValueType.String;
+    public const KeyValueType Value = KeyValueType.String;
 }

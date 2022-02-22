@@ -12,18 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+namespace SergeSavel.KafkaRestProxy.Common.Responses;
 
-namespace SergeSavel.KafkaRestProxy.Common.Responses
+public class Metadata
 {
-    public class Metadata
-    {
-        public ICollection<BrokerMetadata> Brokers { get; init; }
+    public ICollection<BrokerMetadata> Brokers { get; init; }
 
-        public ICollection<TopicMetadata> Topics { get; init; }
+    public ICollection<TopicMetadata> Topics { get; init; }
 
-        public int? OriginatingBrokerId { get; init; }
+    public int? OriginatingBrokerId { get; init; }
 
-        public string OriginatingBrokerName { get; init; }
-    }
+    public string OriginatingBrokerName { get; init; }
 }

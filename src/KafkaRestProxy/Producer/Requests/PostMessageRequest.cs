@@ -12,22 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
 using SergeSavel.KafkaRestProxy.Common.Contract;
 using SergeSavel.KafkaRestProxy.Producer.Contract;
 
-namespace SergeSavel.KafkaRestProxy.Producer.Requests
+namespace SergeSavel.KafkaRestProxy.Producer.Requests;
+
+public class PostMessageRequest : IMessage
 {
-    public class PostMessageRequest : IMessage
-    {
-        public KeyValueType KeyType { get; init; } = KeyValueTypeDefaults.Key;
-        public string KeySchema { get; init; }
-        public string Key { get; init; }
+    public KeyValueType KeyType { get; init; } = KeyValueTypeDefaults.Key;
+    public string KeySchema { get; init; }
+    public string Key { get; init; }
 
-        public KeyValueType ValueType { get; init; } = KeyValueTypeDefaults.Value;
-        public string ValueSchema { get; init; }
-        public string Value { get; init; }
+    public KeyValueType ValueType { get; init; } = KeyValueTypeDefaults.Value;
+    public string ValueSchema { get; init; }
+    public string Value { get; init; }
 
-        public IDictionary<string, string> Headers { get; init; }
-    }
+    public IDictionary<string, string> Headers { get; init; }
 }

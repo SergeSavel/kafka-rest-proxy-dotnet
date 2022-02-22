@@ -12,29 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+namespace SergeSavel.KafkaRestProxy.Common.Responses;
 
-namespace SergeSavel.KafkaRestProxy.Common.Responses
+public class TopicMetadata
 {
-    public class TopicMetadata
-    {
-        public string Topic { get; init; }
+    public string Topic { get; init; }
 
-        public ICollection<PartitionMetadata> Partitions { get; init; }
+    public ICollection<PartitionMetadata> Partitions { get; init; }
+
+    // public Error Error { get; init; }
+
+    public class PartitionMetadata
+    {
+        public int Partition { get; init; }
+
+        public int? Leader { get; init; }
+
+        public ICollection<int> Replicas { get; init; }
+
+        public ICollection<int> InSyncReplicas { get; init; }
 
         // public Error Error { get; init; }
-
-        public class PartitionMetadata
-        {
-            public int Partition { get; init; }
-
-            public int? Leader { get; init; }
-
-            public ICollection<int> Replicas { get; init; }
-
-            public ICollection<int> InSyncReplicas { get; init; }
-
-            // public Error Error { get; init; }
-        }
     }
 }

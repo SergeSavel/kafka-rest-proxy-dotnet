@@ -12,27 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+namespace SergeSavel.KafkaRestProxy.AdminClient.Responses;
 
-namespace SergeSavel.KafkaRestProxy.AdminClient.Responses
+public class ResourceConfig
 {
-    public class ResourceConfig
+    public string ResourceType { get; init; }
+
+    public string ResourceName { get; init; }
+
+    public IDictionary<string, ConfigEntryValue> Entries { get; init; }
+
+    public class ConfigEntryValue
     {
-        public string ResourceType { get; init; }
+        public string Value { get; init; }
 
-        public string ResourceName { get; init; }
+        public bool IsDefault { get; init; }
 
-        public IDictionary<string, ConfigEntryValue> Entries { get; init; }
+        public bool IsReadOnly { get; init; }
 
-        public class ConfigEntryValue
-        {
-            public string Value { get; init; }
-
-            public bool IsDefault { get; init; }
-
-            public bool IsReadOnly { get; init; }
-
-            public bool IsSensitive { get; init; }
-        }
+        public bool IsSensitive { get; init; }
     }
 }

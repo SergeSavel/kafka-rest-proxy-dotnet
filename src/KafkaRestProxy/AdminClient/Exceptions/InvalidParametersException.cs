@@ -1,12 +1,11 @@
 ﻿using SergeSavel.KafkaRestProxy.Common.Exceptions;
 
-namespace SergeSavel.KafkaRestProxy.AdminClient.Exceptions
+namespace SergeSavel.KafkaRestProxy.AdminClient.Exceptions;
+
+public class InvalidParametersException : HttpResponseException
 {
-    public class InvalidParametersException : HttpResponseException
+    public InvalidParametersException(string message) : base(message)
     {
-        public InvalidParametersException(string message) : base(message)
-        {
-            StatusCode = 400;
-        }
+        StatusCode = 400;
     }
 }

@@ -13,23 +13,21 @@
 // limitations under the License.
 
 using Confluent.Kafka;
-using Microsoft.AspNetCore.Http;
 using KafkaException = SergeSavel.KafkaRestProxy.Common.Exceptions.KafkaException;
 
-namespace SergeSavel.KafkaRestProxy.AdminClient.Exceptions
+namespace SergeSavel.KafkaRestProxy.AdminClient.Exceptions;
+
+public class AdminClientException : KafkaException
 {
-    public class AdminClientException : KafkaException
+    public AdminClientException(string message, Confluent.Kafka.KafkaException innerException) : base(message,
+        innerException)
     {
-        public AdminClientException(string message, Confluent.Kafka.KafkaException innerException) : base(message,
-            innerException)
+        StatusCode = innerException.Error.Code switch
         {
-            StatusCode = innerException.Error.Code switch
-            {
-                ErrorCode.UnknownTopicOrPart => StatusCodes.Status404NotFound,
-                ErrorCode.TopicAlreadyExists => StatusCodes.Status400BadRequest,
-                ErrorCode.Local_UnsupportedFeature => StatusCodes.Status400BadRequest,
-                _ => StatusCodes.Status500InternalServerError
-            };
-        }
+            ErrorCode.UnknownTopicOrPart => StatusCodes.Status404NotFound,
+            ErrorCode.TopicAlreadyExists => StatusCodes.Status400BadRequest,
+            ErrorCode.Local_UnsupportedFeature => StatusCodes.Status400BadRequest,
+            _ => StatusCodes.Status500InternalServerError
+        };
     }
 }

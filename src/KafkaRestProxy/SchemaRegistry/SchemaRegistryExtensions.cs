@@ -14,14 +14,13 @@
 
 using Confluent.SchemaRegistry;
 
-namespace SergeSavel.KafkaRestProxy.SchemaRegistry
+namespace SergeSavel.KafkaRestProxy.SchemaRegistry;
+
+public static class SchemaRegistryExtensions
 {
-    public static class SchemaRegistryExtensions
+    public static void AddSchemaRegistry(this IServiceCollection services, IConfiguration configuration)
     {
-        public static void AddSchemaRegistry(this IServiceCollection services, IConfiguration configuration)
-        {
-            services.Configure<SchemaRegistryConfig>(configuration.GetSection("SchemaRegistry"));
-            services.AddSingleton<SchemaRegistryService>();
-        }
+        services.Configure<SchemaRegistryConfig>(configuration.GetSection("SchemaRegistry"));
+        services.AddSingleton<SchemaRegistryService>();
     }
 }

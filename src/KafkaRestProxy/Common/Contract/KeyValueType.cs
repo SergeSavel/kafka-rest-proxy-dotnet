@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace SergeSavel.KafkaRestProxy.Common.Contract
+namespace SergeSavel.KafkaRestProxy.Common.Contract;
+
+public enum KeyValueType
 {
-    public enum KeyValueType
-    {
-        Null,
-        Ignore,
-        Bytes,
-        String,
-        AvroAsXml
-    }
+    Null,
+    Ignore,
+    Bytes,
+    String,
+    AvroAsXml
 }

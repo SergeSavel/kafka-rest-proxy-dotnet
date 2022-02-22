@@ -12,16 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Microsoft.Extensions.Logging;
 using SergeSavel.KafkaRestProxy.Common;
 
-namespace SergeSavel.KafkaRestProxy.AdminClient
+namespace SergeSavel.KafkaRestProxy.AdminClient;
+
+public class AdminClientKiller : ClientKiller<AdminClientWrapper>
 {
-    public class AdminClientKiller : ClientKiller<AdminClientWrapper>
+    public AdminClientKiller(ILogger<AdminClientKiller> logger, AdminClientProvider provider) : base(logger,
+        provider)
     {
-        public AdminClientKiller(ILogger<AdminClientKiller> logger, AdminClientProvider provider) : base(logger,
-            provider)
-        {
-        }
     }
 }

@@ -16,18 +16,17 @@ using Microsoft.AspNetCore.Authentication;
 using SergeSavel.KafkaRestProxy.Proxy.Authentication;
 using SergeSavel.KafkaRestProxy.Proxy.Configuration;
 
-namespace SergeSavel.KafkaRestProxy.Proxy
-{
-    public static class ProxyExtensions
-    {
-        public static void AddProxy(this IServiceCollection services, IConfiguration configuration)
-        {
-            services.Configure<BasicAuthUsers>(configuration.GetSection(BasicAuthUsers.SectionName));
-            
-            services.AddAuthentication("Basic")
-                .AddScheme<AuthenticationSchemeOptions, BasicAuthHandler>("Basic", null);
+namespace SergeSavel.KafkaRestProxy.Proxy;
 
-            services.AddSingleton<UserService>();
-        }
+public static class ProxyExtensions
+{
+    public static void AddProxy(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<BasicAuthUsers>(configuration.GetSection(BasicAuthUsers.SectionName));
+
+        services.AddAuthentication("Basic")
+            .AddScheme<AuthenticationSchemeOptions, BasicAuthHandler>("Basic", null);
+
+        services.AddSingleton<UserService>();
     }
 }

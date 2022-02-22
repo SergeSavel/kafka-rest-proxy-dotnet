@@ -12,19 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace SergeSavel.KafkaRestProxy.AdminClient.Requests
+namespace SergeSavel.KafkaRestProxy.AdminClient.Requests;
+
+public class CreateTopicRequest
 {
-    public class CreateTopicRequest
-    {
-        [Required] public string Topic { get; init; }
+    [Required] public string Topic { get; init; }
 
-        [Range(1, 100000)] public int? NumPartitions { get; init; }
+    [Range(1, 100000)] public int? NumPartitions { get; init; }
 
-        public short? ReplicationFactor { get; init; }
+    public short? ReplicationFactor { get; init; }
 
-        public Dictionary<string, string> Config { get; init; }
-    }
+    public Dictionary<string, string> Config { get; init; }
 }

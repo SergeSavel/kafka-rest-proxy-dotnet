@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace SergeSavel.KafkaRestProxy.Consumer.Responses
-{
-    public class TopicPartition
-    {
-        public string Topic { get; init; }
+namespace SergeSavel.KafkaRestProxy.Consumer.Responses;
 
-        public int Partition { get; init; }
-    }
+public class TopicPartition
+{
+    public string Topic { get; init; }
+
+    public int Partition { get; init; }
 }

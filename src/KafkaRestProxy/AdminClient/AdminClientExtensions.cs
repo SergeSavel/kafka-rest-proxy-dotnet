@@ -13,19 +13,16 @@
 // limitations under the License.
 
 using Confluent.Kafka;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace SergeSavel.KafkaRestProxy.AdminClient
+namespace SergeSavel.KafkaRestProxy.AdminClient;
+
+public static class AdminClientExtensions
 {
-    public static class AdminClientExtensions
+    public static void AddAdminClient(this IServiceCollection services, IConfiguration configuration)
     {
-        public static void AddAdminClient(this IServiceCollection services, IConfiguration configuration)
-        {
-            services.Configure<AdminClientConfig>(configuration.GetSection("Kafka:AdminClient"));
-            services.AddSingleton<AdminClientService>();
-            services.AddSingleton<AdminClientProvider>();
-            services.AddHostedService<AdminClientKiller>();
-        }
+        services.Configure<AdminClientConfig>(configuration.GetSection("Kafka:AdminClient"));
+        services.AddSingleton<AdminClientService>();
+        services.AddSingleton<AdminClientProvider>();
+        services.AddHostedService<AdminClientKiller>();
     }
 }

@@ -12,27 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace SergeSavel.KafkaRestProxy.Consumer.Responses
+namespace SergeSavel.KafkaRestProxy.Consumer.Responses;
+
+public class PartitionOffsets
 {
-    public class PartitionOffsets
+    public string Topic { get; init; }
+
+    public int Partition { get; init; }
+
+    public long Low { get; init; }
+
+    public long High { get; init; }
+
+    public Offset Current { get; init; }
+
+    public class Offset
     {
-        public string Topic { get; init; }
+        public long Value { get; init; }
 
-        public int Partition { get; init; }
+        public bool IsSpecial { get; init; }
 
-        public long Low { get; init; }
-
-        public long High { get; init; }
-
-        public Offset Current { get; init; }
-
-        public class Offset
-        {
-            public long Value { get; init; }
-
-            public bool IsSpecial { get; init; }
-
-            public string SpecialValue { get; init; }
-        }
+        public string SpecialValue { get; init; }
     }
 }

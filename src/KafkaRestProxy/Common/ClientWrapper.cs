@@ -12,42 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
+namespace SergeSavel.KafkaRestProxy.Common;
 
-namespace SergeSavel.KafkaRestProxy.Common
+public abstract class ClientWrapper : IDisposable
 {
-    public abstract class ClientWrapper : IDisposable
+    private readonly TimeSpan _expirationTimeout;
+
+    protected ClientWrapper(string name, IDictionary<string, string> config, TimeSpan expirationTimeout)
     {
-        private readonly TimeSpan _expirationTimeout;
+        Name = name;
+        User = GetUsernameFromConfig(config);
+        _expirationTimeout = expirationTimeout;
+        UpdateExpiration();
+    }
 
-        protected ClientWrapper(string name, IDictionary<string, string> config, TimeSpan expirationTimeout)
-        {
-            Name = name;
-            User = GetUsernameFromConfig(config);
-            _expirationTimeout = expirationTimeout;
-            UpdateExpiration();
-        }
+    public Guid Id { get; } = Guid.NewGuid();
+    public string Name { get; }
+    public string Owner { get; init; }
+    public DateTime ExpiresAt { get; private set; }
+    public bool IsExpired => DateTime.Now >= ExpiresAt;
+    public string User { get; }
+    public string Token { get; } = Guid.NewGuid().ToString();
 
-        public Guid Id { get; } = Guid.NewGuid();
-        public string Name { get; }
-        public string Owner { get; init; }
-        public DateTime ExpiresAt { get; private set; }
-        public bool IsExpired => DateTime.Now >= ExpiresAt;
-        public string User { get; }
-        public string Token { get; } = Guid.NewGuid().ToString();
+    public abstract void Dispose();
 
-        public abstract void Dispose();
+    public void UpdateExpiration()
+    {
+        ExpiresAt = DateTime.Now + _expirationTimeout;
+    }
 
-        public void UpdateExpiration()
-        {
-            ExpiresAt = DateTime.Now + _expirationTimeout;
-        }
-
-        private static string GetUsernameFromConfig(IDictionary<string, string> config)
-        {
-            if (!config.TryGetValue("sasl.username", out var username)) return null;
-            return username;
-        }
+    private static string GetUsernameFromConfig(IDictionary<string, string> config)
+    {
+        if (!config.TryGetValue("sasl.username", out var username)) return null;
+        return username;
     }
 }

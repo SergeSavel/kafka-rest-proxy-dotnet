@@ -12,32 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Confluent.SchemaRegistry;
 using Microsoft.Extensions.Options;
 
-namespace SergeSavel.KafkaRestProxy.SchemaRegistry
+namespace SergeSavel.KafkaRestProxy.SchemaRegistry;
+
+public class SchemaRegistryService : IDisposable
 {
-    public class SchemaRegistryService : IDisposable
+    public SchemaRegistryService(IOptions<SchemaRegistryConfig> configOptions)
     {
-        public SchemaRegistryService(IOptions<SchemaRegistryConfig> configOptions)
-        {
-            var config = configOptions.Value;
-            if (config.Url == null) return;
-            Client = new CachedSchemaRegistryClient(config);
-        }
+        var config = configOptions.Value;
+        if (config.Url == null) return;
+        Client = new CachedSchemaRegistryClient(config);
+    }
 
-        public ISchemaRegistryClient Client { get; }
+    public ISchemaRegistryClient Client { get; }
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing) Client?.Dispose();
-        }
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing) Client?.Dispose();
     }
 }

@@ -12,85 +12,79 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using SergeSavel.KafkaRestProxy.Producer.Requests;
 using SergeSavel.KafkaRestProxy.Producer.Responses;
 
-namespace SergeSavel.KafkaRestProxy.Producer
+namespace SergeSavel.KafkaRestProxy.Producer;
+
+public class ProducerService
 {
-    public class ProducerService
+    private readonly ILogger<ProducerService> _logger;
+    private readonly ProducerProvider _provider;
+
+    public ProducerService(ILogger<ProducerService> logger, ProducerProvider provider)
     {
-        private readonly ILogger<ProducerService> _logger;
-        private readonly ProducerProvider _provider;
+        _logger = logger;
+        _provider = provider;
+    }
 
-        public ProducerService(ILogger<ProducerService> logger, ProducerProvider provider)
-        {
-            _logger = logger;
-            _provider = provider;
-        }
+    public ICollection<Responses.Producer> ListProducers()
+    {
+        var wrappers = _provider.ListItems();
+        return wrappers
+            .Select(MapProducer)
+            .ToList();
+    }
 
-        public ICollection<Responses.Producer> ListProducers()
-        {
-            var wrappers = _provider.ListItems();
-            return wrappers
-                .Select(MapProducer)
-                .ToList();
-        }
+    public Responses.Producer GetProducer(Guid producerId)
+    {
+        var wrapper = _provider.GetItem(producerId);
+        return MapProducer(wrapper);
+    }
 
-        public Responses.Producer GetProducer(Guid producerId)
-        {
-            var wrapper = _provider.GetItem(producerId);
-            return MapProducer(wrapper);
-        }
+    public ProducerWithToken CreateProducer(CreateProducerRequest request, string owner)
+    {
+        var wrapper = _provider.CreateProducer(request.Name, request.Config,
+            TimeSpan.FromMilliseconds(request.ExpirationTimeoutMs), owner);
+        return MapProducerWithToken(wrapper);
+    }
 
-        public ProducerWithToken CreateProducer(CreateProducerRequest request, string owner)
-        {
-            var wrapper = _provider.CreateProducer(request.Name, request.Config,
-                TimeSpan.FromMilliseconds(request.ExpirationTimeoutMs), owner);
-            return MapProducerWithToken(wrapper);
-        }
+    public void RemoveProducer(Guid producerId, string token)
+    {
+        var wrapper = _provider.GetItem(producerId, token);
+        _provider.RemoveItem(wrapper.Id);
+    }
 
-        public void RemoveProducer(Guid producerId, string token)
-        {
-            var wrapper = _provider.GetItem(producerId, token);
-            _provider.RemoveItem(wrapper.Id);
-        }
+    public async Task<DeliveryResult> ProduceAsync(Guid producerId, string token, string topic, int? partition,
+        PostMessageRequest request)
+    {
+        var wrapper = _provider.GetItem(producerId, token);
+        wrapper.UpdateExpiration();
+        return await wrapper.ProduceAsync(topic, partition, request).ConfigureAwait(false);
+    }
 
-        public async Task<DeliveryResult> ProduceAsync(Guid producerId, string token, string topic, int? partition,
-            PostMessageRequest request)
+    private static Responses.Producer MapProducer(ProducerWrapper source)
+    {
+        return new Responses.Producer
         {
-            var wrapper = _provider.GetItem(producerId, token);
-            wrapper.UpdateExpiration();
-            return await wrapper.ProduceAsync(topic, partition, request).ConfigureAwait(false);
-        }
+            Id = source.Id,
+            Name = source.Name,
+            User = source.User,
+            ExpiresAt = source.ExpiresAt,
+            Owner = source.Owner
+        };
+    }
 
-        private static Responses.Producer MapProducer(ProducerWrapper source)
+    private static ProducerWithToken MapProducerWithToken(ProducerWrapper source)
+    {
+        return new ProducerWithToken
         {
-            return new Responses.Producer
-            {
-                Id = source.Id,
-                Name = source.Name,
-                User = source.User,
-                ExpiresAt = source.ExpiresAt,
-                Owner = source.Owner
-            };
-        }
-
-        private static ProducerWithToken MapProducerWithToken(ProducerWrapper source)
-        {
-            return new ProducerWithToken
-            {
-                Id = source.Id,
-                Name = source.Name,
-                User = source.User,
-                ExpiresAt = source.ExpiresAt,
-                Owner = source.Owner,
-                Token = source.Token
-            };
-        }
+            Id = source.Id,
+            Name = source.Name,
+            User = source.User,
+            ExpiresAt = source.ExpiresAt,
+            Owner = source.Owner,
+            Token = source.Token
+        };
     }
 }

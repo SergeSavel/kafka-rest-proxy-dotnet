@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace SergeSavel.KafkaRestProxy.Consumer.Responses
+namespace SergeSavel.KafkaRestProxy.Consumer.Responses;
+
+public class ConsumerWithToken : Consumer
 {
-    public class ConsumerWithToken : Consumer
-    {
-        public string Token { get; init; }
-    }
+    public string Token { get; init; }
 }

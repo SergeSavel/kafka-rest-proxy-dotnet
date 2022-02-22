@@ -12,17 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Microsoft.AspNetCore.Http;
+namespace SergeSavel.KafkaRestProxy.Common.Exceptions;
 
-namespace SergeSavel.KafkaRestProxy.Common.Exceptions
+public class InvalidTokenException : HttpResponseException
 {
-    public class InvalidTokenException : HttpResponseException
+    public InvalidTokenException(Guid clientId)
     {
-        public InvalidTokenException(Guid clientId)
-        {
-            StatusCode = StatusCodes.Status403Forbidden;
-            Value = $"Invalid token for client '{clientId}'.";
-        }
+        StatusCode = StatusCodes.Status403Forbidden;
+        Value = $"Invalid token for client '{clientId}'.";
     }
 }

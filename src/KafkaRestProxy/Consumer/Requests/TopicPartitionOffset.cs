@@ -14,14 +14,13 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace SergeSavel.KafkaRestProxy.Consumer.Requests
+namespace SergeSavel.KafkaRestProxy.Consumer.Requests;
+
+public class TopicPartitionOffset
 {
-    public class TopicPartitionOffset
-    {
-        [Required] public string Topic { get; init; }
+    [Required] public string Topic { get; init; }
 
-        [Required] public int Partition { get; init; }
+    [Required] public int Partition { get; init; }
 
-        public long Offset { get; init; }
-    }
+    public long Offset { get; init; }
 }

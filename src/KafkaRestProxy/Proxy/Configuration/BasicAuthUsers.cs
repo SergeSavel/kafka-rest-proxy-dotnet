@@ -12,17 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+namespace SergeSavel.KafkaRestProxy.Proxy.Configuration;
 
-namespace SergeSavel.KafkaRestProxy.Proxy.Configuration
+public class BasicAuthUsers : Dictionary<string, BasicAuthUsers.UserInfo>
 {
-    public class BasicAuthUsers : Dictionary<string, BasicAuthUsers.UserInfo>
-    {
-        public const string SectionName = "BasicAuthUsers";
+    public const string SectionName = "BasicAuthUsers";
 
-        public class UserInfo
-        {
-            public string Password { get; init; }
-        }
+    public class UserInfo
+    {
+        public string Password { get; init; }
     }
 }

@@ -12,20 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+namespace SergeSavel.KafkaRestProxy.Common.Exceptions;
 
-namespace SergeSavel.KafkaRestProxy.Common.Exceptions
+public class DeserializationException : HttpResponseException
 {
-    public class DeserializationException : HttpResponseException
+    public DeserializationException(string message) : base(message)
     {
-        public DeserializationException(string message) : base(message)
-        {
-            StatusCode = 500;
-        }
+        StatusCode = 500;
+    }
 
-        public DeserializationException(string message, Exception innerException) : base(message, innerException)
-        {
-            StatusCode = 500;
-        }
+    public DeserializationException(string message, Exception innerException) : base(message, innerException)
+    {
+        StatusCode = 500;
     }
 }

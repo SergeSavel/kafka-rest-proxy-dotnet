@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using SergeSavel.KafkaRestProxy.Common.Contract;
 
-namespace SergeSavel.KafkaRestProxy.Consumer.Requests
+namespace SergeSavel.KafkaRestProxy.Consumer.Requests;
+
+public class CreateConsumerRequest
 {
-    public class CreateConsumerRequest
-    {
-        [Required] public string Name { get; init; }
-        [Required] public Dictionary<string, string> Config { get; init; }
-        [Required] [Range(1000, 86400000)] public int ExpirationTimeoutMs { get; init; }
-        public KeyValueType KeyType { get; init; } = KeyValueTypeDefaults.Key;
-        public KeyValueType ValueType { get; init; } = KeyValueTypeDefaults.Value;
-    }
+    [Required] public string Name { get; init; }
+    [Required] public Dictionary<string, string> Config { get; init; }
+    [Required] [Range(1000, 86400000)] public int ExpirationTimeoutMs { get; init; }
+    public KeyValueType KeyType { get; init; } = KeyValueTypeDefaults.Key;
+    public KeyValueType ValueType { get; init; } = KeyValueTypeDefaults.Value;
 }

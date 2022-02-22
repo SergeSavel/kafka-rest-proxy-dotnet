@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
 using Avro.Generic;
 using Confluent.Kafka;
 using Confluent.Kafka.SyncOverAsync;
@@ -21,27 +19,26 @@ using Confluent.SchemaRegistry;
 using Confluent.SchemaRegistry.Serdes;
 using SergeSavel.KafkaRestProxy.Common.Extensions;
 
-namespace SergeSavel.KafkaRestProxy.Consumer
+namespace SergeSavel.KafkaRestProxy.Consumer;
+
+public class StringAvroDeserializer : IDeserializer<string>
 {
-    public class StringAvroDeserializer : IDeserializer<string>
+    private readonly IDeserializer<GenericRecord> _avroDeserializer;
+
+    public StringAvroDeserializer(ISchemaRegistryClient schemaRegistryClient)
     {
-        private readonly IDeserializer<GenericRecord> _avroDeserializer;
+        _avroDeserializer = new AvroDeserializer<GenericRecord>(schemaRegistryClient).AsSyncOverAsync();
+    }
 
-        public StringAvroDeserializer(ISchemaRegistryClient schemaRegistryClient)
-        {
-            _avroDeserializer = new AvroDeserializer<GenericRecord>(schemaRegistryClient).AsSyncOverAsync();
-        }
+    public StringAvroDeserializer(ISchemaRegistryClient schemaRegistryClient,
+        IEnumerable<KeyValuePair<string, string>> config)
+    {
+        _avroDeserializer = new AvroDeserializer<GenericRecord>(schemaRegistryClient, config).AsSyncOverAsync();
+    }
 
-        public StringAvroDeserializer(ISchemaRegistryClient schemaRegistryClient,
-            IEnumerable<KeyValuePair<string, string>> config)
-        {
-            _avroDeserializer = new AvroDeserializer<GenericRecord>(schemaRegistryClient, config).AsSyncOverAsync();
-        }
-
-        public string Deserialize(ReadOnlySpan<byte> data, bool isNull, SerializationContext context)
-        {
-            var genericRecord = _avroDeserializer.Deserialize(data, isNull, context);
-            return genericRecord.AsXmlString();
-        }
+    public string Deserialize(ReadOnlySpan<byte> data, bool isNull, SerializationContext context)
+    {
+        var genericRecord = _avroDeserializer.Deserialize(data, isNull, context);
+        return genericRecord.AsXmlString();
     }
 }

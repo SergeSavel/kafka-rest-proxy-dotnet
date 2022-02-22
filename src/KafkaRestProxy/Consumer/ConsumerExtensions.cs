@@ -14,16 +14,15 @@
 
 using Confluent.Kafka;
 
-namespace SergeSavel.KafkaRestProxy.Consumer
+namespace SergeSavel.KafkaRestProxy.Consumer;
+
+public static class ConsumerExtensions
 {
-    public static class ConsumerExtensions
+    public static void AddConsumer(this IServiceCollection services, IConfiguration configuration)
     {
-        public static void AddConsumer(this IServiceCollection services, IConfiguration configuration)
-        {
-            services.Configure<ConsumerConfig>(configuration.GetSection("Kafka:Consumer"));
-            services.AddSingleton<ConsumerService>();
-            services.AddSingleton<ConsumerProvider>();
-            services.AddHostedService<ConsumerKiller>();
-        }
+        services.Configure<ConsumerConfig>(configuration.GetSection("Kafka:Consumer"));
+        services.AddSingleton<ConsumerService>();
+        services.AddSingleton<ConsumerProvider>();
+        services.AddHostedService<ConsumerKiller>();
     }
 }

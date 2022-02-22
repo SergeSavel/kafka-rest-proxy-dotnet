@@ -12,55 +12,51 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
 using Confluent.Kafka;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SergeSavel.KafkaRestProxy.Common;
 using SergeSavel.KafkaRestProxy.SchemaRegistry;
 
-namespace SergeSavel.KafkaRestProxy.Producer
+namespace SergeSavel.KafkaRestProxy.Producer;
+
+public class ProducerProvider : ClientProvider<ProducerWrapper>
 {
-    public class ProducerProvider : ClientProvider<ProducerWrapper>
+    private readonly IDictionary<string, string> _defaultConfig;
+    private readonly ILogger<ProducerProvider> _logger;
+    private readonly SchemaRegistryService _schemaRegistryService;
+
+    public ProducerProvider(ILogger<ProducerProvider> logger, IOptions<ClientConfig> clientConfigOptions,
+        IOptions<ProducerConfig> producerConfigOptions,
+        SchemaRegistryService schemaRegistryService)
     {
-        private readonly ILogger<ProducerProvider> _logger;
-        private readonly IDictionary<string, string> _defaultConfig;
-        private readonly SchemaRegistryService _schemaRegistryService;
+        _logger = logger;
+        _defaultConfig = EffectiveConfig(clientConfigOptions.Value, producerConfigOptions.Value);
+        _schemaRegistryService = schemaRegistryService;
+    }
 
-        public ProducerProvider(ILogger<ProducerProvider> logger, IOptions<ClientConfig> clientConfigOptions,
-            IOptions<ProducerConfig> producerConfigOptions,
-            SchemaRegistryService schemaRegistryService)
+    public ProducerWrapper CreateProducer(string name, IEnumerable<KeyValuePair<string, string>> config,
+        TimeSpan expirationTimeout, string owner = null)
+    {
+        var effectiveConfig = EffectiveConfig(_defaultConfig, config);
+
+        var wrapper = new ProducerWrapper(name, effectiveConfig, _schemaRegistryService.Client, expirationTimeout)
         {
-            _logger = logger;
-            _defaultConfig = EffectiveConfig(clientConfigOptions.Value, producerConfigOptions.Value);
-            _schemaRegistryService = schemaRegistryService;
-        }
+            Owner = owner
+        };
 
-        public ProducerWrapper CreateProducer(string name, IEnumerable<KeyValuePair<string, string>> config,
-            TimeSpan expirationTimeout, string owner = null)
-        {
-            var effectiveConfig = EffectiveConfig(_defaultConfig, config);
+        AddItem(wrapper);
 
-            var wrapper = new ProducerWrapper(name, effectiveConfig, _schemaRegistryService.Client, expirationTimeout)
-            {
-                Owner = owner
-            };
+        return wrapper;
+    }
 
-            AddItem(wrapper);
-
-            return wrapper;
-        }
-        
-        private static IDictionary<string, string> EffectiveConfig(IEnumerable<KeyValuePair<string, string>> config1,
-            IEnumerable<KeyValuePair<string, string>> config2)
-        {
-            var effectiveConfig = new Dictionary<string, string>();
-            foreach (var (key, value) in config1)
-                effectiveConfig[key] = value;
-            foreach (var (key, value) in config2)
-                effectiveConfig[key] = value;
-            return effectiveConfig;
-        }
+    private static IDictionary<string, string> EffectiveConfig(IEnumerable<KeyValuePair<string, string>> config1,
+        IEnumerable<KeyValuePair<string, string>> config2)
+    {
+        var effectiveConfig = new Dictionary<string, string>();
+        foreach (var (key, value) in config1)
+            effectiveConfig[key] = value;
+        foreach (var (key, value) in config2)
+            effectiveConfig[key] = value;
+        return effectiveConfig;
     }
 }

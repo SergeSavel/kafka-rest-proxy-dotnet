@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace SergeSavel.KafkaRestProxy.Common.Responses
+namespace SergeSavel.KafkaRestProxy.Common.Responses;
+
+public class BrokerMetadata
 {
-    public class BrokerMetadata
-    {
-        public int Id { get; init; }
+    public int Id { get; init; }
 
-        public string Host { get; init; }
+    public string Host { get; init; }
 
-        public int Port { get; init; }
-    }
+    public int Port { get; init; }
 }

@@ -12,60 +12,58 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Text;
 using Confluent.Kafka;
 
-namespace SergeSavel.KafkaRestProxy.Consumer
+namespace SergeSavel.KafkaRestProxy.Consumer;
+
+public static class StringDeserializers
 {
-    public static class StringDeserializers
+    public static IDeserializer<string> Utf8 = new Utf8Deserializer();
+
+    public static IDeserializer<string> Null = new NullDeserializer();
+
+    public static IDeserializer<string> Ignore = new IgnoreDeserializer();
+
+    public static IDeserializer<string> Base64 = new Base64Deserializer();
+
+    private class Utf8Deserializer : IDeserializer<string>
     {
-        public static IDeserializer<string> Utf8 = new Utf8Deserializer();
-
-        public static IDeserializer<string> Null = new NullDeserializer();
-
-        public static IDeserializer<string> Ignore = new IgnoreDeserializer();
-
-        public static IDeserializer<string> Base64 = new Base64Deserializer();
-
-        private class Utf8Deserializer : IDeserializer<string>
+        public string Deserialize(ReadOnlySpan<byte> data, bool isNull, SerializationContext context)
         {
-            public string Deserialize(ReadOnlySpan<byte> data, bool isNull, SerializationContext context)
-            {
-                if (isNull) return null;
+            if (isNull) return null;
 
-                return Encoding.UTF8.GetString(data);
-            }
+            return Encoding.UTF8.GetString(data);
         }
+    }
 
-        private class NullDeserializer : IDeserializer<string>
+    private class NullDeserializer : IDeserializer<string>
+    {
+        public string Deserialize(ReadOnlySpan<byte> data, bool isNull, SerializationContext context)
         {
-            public string Deserialize(ReadOnlySpan<byte> data, bool isNull, SerializationContext context)
-            {
-                if (!isNull)
-                    throw new ArgumentException(
-                        "Deserializer<Null> may only be used to deserialize data that is null.");
+            if (!isNull)
+                throw new ArgumentException(
+                    "Deserializer<Null> may only be used to deserialize data that is null.");
 
-                return null;
-            }
+            return null;
         }
+    }
 
-        private class IgnoreDeserializer : IDeserializer<string>
+    private class IgnoreDeserializer : IDeserializer<string>
+    {
+        public string Deserialize(ReadOnlySpan<byte> data, bool isNull, SerializationContext context)
         {
-            public string Deserialize(ReadOnlySpan<byte> data, bool isNull, SerializationContext context)
-            {
-                return null;
-            }
+            return null;
         }
+    }
 
-        private class Base64Deserializer : IDeserializer<string>
+    private class Base64Deserializer : IDeserializer<string>
+    {
+        public string Deserialize(ReadOnlySpan<byte> data, bool isNull, SerializationContext context)
         {
-            public string Deserialize(ReadOnlySpan<byte> data, bool isNull, SerializationContext context)
-            {
-                if (isNull) return null;
+            if (isNull) return null;
 
-                return Convert.ToBase64String(data);
-            }
+            return Convert.ToBase64String(data);
         }
     }
 }

@@ -12,17 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Microsoft.AspNetCore.Http;
+namespace SergeSavel.KafkaRestProxy.Common.Exceptions;
 
-namespace SergeSavel.KafkaRestProxy.Common.Exceptions
+public class ClientNotFoundException : HttpResponseException
 {
-    public class ClientNotFoundException : HttpResponseException
+    public ClientNotFoundException(Guid clientId)
     {
-        public ClientNotFoundException(Guid clientId)
-        {
-            StatusCode = StatusCodes.Status404NotFound;
-            Value = $"Client '{clientId}' not found.";
-        }
+        StatusCode = StatusCodes.Status404NotFound;
+        Value = $"Client '{clientId}' not found.";
     }
 }

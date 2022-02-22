@@ -12,27 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+namespace SergeSavel.KafkaRestProxy.Common.Extensions;
 
-namespace SergeSavel.KafkaRestProxy.Common.Extensions
+public static class DecimalExtensions
 {
-    public static class DecimalExtensions
+    public static int GetScale(this decimal value)
     {
-        public static int GetScale(this decimal value)
-        {
-            if (value == 0)
-                return 0;
-            var bits = decimal.GetBits(value);
-            return (bits[3] >> 16) & 0x7F;
-        }
+        if (value == 0)
+            return 0;
+        var bits = decimal.GetBits(value);
+        return (bits[3] >> 16) & 0x7F;
+    }
 
-        public static int GetPrecision(this decimal value)
-        {
-            if (value == 0)
-                return 0;
-            var bits = decimal.GetBits(value);
-            var d = new decimal(bits[0], bits[1], bits[2], false, 0);
-            return (int)Math.Floor(Math.Log10((double)d)) + 1;
-        }
+    public static int GetPrecision(this decimal value)
+    {
+        if (value == 0)
+            return 0;
+        var bits = decimal.GetBits(value);
+        var d = new decimal(bits[0], bits[1], bits[2], false, 0);
+        return (int)Math.Floor(Math.Log10((double)d)) + 1;
     }
 }

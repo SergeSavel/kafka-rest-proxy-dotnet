@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace SergeSavel.KafkaRestProxy.Producer.Responses
+namespace SergeSavel.KafkaRestProxy.Producer.Responses;
+
+public class ProducerWithToken : Producer
 {
-    public class ProducerWithToken : Producer
-    {
-        public string Token { get; init; }
-    }
+    public string Token { get; init; }
 }

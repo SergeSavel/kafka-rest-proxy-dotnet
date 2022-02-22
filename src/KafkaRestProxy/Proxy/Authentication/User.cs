@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace SergeSavel.KafkaRestProxy.Proxy.Authentication
+namespace SergeSavel.KafkaRestProxy.Proxy.Authentication;
+
+public class User
 {
-    public class User
-    {
-        public string Name { get; init; }
-    }
+    public string Name { get; init; }
 }

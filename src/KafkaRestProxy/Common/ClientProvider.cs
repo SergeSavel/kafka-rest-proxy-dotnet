@@ -12,65 +12,60 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using SergeSavel.KafkaRestProxy.Common.Exceptions;
 
-namespace SergeSavel.KafkaRestProxy.Common
+namespace SergeSavel.KafkaRestProxy.Common;
+
+public abstract class ClientProvider<TClientWrapper> : IDisposable where TClientWrapper : ClientWrapper
 {
-    public abstract class ClientProvider<TClientWrapper> : IDisposable where TClientWrapper : ClientWrapper
+    private readonly ConcurrentDictionary<Guid, TClientWrapper> _wrappers = new();
+
+    public void Dispose()
     {
-        private readonly ConcurrentDictionary<Guid, TClientWrapper> _wrappers = new();
+        var items = ListItems();
+        foreach (var item in items) item.Dispose();
+    }
 
-        public void Dispose()
+    public IList<TClientWrapper> ListItems()
+    {
+        return _wrappers.Values.ToList();
+    }
+
+    protected void AddItem(TClientWrapper wrapper)
+    {
+        if (!_wrappers.TryAdd(wrapper.Id, wrapper))
         {
-            var items = ListItems();
-            foreach (var item in items) item.Dispose();
+            wrapper.Dispose();
+            throw new Exception("Unable to register consumer.");
+        }
+    }
+
+    public TClientWrapper GetItem(Guid id, string token = null)
+    {
+        if (!_wrappers.TryGetValue(id, out var matchedWrapper)) throw new ClientNotFoundException(id);
+        if (token != null && !token.Equals(matchedWrapper.Token)) throw new InvalidTokenException(id);
+        return matchedWrapper;
+    }
+
+    public bool TryGetItem(Guid id, out TClientWrapper wrapper, string token = null)
+    {
+        if (!_wrappers.TryGetValue(id, out var matchedWrapper))
+        {
+            wrapper = null;
+            return false;
         }
 
-        public IList<TClientWrapper> ListItems()
-        {
-            return _wrappers.Values.ToList();
-        }
+        if (token != null && !token.Equals(matchedWrapper.Token)) throw new InvalidTokenException(id);
+        wrapper = matchedWrapper;
+        return true;
+    }
 
-        protected void AddItem(TClientWrapper wrapper)
-        {
-            if (!_wrappers.TryAdd(wrapper.Id, wrapper))
-            {
-                wrapper.Dispose();
-                throw new Exception("Unable to register consumer.");
-            }
-        }
-
-        public TClientWrapper GetItem(Guid id, string token = null)
-        {
-            if (!_wrappers.TryGetValue(id, out var matchedWrapper)) throw new ClientNotFoundException(id);
-            if (token != null && !token.Equals(matchedWrapper.Token)) throw new InvalidTokenException(id);
-            return matchedWrapper;
-        }
-
-        public bool TryGetItem(Guid id, out TClientWrapper wrapper, string token = null)
-        {
-            if (!_wrappers.TryGetValue(id, out var matchedWrapper))
-            {
-                wrapper = null;
-                return false;
-            }
-
-            if (token != null && !token.Equals(matchedWrapper.Token)) throw new InvalidTokenException(id);
-            wrapper = matchedWrapper;
-            return true;
-        }
-
-        public void RemoveItem(Guid id, string token = null)
-        {
-            if (!_wrappers.TryGetValue(id, out var matchedWrapper)) return;
-            if (token != null && !token.Equals(matchedWrapper.Token)) throw new InvalidTokenException(id);
-            if (_wrappers.TryRemove(id, out matchedWrapper))
-                Task.Run(() => matchedWrapper.Dispose());
-        }
+    public void RemoveItem(Guid id, string token = null)
+    {
+        if (!_wrappers.TryGetValue(id, out var matchedWrapper)) return;
+        if (token != null && !token.Equals(matchedWrapper.Token)) throw new InvalidTokenException(id);
+        if (_wrappers.TryRemove(id, out matchedWrapper))
+            Task.Run(() => matchedWrapper.Dispose());
     }
 }
