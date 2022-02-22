@@ -12,28 +12,71 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
+using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Microsoft.OpenApi.Models;
+using SergeSavel.KafkaRestProxy.AdminClient;
+using SergeSavel.KafkaRestProxy.Common.Exceptions;
+using SergeSavel.KafkaRestProxy.Consumer;
+using SergeSavel.KafkaRestProxy.Producer;
+using SergeSavel.KafkaRestProxy.Proxy;
+using SergeSavel.KafkaRestProxy.SchemaRegistry;
 
-namespace SergeSavel.KafkaRestProxy
-{
-    public class Program
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseWindowsService();
+builder.WebHost.UseUrls("http://localhost:8086");
+
+// Add services to the container.
+
+builder.Services.AddControllers(options => options.Filters.Add(new HttpResponseExceptionFilter()))
+    .AddJsonOptions(options =>
     {
-        public static void Main(string[] args)
-        {
-            CreateHostBuilder(args).Build().Run();
-        }
+        options.JsonSerializerOptions.WriteIndented = false;
+        //options.JsonSerializerOptions.IgnoreNullValues = true;
+        options.JsonSerializerOptions.PropertyNamingPolicy = null;
+        options.JsonSerializerOptions.Converters.Add(
+            new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+    });
 
-        public static IHostBuilder CreateHostBuilder(string[] args)
-        {
-            return Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder
-                        .UseStartup<Startup>()
-                        .UseUrls("http://localhost:8086");
-                })
-                .UseWindowsService();
-        }
-    }
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v3", new OpenApiInfo { Title = "KafkaRestProxy", Version = "v3" });
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath);
+});
+
+builder.Services.AddHealthChecks();
+
+builder.Services.AddProxy(builder.Configuration);
+builder.Services.AddAdminClient(builder.Configuration);
+builder.Services.AddConsumer(builder.Configuration);
+builder.Services.AddProducer(builder.Configuration);
+builder.Services.AddSchemaRegistry(builder.Configuration);
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+    app.UseSwagger();
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v3/swagger.json", "KafkaRestProxy v3"));
 }
+
+app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHealthChecks("/health");
+    endpoints.MapControllers();
+});
+
+app.Run();
