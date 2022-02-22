@@ -15,6 +15,7 @@
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Hosting.WindowsServices;
 using Microsoft.OpenApi.Models;
 using SergeSavel.KafkaRestProxy.AdminClient;
 using SergeSavel.KafkaRestProxy.Common.Exceptions;
@@ -24,7 +25,13 @@ using SergeSavel.KafkaRestProxy.Producer;
 using SergeSavel.KafkaRestProxy.Proxy;
 using SergeSavel.KafkaRestProxy.SchemaRegistry;
 
-var builder = WebApplication.CreateBuilder(args);
+var options = new WebApplicationOptions
+{
+    Args = args,
+    ContentRootPath = WindowsServiceHelpers.IsWindowsService() ? AppContext.BaseDirectory : default
+};
+
+var builder = WebApplication.CreateBuilder(options);
 
 builder.Host.UseWindowsService();
 builder.WebHost.UseUrls("http://localhost:8086");
