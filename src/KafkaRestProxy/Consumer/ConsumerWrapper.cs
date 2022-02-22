@@ -39,7 +39,6 @@ namespace SergeSavel.KafkaRestProxy.Consumer
 
         private readonly SemaphoreSlim _semaphore = new(1);
         private IDeserializer<string> _avroDeserializer;
-        private IAdminClient _dependentAdminClient;
 
         public ConsumerWrapper(string name, IDictionary<string, string> config, KeyValueType keyType,
             KeyValueType valueType, ISchemaRegistryClient schemaRegistryClient, TimeSpan expirationTimeout) : base(name,
@@ -177,17 +176,18 @@ namespace SergeSavel.KafkaRestProxy.Consumer
 
         public Metadata GetMetadata(TimeSpan timeout)
         {
-            var adminClient = GetAdminClient();
             Confluent.Kafka.Metadata metadata;
-            try
+            using (var adminClient = new DependentAdminClientBuilder(_consumer.Handle).Build())
             {
-                metadata = adminClient.GetMetadata(timeout);
+                try
+                {
+                    metadata = adminClient.GetMetadata(timeout);
+                }
+                catch (KafkaException e)
+                {
+                    throw new ConsumeException("Unable to get topic metadata.", e);
+                }
             }
-            catch (KafkaException e)
-            {
-                throw new ConsumeException("Unable to get topic metadata.", e);
-            }
-
             return new Metadata
             {
                 Brokers = metadata.Brokers?.Select(CommonMapper.Map).ToList(),
@@ -199,17 +199,18 @@ namespace SergeSavel.KafkaRestProxy.Consumer
 
         public Metadata GetMetadata(string topic, TimeSpan timeout)
         {
-            var adminClient = GetAdminClient();
             Confluent.Kafka.Metadata metadata;
-            try
+            using (var adminClient = new DependentAdminClientBuilder(_consumer.Handle).Build())
             {
-                metadata = adminClient.GetMetadata(topic, timeout);
+                try
+                {
+                    metadata = adminClient.GetMetadata(topic, timeout);
+                }
+                catch (KafkaException e)
+                {
+                    throw new ConsumeException("Unable to get topic metadata.", e);
+                }
             }
-            catch (KafkaException e)
-            {
-                throw new ConsumeException("Unable to get topic metadata.", e);
-            }
-
             if (metadata.Topics[0].Error.Code == ErrorCode.UnknownTopicOrPart) throw new TopicNotFoundException(topic);
             return new Metadata
             {
@@ -253,25 +254,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer
 
             return _avroDeserializer;
         }
-
-        private IAdminClient GetAdminClient()
-        {
-            if (_dependentAdminClient == null)
-            {
-                _semaphore.Wait(TimeSpan.FromSeconds(10));
-                try
-                {
-                    _dependentAdminClient = new DependentAdminClientBuilder(_consumer.Handle).Build();
-                }
-                finally
-                {
-                    _semaphore.Release();
-                }
-            }
-
-            return _dependentAdminClient;
-        }
-
+        
         private static TopicPartition Map(Confluent.Kafka.TopicPartition source)
         {
             return new TopicPartition
@@ -338,16 +321,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer
             {
                 // ignore
             }
-
-            try
-            {
-                _dependentAdminClient?.Dispose();
-            }
-            catch (Exception)
-            {
-                // ignore
-            }
-
+            
             _consumer.Dispose();
         }
     }
