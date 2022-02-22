@@ -52,8 +52,8 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
 
             return new Metadata
             {
-                Brokers = metadata.Brokers?.Select(brokerMetadata => CommonMapper.Map(brokerMetadata)).ToArray(),
-                Topics = metadata.Topics?.Select(topicMetadata => CommonMapper.Map(topicMetadata)).ToArray(),
+                Brokers = metadata.Brokers?.Select(CommonMapper.Map).ToList(),
+                Topics = metadata.Topics?.Select(CommonMapper.Map).ToList(),
                 OriginatingBrokerId = metadata.OriginatingBrokerId,
                 OriginatingBrokerName = metadata.OriginatingBrokerName
             };
@@ -74,8 +74,8 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
             if (metadata.Topics[0].Error.Code == ErrorCode.UnknownTopicOrPart) throw new TopicNotFoundException(topic);
             return new Metadata
             {
-                Brokers = metadata.Brokers?.Select(brokerMetadata => CommonMapper.Map(brokerMetadata)).ToArray(),
-                Topics = metadata.Topics?.Select(topicMetadata => CommonMapper.Map(topicMetadata)).ToArray(),
+                Brokers = metadata.Brokers?.Select(CommonMapper.Map).ToList(),
+                Topics = metadata.Topics?.Select(CommonMapper.Map).ToList(),
                 OriginatingBrokerId = metadata.OriginatingBrokerId,
                 OriginatingBrokerName = metadata.OriginatingBrokerName
             };

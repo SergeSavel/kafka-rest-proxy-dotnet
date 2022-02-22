@@ -609,12 +609,12 @@ namespace SergeSavel.KafkaRestProxy.Common.Extensions
         private static Array ParseArray(XContainer element, Schema schema)
         {
             var effectiveSchema = GetEffectiveSchema<ArraySchema>(schema);
-            var array = new ArrayList();
+            var list = new ArrayList();
 
             foreach (var childElement in element.Elements())
-                array.Add(ParseValue(childElement, effectiveSchema.ItemSchema));
+                list.Add(ParseValue(childElement, effectiveSchema.ItemSchema));
 
-            return array.ToArray();
+            return list.ToArray();
         }
 
         private static IDictionary<string, object> ParseMap(XElement element, Schema schema)
