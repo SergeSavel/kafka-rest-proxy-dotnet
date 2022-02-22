@@ -18,6 +18,7 @@ using System.Text.Json.Serialization;
 using Microsoft.OpenApi.Models;
 using SergeSavel.KafkaRestProxy.AdminClient;
 using SergeSavel.KafkaRestProxy.Common.Exceptions;
+using SergeSavel.KafkaRestProxy.Common.Extensions;
 using SergeSavel.KafkaRestProxy.Consumer;
 using SergeSavel.KafkaRestProxy.Producer;
 using SergeSavel.KafkaRestProxy.Proxy;
@@ -51,6 +52,7 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddHealthChecks();
 
+builder.Services.AddCommon(builder.Configuration);
 builder.Services.AddProxy(builder.Configuration);
 builder.Services.AddAdminClient(builder.Configuration);
 builder.Services.AddConsumer(builder.Configuration);
