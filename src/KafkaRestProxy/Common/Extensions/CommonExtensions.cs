@@ -13,22 +13,14 @@
 // limitations under the License.
 
 using Confluent.Kafka;
-using Microsoft.Extensions.Configuration;
-using SergeSavel.KafkaRestProxy.Common;
 
-namespace SergeSavel.KafkaRestProxy.AdminClient
+namespace SergeSavel.KafkaRestProxy.Common.Extensions
 {
-    public static class AdminClientConfigProvider
+    public static class CommonExtensions
     {
-        public static AdminClientConfig GetConfig(IConfiguration configuration = null)
+        public static void AddCommon(this IServiceCollection services, IConfiguration configuration)
         {
-            var clientConfig = ClientConfigProvider.GetConfig(configuration);
-
-            var result = new AdminClientConfig(clientConfig);
-
-            configuration?.Bind("Kafka:AdminClient", result);
-
-            return result;
+            services.Configure<ClientConfig>(configuration.GetSection("Kafka"));
         }
     }
 }

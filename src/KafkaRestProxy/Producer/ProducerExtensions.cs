@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Confluent.Kafka;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -21,7 +22,7 @@ namespace SergeSavel.KafkaRestProxy.Producer
     {
         public static void AddProducer(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddSingleton(ProducerConfigProvider.GetConfig(configuration));
+            services.Configure<ProducerConfig>(configuration.GetSection("Kafka:Producer"));
             services.AddSingleton<ProducerService>();
             services.AddSingleton<ProducerProvider>();
             services.AddHostedService<ProducerKiller>();

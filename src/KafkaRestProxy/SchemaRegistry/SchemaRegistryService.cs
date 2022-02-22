@@ -14,15 +14,16 @@
 
 using System;
 using Confluent.SchemaRegistry;
+using Microsoft.Extensions.Options;
 
 namespace SergeSavel.KafkaRestProxy.SchemaRegistry
 {
     public class SchemaRegistryService : IDisposable
     {
-        public SchemaRegistryService(SchemaRegistryConfig config)
+        public SchemaRegistryService(IOptions<SchemaRegistryConfig> configOptions)
         {
+            var config = configOptions.Value;
             if (config.Url == null) return;
-
             Client = new CachedSchemaRegistryClient(config);
         }
 

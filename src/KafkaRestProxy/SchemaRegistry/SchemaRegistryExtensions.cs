@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+using Confluent.SchemaRegistry;
 
 namespace SergeSavel.KafkaRestProxy.SchemaRegistry
 {
@@ -21,7 +20,7 @@ namespace SergeSavel.KafkaRestProxy.SchemaRegistry
     {
         public static void AddSchemaRegistry(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddSingleton(SchemaRegistryConfigProvider.GetConfig(configuration));
+            services.Configure<SchemaRegistryConfig>(configuration.GetSection("SchemaRegistry"));
             services.AddSingleton<SchemaRegistryService>();
         }
     }

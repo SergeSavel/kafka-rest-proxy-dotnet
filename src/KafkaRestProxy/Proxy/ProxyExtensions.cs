@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using SergeSavel.KafkaRestProxy.Proxy.Authentication;
 using SergeSavel.KafkaRestProxy.Proxy.Configuration;
 
@@ -24,10 +22,8 @@ namespace SergeSavel.KafkaRestProxy.Proxy
     {
         public static void AddProxy(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddOptions<BasicAuthUsers>()
-                .Bind(configuration.GetSection(BasicAuthUsers.SectionName))
-                .ValidateDataAnnotations();
-
+            services.Configure<BasicAuthUsers>(configuration.GetSection(BasicAuthUsers.SectionName));
+            
             services.AddAuthentication("Basic")
                 .AddScheme<AuthenticationSchemeOptions, BasicAuthHandler>("Basic", null);
 

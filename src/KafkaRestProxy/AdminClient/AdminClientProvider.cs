@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SergeSavel.KafkaRestProxy.Common;
 using SergeSavel.KafkaRestProxy.Common.Exceptions;
 
@@ -24,19 +25,20 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
 {
     public class AdminClientProvider : ClientProvider<AdminClientWrapper>
     {
-        private readonly AdminClientConfig _defaultConfig;
         private readonly ILogger<AdminClientProvider> _logger;
-
-        public AdminClientProvider(ILogger<AdminClientProvider> logger, AdminClientConfig defaultConfig)
+        private readonly IDictionary<string, string> _defaultConfig;
+        
+        public AdminClientProvider(ILogger<AdminClientProvider> logger, IOptions<ClientConfig> clientConfigOptions,
+            IOptions<AdminClientConfig> adminClientConfigOptions)
         {
             _logger = logger;
-            _defaultConfig = defaultConfig;
+            _defaultConfig = EffectiveConfig(clientConfigOptions.Value, adminClientConfigOptions.Value);
         }
 
         public AdminClientWrapper CreateClient(string name, IDictionary<string, string> config,
             TimeSpan expirationTimeout, string owner = null)
         {
-            var effectiveConfig = GetEffectiveConfig(config);
+            var effectiveConfig = EffectiveConfig(_defaultConfig, config);
             var wrapper = new AdminClientWrapper(name, effectiveConfig, expirationTimeout)
             {
                 Owner = owner
@@ -45,36 +47,15 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
             return wrapper;
         }
 
-        private IDictionary<string, string> GetEffectiveConfig(IDictionary<string, string> config)
+        private static IDictionary<string, string> EffectiveConfig(IEnumerable<KeyValuePair<string, string>> config1,
+            IEnumerable<KeyValuePair<string, string>> config2)
         {
-            //ValidateStrictParameter(config, "bootstrap.servers");
             var effectiveConfig = new Dictionary<string, string>();
-            foreach (var (key, value) in _defaultConfig)
+            foreach (var (key, value) in config1)
                 effectiveConfig[key] = value;
-            foreach (var (key, value) in config)
+            foreach (var (key, value) in config2)
                 effectiveConfig[key] = value;
             return effectiveConfig;
-        }
-
-        private void ValidateStrictParameter(IDictionary<string, string> config, string parameterName)
-        {
-            var defaultValue = _defaultConfig.Get(parameterName);
-            if (defaultValue != null)
-            {
-                var value = config
-                    .Where(kv => string.Equals(kv.Key, parameterName, StringComparison.OrdinalIgnoreCase))
-                    .Select(kv => kv.Value)
-                    .FirstOrDefault();
-                if (value != null)
-                {
-                    var defaultList = defaultValue
-                        .Split(",", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-                    var list = value
-                        .Split(",", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-                    if (!defaultList.SequenceEqual(list, StringComparer.OrdinalIgnoreCase))
-                        throw new ConfigConflictException(parameterName);
-                }
-            }
         }
     }
 }

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Confluent.Kafka;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -21,7 +22,7 @@ namespace SergeSavel.KafkaRestProxy.AdminClient
     {
         public static void AddAdminClient(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddSingleton(AdminClientConfigProvider.GetConfig(configuration));
+            services.Configure<AdminClientConfig>(configuration.GetSection("Kafka:AdminClient"));
             services.AddSingleton<AdminClientService>();
             services.AddSingleton<AdminClientProvider>();
             services.AddHostedService<AdminClientKiller>();

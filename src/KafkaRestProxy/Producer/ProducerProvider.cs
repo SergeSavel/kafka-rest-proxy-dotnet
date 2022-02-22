@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SergeSavel.KafkaRestProxy.Common;
 using SergeSavel.KafkaRestProxy.SchemaRegistry;
 
@@ -23,26 +24,23 @@ namespace SergeSavel.KafkaRestProxy.Producer
 {
     public class ProducerProvider : ClientProvider<ProducerWrapper>
     {
-        private readonly ProducerConfig _defaultConfig;
         private readonly ILogger<ProducerProvider> _logger;
+        private readonly IDictionary<string, string> _defaultConfig;
         private readonly SchemaRegistryService _schemaRegistryService;
 
-        public ProducerProvider(ILogger<ProducerProvider> logger, ProducerConfig defaultConfig,
+        public ProducerProvider(ILogger<ProducerProvider> logger, IOptions<ClientConfig> clientConfigOptions,
+            IOptions<ProducerConfig> producerConfigOptions,
             SchemaRegistryService schemaRegistryService)
         {
             _logger = logger;
-            _defaultConfig = defaultConfig;
+            _defaultConfig = EffectiveConfig(clientConfigOptions.Value, producerConfigOptions.Value);
             _schemaRegistryService = schemaRegistryService;
         }
 
         public ProducerWrapper CreateProducer(string name, IEnumerable<KeyValuePair<string, string>> config,
             TimeSpan expirationTimeout, string owner = null)
         {
-            var effectiveConfig = new Dictionary<string, string>();
-            foreach (var (key, value) in _defaultConfig)
-                effectiveConfig[key] = value;
-            foreach (var (key, value) in config)
-                effectiveConfig[key] = value;
+            var effectiveConfig = EffectiveConfig(_defaultConfig, config);
 
             var wrapper = new ProducerWrapper(name, effectiveConfig, _schemaRegistryService.Client, expirationTimeout)
             {
@@ -52,6 +50,17 @@ namespace SergeSavel.KafkaRestProxy.Producer
             AddItem(wrapper);
 
             return wrapper;
+        }
+        
+        private static IDictionary<string, string> EffectiveConfig(IEnumerable<KeyValuePair<string, string>> config1,
+            IEnumerable<KeyValuePair<string, string>> config2)
+        {
+            var effectiveConfig = new Dictionary<string, string>();
+            foreach (var (key, value) in config1)
+                effectiveConfig[key] = value;
+            foreach (var (key, value) in config2)
+                effectiveConfig[key] = value;
+            return effectiveConfig;
         }
     }
 }

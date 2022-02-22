@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+using Confluent.Kafka;
 
 namespace SergeSavel.KafkaRestProxy.Consumer
 {
@@ -21,7 +20,7 @@ namespace SergeSavel.KafkaRestProxy.Consumer
     {
         public static void AddConsumer(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddSingleton(ConsumerConfigProvider.GetConfig(configuration));
+            services.Configure<ConsumerConfig>(configuration.GetSection("Kafka:Consumer"));
             services.AddSingleton<ConsumerService>();
             services.AddSingleton<ConsumerProvider>();
             services.AddHostedService<ConsumerKiller>();
