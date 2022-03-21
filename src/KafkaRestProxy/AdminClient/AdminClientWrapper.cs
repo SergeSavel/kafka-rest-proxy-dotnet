@@ -31,7 +31,14 @@ public class AdminClientWrapper : ClientWrapper
     public AdminClientWrapper(string name, IDictionary<string, string> config, TimeSpan expirationTimeout) : base(
         name, config, expirationTimeout)
     {
-        _adminClient = new AdminClientBuilder(config).Build();
+        try
+        {
+            _adminClient = new AdminClientBuilder(config).Build();
+        }
+        catch (Exception e)
+        {
+            throw new ClientConfigException(e);
+        }
     }
 
     public Metadata GetMetadata(TimeSpan timeout)

@@ -45,10 +45,17 @@ public class ConsumerWrapper : ClientWrapper
         ValueType = valueType;
         var keyDeserializer = GetDeserializer(keyType);
         var valueDeserializer = GetDeserializer(valueType);
-        _consumer = new ConsumerBuilder<string, string>(config)
-            .SetKeyDeserializer(keyDeserializer)
-            .SetValueDeserializer(valueDeserializer)
-            .Build();
+        try
+        {
+            _consumer = new ConsumerBuilder<string, string>(config)
+                .SetKeyDeserializer(keyDeserializer)
+                .SetValueDeserializer(valueDeserializer)
+                .Build();
+        }
+        catch (ArgumentException e)
+        {
+            throw new ClientConfigException(e);
+        }
     }
 
     public KeyValueType KeyType { get; }

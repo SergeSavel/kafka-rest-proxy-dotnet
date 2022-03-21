@@ -46,10 +46,17 @@ public class ProducerWrapper : ClientWrapper
         expirationTimeout)
     {
         _schemaRegistryClient = schemaRegistryClient;
-        _producer = new ProducerBuilder<byte[], byte[]>(config)
-            .SetKeySerializer(XSerializer)
-            .SetValueSerializer(XSerializer)
-            .Build();
+        try
+        {
+            _producer = new ProducerBuilder<byte[], byte[]>(config)
+                .SetKeySerializer(XSerializer)
+                .SetValueSerializer(XSerializer)
+                .Build();
+        }
+        catch (Exception e)
+        {
+            throw new ClientConfigException(e);
+        }
     }
 
     public async Task<DeliveryResult> ProduceAsync(string topic, int? partition, IMessage message)
