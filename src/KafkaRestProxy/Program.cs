@@ -25,13 +25,13 @@ using SergeSavel.KafkaRestProxy.Producer;
 using SergeSavel.KafkaRestProxy.Proxy;
 using SergeSavel.KafkaRestProxy.SchemaRegistry;
 
-var options = new WebApplicationOptions
+var webAppOptions = new WebApplicationOptions
 {
     Args = args,
     ContentRootPath = WindowsServiceHelpers.IsWindowsService() ? AppContext.BaseDirectory : default
 };
 
-var builder = WebApplication.CreateBuilder(options);
+var builder = WebApplication.CreateBuilder(webAppOptions);
 
 builder.Host.UseWindowsService();
 builder.WebHost.UseUrls("http://localhost:8086");
