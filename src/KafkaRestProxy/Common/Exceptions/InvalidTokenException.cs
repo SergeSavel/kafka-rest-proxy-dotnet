@@ -16,9 +16,8 @@ namespace SergeSavel.KafkaRestProxy.Common.Exceptions;
 
 public class InvalidTokenException : HttpResponseException
 {
-    public InvalidTokenException(Guid clientId)
+    public InvalidTokenException(Guid clientId) : base($"Invalid token for client '{clientId}'.")
     {
         StatusCode = StatusCodes.Status403Forbidden;
-        Value = $"Invalid token for client '{clientId}'.";
     }
 }

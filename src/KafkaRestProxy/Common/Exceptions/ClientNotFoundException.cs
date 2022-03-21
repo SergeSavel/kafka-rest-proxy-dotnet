@@ -16,9 +16,8 @@ namespace SergeSavel.KafkaRestProxy.Common.Exceptions;
 
 public class ClientNotFoundException : HttpResponseException
 {
-    public ClientNotFoundException(Guid clientId)
+    public ClientNotFoundException(Guid clientId) : base($"Client '{clientId}' not found.")
     {
         StatusCode = StatusCodes.Status404NotFound;
-        Value = $"Client '{clientId}' not found.";
     }
 }

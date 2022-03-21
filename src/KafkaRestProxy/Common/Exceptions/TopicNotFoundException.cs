@@ -16,9 +16,8 @@ namespace SergeSavel.KafkaRestProxy.Common.Exceptions;
 
 public class TopicNotFoundException : HttpResponseException
 {
-    public TopicNotFoundException(string topic)
+    public TopicNotFoundException(string topic) : base ($"Topic '{topic}' not found.")
     {
         StatusCode = StatusCodes.Status404NotFound;
-        Value = $"Topic '{topic}' not found.";
     }
 }

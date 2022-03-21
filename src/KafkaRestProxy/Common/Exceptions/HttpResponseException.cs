@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Text;
+using Microsoft.AspNetCore.Mvc;
 
 namespace SergeSavel.KafkaRestProxy.Common.Exceptions;
 
@@ -21,25 +22,46 @@ public abstract class HttpResponseException : Exception
     public HttpResponseException(string message, Exception innerException) : base(message, innerException)
     {
         var sb = new StringBuilder();
-        sb.Append(message);
-
         while (innerException != null)
         {
-            sb.AppendLine();
             sb.Append(innerException.Message);
+            if (innerException.InnerException != null) sb.AppendLine();
             innerException = innerException.InnerException;
         }
+        var detail = sb.ToString();
 
-        Value = sb.ToString();
+        Value = new ProblemDetails
+        {
+            Title = message,
+            Detail = detail
+        };
     }
 
     public HttpResponseException(string message) : base(message)
     {
-        Value = message;
+        var details = new ProblemDetails
+        {
+            Title = message
+        };
+        Value = details;
     }
 
     public HttpResponseException(Exception innerException) : base(null, innerException)
     {
+        var sb = new StringBuilder();
+        while (innerException.InnerException != null)
+        {
+            innerException = innerException.InnerException;
+            sb.Append(innerException.Message);
+            if (innerException.InnerException != null) sb.AppendLine();
+        }
+        var detail = sb.ToString();
+
+        Value = new ProblemDetails
+        {
+            Title = innerException.Message,
+            Detail = detail
+        };
     }
 
     public HttpResponseException()
