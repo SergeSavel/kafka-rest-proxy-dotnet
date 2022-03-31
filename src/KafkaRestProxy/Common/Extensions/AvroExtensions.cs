@@ -385,8 +385,9 @@ public static class AvroExtensions
         if (nspace != null)
             element.SetAttributeValue(XNamespace, nspace);
 
-        element.Value = BitConverter.ToString(value.Value).Replace("-", string.Empty).ToLowerInvariant();
-
+        //element.Value = BitConverter.ToString(value.Value).Replace("-", string.Empty).ToLowerInvariant();
+        element.Value = Convert.ToBase64String(value.Value);
+        
         parent.Add(element);
     }
 
@@ -635,7 +636,8 @@ public static class AvroExtensions
     private static GenericFixed ParseFixed(XElement element, Schema schema)
     {
         var effectiveSchema = GetEffectiveSchema<FixedSchema>(schema);
-        return new GenericFixed(effectiveSchema, Convert.FromHexString(element.Value));
+        //return new GenericFixed(effectiveSchema, Convert.FromHexString(element.Value));
+        return new GenericFixed(effectiveSchema, Convert.FromBase64String(element.Value));
     }
 
     private static AvroDecimal ParseDecimal(XElement element, Schema schema)
