@@ -123,10 +123,18 @@ public class ProducerWrapper : ClientWrapper
                 }
                 catch (Exception e)
                 {
-                    throw new SerializationException("An error occured while parsing generic record.", e);
+                    throw new SerializationException("An error occured while parsing Avro generic record.", e);
                 }
 
-                result = await GetAvroSerializer().SerializeAsync(genericRecord, serializationContext);
+                try
+                {
+                    result = await GetAvroSerializer().SerializeAsync(genericRecord, serializationContext);
+                }
+                catch (Exception e)
+                {
+                    throw new SerializationException("An error occured while serializing Avro generic record.", e);
+                }
+                
                 break;
             }
             default:
