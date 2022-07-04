@@ -15,6 +15,7 @@
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Hosting.WindowsServices;
 using Microsoft.OpenApi.Models;
 using SergeSavel.KafkaRestProxy.AdminClient;
@@ -35,6 +36,9 @@ var builder = WebApplication.CreateBuilder(webAppOptions);
 
 builder.Host.UseWindowsService();
 builder.WebHost.UseUrls("http://localhost:8086");
+
+builder.Services.Configure<IISServerOptions>(options => { options.MaxRequestBodySize = int.MaxValue; });
+builder.Services.Configure<KestrelServerOptions>(options => { options.Limits.MaxRequestBodySize = int.MaxValue; });
 
 // Add services to the container.
 
