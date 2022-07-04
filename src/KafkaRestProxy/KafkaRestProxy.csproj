@@ -24,10 +24,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Confluent.Kafka" Version="1.8.2" />
-        <PackageReference Include="Confluent.SchemaRegistry.Serdes.Avro" Version="1.8.2" />
-        <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="6.0.0" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1" />
+        <PackageReference Include="Confluent.Kafka" Version="1.9.0"/>
+        <PackageReference Include="Confluent.SchemaRegistry.Serdes.Avro" Version="1.9.0"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="6.0.0"/>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1"/>
     </ItemGroup>
 
 </Project>
