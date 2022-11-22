@@ -35,7 +35,6 @@ var webAppOptions = new WebApplicationOptions
 var builder = WebApplication.CreateBuilder(webAppOptions);
 
 builder.Host.UseWindowsService();
-builder.WebHost.UseUrls("http://localhost:8086");
 
 builder.Services.Configure<IISServerOptions>(options => { options.MaxRequestBodySize = int.MaxValue; });
 builder.Services.Configure<KestrelServerOptions>(options => { options.Limits.MaxRequestBodySize = int.MaxValue; });
