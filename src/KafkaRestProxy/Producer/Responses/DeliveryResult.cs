@@ -20,9 +20,9 @@ public class DeliveryResult
 
     public string Topic { get; init; }
 
-    public int Partition { get; init; }
+    public int? Partition { get; init; }
 
-    public long Offset { get; init; }
+    public long? Offset { get; init; }
 
-    public long Timestamp { get; init; }
+    public long? Timestamp { get; init; }
 }

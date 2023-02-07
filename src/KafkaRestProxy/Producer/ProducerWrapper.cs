@@ -134,7 +134,7 @@ public class ProducerWrapper : ClientWrapper
                 {
                     throw new SerializationException("An error occured while serializing Avro generic record.", e);
                 }
-                
+
                 break;
             }
             default:
@@ -188,7 +188,7 @@ public class ProducerWrapper : ClientWrapper
         {
             Status = Enum.GetName(source.Status),
             Topic = source.Topic,
-            Partition = source.Partition.Value,
+            Partition = source.Partition,
             Offset = source.Offset,
             Timestamp = source.Timestamp.UnixTimestampMs
         };

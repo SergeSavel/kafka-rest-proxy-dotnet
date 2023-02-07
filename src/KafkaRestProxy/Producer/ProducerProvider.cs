@@ -21,16 +21,26 @@ namespace SergeSavel.KafkaRestProxy.Producer;
 
 public class ProducerProvider : ClientProvider<ProducerWrapper>
 {
+    private static readonly IDictionary<string, string> XPredefinedConfig;
+
     private readonly IDictionary<string, string> _defaultConfig;
     private readonly ILogger<ProducerProvider> _logger;
     private readonly SchemaRegistryService _schemaRegistryService;
+
+    static ProducerProvider()
+    {
+        XPredefinedConfig = new Dictionary<string, string>
+        {
+            { "dotnet.producer.delivery.report.fields", "timestamp,status" }
+        };
+    }
 
     public ProducerProvider(ILogger<ProducerProvider> logger, IOptions<ClientConfig> clientConfigOptions,
         IOptions<ProducerConfig> producerConfigOptions,
         SchemaRegistryService schemaRegistryService)
     {
         _logger = logger;
-        _defaultConfig = EffectiveConfig(clientConfigOptions.Value, producerConfigOptions.Value);
+        _defaultConfig = EffectiveConfig(XPredefinedConfig, clientConfigOptions.Value, producerConfigOptions.Value);
         _schemaRegistryService = schemaRegistryService;
     }
 
@@ -49,13 +59,12 @@ public class ProducerProvider : ClientProvider<ProducerWrapper>
         return wrapper;
     }
 
-    private static IDictionary<string, string> EffectiveConfig(IEnumerable<KeyValuePair<string, string>> config1,
-        IEnumerable<KeyValuePair<string, string>> config2)
+    private static IDictionary<string, string> EffectiveConfig(
+        params IEnumerable<KeyValuePair<string, string>>[] configs)
     {
         var effectiveConfig = new Dictionary<string, string>();
-        foreach (var (key, value) in config1)
-            effectiveConfig[key] = value;
-        foreach (var (key, value) in config2)
+        foreach (var config in configs)
+        foreach (var (key, value) in config)
             effectiveConfig[key] = value;
         return effectiveConfig;
     }
