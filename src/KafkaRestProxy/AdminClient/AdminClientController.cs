@@ -130,7 +130,8 @@ public class AdminClientController : ControllerBase
     public async Task<ActionResult<bool>> CreateTopicAsync(Guid clientId, [Required] string token,
         [Required] CreateTopicRequest request, [Required] [Range(0, int.MaxValue)] int timeout)
     {
-        await _service.CreateTopicAsync(clientId, token, request, TimeSpan.FromMilliseconds(timeout));
+        await _service.CreateTopicAsync(clientId, token, request, TimeSpan.FromMilliseconds(timeout))
+            .ConfigureAwait(false);
         return CreatedAtAction(nameof(GetMetadata), new { clientId, token, request.Topic, timeout }, true);
     }
 
@@ -161,9 +162,10 @@ public class AdminClientController : ControllerBase
             throw new InvalidParametersException("\"broker\" and \"topic\" parameters must not be both provided.");
         if (broker.HasValue)
             return await _service.GetBrokerConfigAsync(clientId, token, broker.Value,
-                TimeSpan.FromMilliseconds(timeout));
+                TimeSpan.FromMilliseconds(timeout)).ConfigureAwait(false);
         if (topic != null)
-            return await _service.GetTopicConfigAsync(clientId, token, topic, TimeSpan.FromMilliseconds(timeout));
+            return await _service.GetTopicConfigAsync(clientId, token, topic, TimeSpan.FromMilliseconds(timeout))
+                .ConfigureAwait(false);
         throw new InvalidParametersException("Either \"broker\" or \"topic\" parameter must be provided.");
     }
 }

@@ -55,7 +55,8 @@ public class BasicAuthHandler : AuthenticationHandler<AuthenticationSchemeOption
                 {
                     var credentialBytes = Convert.FromBase64String(authHeaderValue.Parameter ?? string.Empty);
                     var credentials = Encoding.UTF8.GetString(credentialBytes).Split(':', 2);
-                    user = await _userService.AuthenticateAsync(BasicScheme, credentials[0], credentials[1]);
+                    user = await _userService.AuthenticateAsync(BasicScheme, credentials[0], credentials[1])
+                        .ConfigureAwait(false);
                 }
             }
             catch
@@ -72,7 +73,7 @@ public class BasicAuthHandler : AuthenticationHandler<AuthenticationSchemeOption
         }
         else
         {
-            user = await _userService.AuthenticateAsync(null, null, null);
+            user = await _userService.AuthenticateAsync(null, null, null).ConfigureAwait(false);
             if (user == null)
             {
                 _failureMessage = "Missing Authorization Header";
@@ -95,6 +96,6 @@ public class BasicAuthHandler : AuthenticationHandler<AuthenticationSchemeOption
     {
         Response.Headers["WWW-Authenticate"] = $"Basic realm=\"{Realm}\"";
         Response.StatusCode = 401;
-        await Response.WriteAsync(_failureMessage);
+        await Response.WriteAsync(_failureMessage).ConfigureAwait(false);
     }
 }

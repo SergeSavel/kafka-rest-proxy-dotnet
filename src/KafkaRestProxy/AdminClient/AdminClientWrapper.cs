@@ -102,7 +102,7 @@ public class AdminClientWrapper : ClientWrapper
 
         try
         {
-            await _adminClient.CreateTopicsAsync(new[] { topicSpecification }, options);
+            await _adminClient.CreateTopicsAsync(new[] { topicSpecification }, options).ConfigureAwait(false);
         }
         catch (KafkaException e)
         {
@@ -126,7 +126,7 @@ public class AdminClientWrapper : ClientWrapper
         ICollection<DescribeConfigsResult> results;
         try
         {
-            results = await _adminClient.DescribeConfigsAsync(new[] { resource }, options);
+            results = await _adminClient.DescribeConfigsAsync(new[] { resource }, options).ConfigureAwait(false);
         }
         catch (KafkaException e)
         {
@@ -152,7 +152,7 @@ public class AdminClientWrapper : ClientWrapper
         ICollection<DescribeConfigsResult> results;
         try
         {
-            results = await _adminClient.DescribeConfigsAsync(new[] { resource }, options);
+            results = await _adminClient.DescribeConfigsAsync(new[] { resource }, options).ConfigureAwait(false);
         }
         catch (KafkaException e)
         {

@@ -75,7 +75,7 @@ public class AdminClientService
         var wrapper = _provider.GetItem(clientId, token);
         wrapper.UpdateExpiration();
         await wrapper.CreateTopicAsync(request.Topic, request.NumPartitions, request.ReplicationFactor,
-            request.Config, timeout);
+            request.Config, timeout).ConfigureAwait(false);
     }
 
     public async Task<ResourceConfig> GetTopicConfigAsync(Guid clientId, string token, string topic,
@@ -83,7 +83,7 @@ public class AdminClientService
     {
         var wrapper = _provider.GetItem(clientId, token);
         wrapper.UpdateExpiration();
-        return await wrapper.GetTopicConfigAsync(topic, timeout);
+        return await wrapper.GetTopicConfigAsync(topic, timeout).ConfigureAwait(false);
     }
 
     public async Task<ResourceConfig> GetBrokerConfigAsync(Guid clientId, string token, int brokerId,
@@ -91,7 +91,7 @@ public class AdminClientService
     {
         var wrapper = _provider.GetItem(clientId, token);
         wrapper.UpdateExpiration();
-        return await wrapper.GetBrokerConfigAsync(brokerId, timeout);
+        return await wrapper.GetBrokerConfigAsync(brokerId, timeout).ConfigureAwait(false);
     }
 
     private static Responses.AdminClient MapAdminClient(AdminClientWrapper wrapper)

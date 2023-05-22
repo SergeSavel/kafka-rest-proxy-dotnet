@@ -128,7 +128,8 @@ public class ProducerWrapper : ClientWrapper
 
                 try
                 {
-                    result = await GetAvroSerializer().SerializeAsync(genericRecord, serializationContext);
+                    result = await GetAvroSerializer().SerializeAsync(genericRecord, serializationContext)
+                        .ConfigureAwait(false);
                 }
                 catch (Exception e)
                 {

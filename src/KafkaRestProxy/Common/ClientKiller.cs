@@ -46,7 +46,7 @@ public abstract class ClientKiller<TClientWrapper> : BackgroundService where TCl
 
             var remainingMs = PeriodMs - stopwatch.ElapsedMilliseconds;
             if (remainingMs > 0)
-                await Task.Delay((int)remainingMs, stoppingToken);
+                await Task.Delay((int)remainingMs, stoppingToken).ConfigureAwait(false);
         }
     }
 }
