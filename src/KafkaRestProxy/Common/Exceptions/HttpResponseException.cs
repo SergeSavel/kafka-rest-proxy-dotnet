@@ -28,6 +28,7 @@ public abstract class HttpResponseException : Exception
             if (innerException.InnerException != null) sb.AppendLine();
             innerException = innerException.InnerException;
         }
+
         var detail = sb.ToString();
 
         Value = new ProblemDetails
@@ -55,6 +56,7 @@ public abstract class HttpResponseException : Exception
             sb.Append(innerException.Message);
             if (innerException.InnerException != null) sb.AppendLine();
         }
+
         var detail = sb.ToString();
 
         Value = new ProblemDetails

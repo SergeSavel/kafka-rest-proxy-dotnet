@@ -13,12 +13,12 @@
 // limitations under the License.
 
 using System.Reflection;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Hosting.WindowsServices;
 using Microsoft.OpenApi.Models;
 using SergeSavel.KafkaRestProxy.AdminClient;
+using SergeSavel.KafkaRestProxy.Common;
 using SergeSavel.KafkaRestProxy.Common.Exceptions;
 using SergeSavel.KafkaRestProxy.Common.Extensions;
 using SergeSavel.KafkaRestProxy.Consumer;
@@ -48,7 +48,7 @@ builder.Services.AddControllers(options => options.Filters.Add(new HttpResponseE
         //options.JsonSerializerOptions.IgnoreNullValues = true;
         options.JsonSerializerOptions.PropertyNamingPolicy = null;
         options.JsonSerializerOptions.Converters.Add(
-            new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+            new JsonStringEnumConverter(new JsonStraightNamingPolicy()));
     });
 
 builder.Services.AddEndpointsApiExplorer();

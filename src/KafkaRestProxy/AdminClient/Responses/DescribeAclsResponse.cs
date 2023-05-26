@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace SergeSavel.KafkaRestProxy.Common.Exceptions;
+using SergeSavel.KafkaRestProxy.AdminClient.Contract;
 
-public class TopicNotFoundException : HttpResponseException
+namespace SergeSavel.KafkaRestProxy.AdminClient.Responses;
+
+public class DescribeAclsResponse
 {
-    public TopicNotFoundException(string topic) : base($"Topic '{topic}' not found.")
-    {
-        StatusCode = StatusCodes.Status404NotFound;
-    }
+    public List<AclBinding> AclBindings { get; init; }
 }

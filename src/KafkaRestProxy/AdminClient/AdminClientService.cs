@@ -94,6 +94,37 @@ public class AdminClientService
         return await wrapper.GetBrokerConfigAsync(brokerId, timeout).ConfigureAwait(false);
     }
 
+    public async Task CreateAclsAsync(Guid clientId, string token, CreateAclsRequest request, TimeSpan timeout)
+    {
+        var wrapper = _provider.GetItem(clientId, token);
+        wrapper.UpdateExpiration();
+        await wrapper.CreateAclsAsync(request.AclBindings, timeout).ConfigureAwait(false);
+    }
+
+    public async Task<DescribeAclsResponse> DescribeAclsAsync(Guid clientId, string token, DescribeAclsRequest request,
+        TimeSpan timeout)
+    {
+        var wrapper = _provider.GetItem(clientId, token);
+        wrapper.UpdateExpiration();
+        var aclBindings = await wrapper.DescribeAclsAsync(request.AclBindingFilter, timeout).ConfigureAwait(false);
+        return new DescribeAclsResponse
+        {
+            AclBindings = aclBindings
+        };
+    }
+
+    public async Task<DeleteAclsResponse> DeleteAclsAsync(Guid clientId, string token, DeleteAclsRequest request,
+        TimeSpan timeout)
+    {
+        var wrapper = _provider.GetItem(clientId, token);
+        wrapper.UpdateExpiration();
+        var results = await wrapper.DeleteAclsAsync(request.AclBindingFilters, timeout).ConfigureAwait(false);
+        return new DeleteAclsResponse
+        {
+            Results = results
+        };
+    }
+
     private static Responses.AdminClient MapAdminClient(AdminClientWrapper wrapper)
     {
         return new Responses.AdminClient

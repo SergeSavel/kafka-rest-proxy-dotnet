@@ -1,4 +1,4 @@
-﻿// Copyright 2021 Sergey Savelev
+﻿// Copyright 2023 Sergey Savelev
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace SergeSavel.KafkaRestProxy.Common.Exceptions;
+namespace SergeSavel.KafkaRestProxy.AdminClient.Contract;
 
-public class TopicNotFoundException : HttpResponseException
+public class AclBindingFilter
 {
-    public TopicNotFoundException(string topic) : base($"Topic '{topic}' not found.")
-    {
-        StatusCode = StatusCodes.Status404NotFound;
-    }
+    /// <summary>The resource pattern filter.</summary>
+    public ResourcePatternFilter PatternFilter { get; set; } = null;
+
+    /// <summary>The access control entry filter.</summary>
+    public AccessControlEntryFilter EntryFilter { get; set; } = null;
 }

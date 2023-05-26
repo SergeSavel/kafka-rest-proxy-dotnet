@@ -168,4 +168,73 @@ public class AdminClientController : ControllerBase
                 .ConfigureAwait(false);
         throw new InvalidParametersException("Either \"broker\" or \"topic\" parameter must be provided.");
     }
+
+    /// <summary>Creates one or more ACL bindings.</summary>
+    /// <param name="clientId">Admin client instance Id.</param>
+    /// <param name="token">Security token obtained while creating current instance.</param>
+    /// <param name="request">ACL bindings to create.</param>
+    /// <param name="timeout">Operation timeout (ms).</param>
+    /// <response code="200">ACLs successfully created.</response>
+    /// <response code="403">Invalid token.</response>
+    /// <response code="404">Instance not found.</response>
+    /// <response code="500">Returns error details.</response>
+    [HttpPost("{clientId:guid}/acls/create")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult> CreateAclsAsync(Guid clientId, [Required] string token,
+        [Required] CreateAclsRequest request, [Required] [Range(0, int.MaxValue)] int timeout)
+    {
+        await _service.CreateAclsAsync(clientId, token, request, TimeSpan.FromMilliseconds(timeout))
+            .ConfigureAwait(false);
+        return Ok();
+    }
+
+    /// <summary>Finds ACL bindings using a filter.</summary>
+    /// <param name="clientId">Admin client instance Id.</param>
+    /// <param name="token">Security token obtained while creating current instance.</param>
+    /// <param name="request"> ACL binding filter.</param>
+    /// <param name="timeout">Operation timeout (ms).</param>
+    /// <returns>ACL bindings</returns>
+    /// <response code="200">Returns ACL bindings.</response>
+    /// <response code="403">Invalid token.</response>
+    /// <response code="404">Instance not found.</response>
+    /// <response code="500">Returns error details.</response>
+    [HttpPost("{clientId:guid}/acls/describe")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<DescribeAclsResponse> DescribeAclsAsync(Guid clientId, [Required] string token,
+        [Required] DescribeAclsRequest request, [Required] [Range(0, int.MaxValue)] int timeout)
+    {
+        return await _service.DescribeAclsAsync(clientId, token, request, TimeSpan.FromMilliseconds(timeout))
+            .ConfigureAwait(false);
+    }
+
+    /// <summary>Deletes ACL bindings using multiple filters.</summary>
+    /// <param name="clientId">Admin client instance Id.</param>
+    /// <param name="token">Security token obtained while creating current instance.</param>
+    /// <param name="request"> ACL binding filters.</param>
+    /// <param name="timeout">Operation timeout (ms).</param>
+    /// <returns>Deleted ACL bindings</returns>
+    /// <response code="200">Returns deleted ACL bindings.</response>
+    /// <response code="403">Invalid token.</response>
+    /// <response code="404">Instance not found.</response>
+    /// <response code="500">Returns error details.</response>
+    [HttpPost("{clientId:guid}/acls/delete")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<DeleteAclsResponse> DeleteAclsAsync(Guid clientId, [Required] string token,
+        [Required] DeleteAclsRequest request, [Required] [Range(0, int.MaxValue)] int timeout)
+    {
+        return await _service.DeleteAclsAsync(clientId, token, request, TimeSpan.FromMilliseconds(timeout))
+            .ConfigureAwait(false);
+    }
 }

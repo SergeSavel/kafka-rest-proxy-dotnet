@@ -6,12 +6,12 @@ public class ClientConfigException : HttpResponseException
     {
         StatusCode = 400;
     }
-    
+
     public ClientConfigException(string message, Exception innerException) : base(message, innerException)
     {
         StatusCode = 400;
     }
-    
+
     public ClientConfigException(Exception innerException) : base("Invalid client configuration.", innerException)
     {
         StatusCode = 400;

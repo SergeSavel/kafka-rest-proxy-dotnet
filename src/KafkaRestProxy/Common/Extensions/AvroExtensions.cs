@@ -387,7 +387,7 @@ public static class AvroExtensions
 
         //element.Value = BitConverter.ToString(value.Value).Replace("-", string.Empty).ToLowerInvariant();
         element.Value = Convert.ToBase64String(value.Value);
-        
+
         parent.Add(element);
     }
 

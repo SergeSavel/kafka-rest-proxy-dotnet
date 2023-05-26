@@ -1,4 +1,4 @@
-﻿// Copyright 2021 Sergey Savelev
+﻿// Copyright 2023 Sergey Savelev
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,12 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace SergeSavel.KafkaRestProxy.Common.Exceptions;
+namespace SergeSavel.KafkaRestProxy.AdminClient.Contract;
 
-public class TopicNotFoundException : HttpResponseException
+public enum ResourcePatternType
 {
-    public TopicNotFoundException(string topic) : base($"Topic '{topic}' not found.")
-    {
-        StatusCode = StatusCodes.Status404NotFound;
-    }
+    /// <summary>Resource pattern type is not known or not set.</summary>
+    Unknown,
+
+    /// <summary>Match any resource, used for lookups.</summary>
+    Any,
+
+    /// <summary>Match: will perform pattern matching</summary>
+    Match,
+
+    /// <summary>Literal: A literal resource name</summary>
+    Literal,
+
+    /// <summary>Prefixed: A prefixed resource name</summary>
+    Prefixed
 }
