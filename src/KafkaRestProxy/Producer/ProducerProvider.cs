@@ -32,6 +32,7 @@ public class ProducerProvider : ClientProvider<ProducerWrapper>
     {
         XPredefinedConfig = new Dictionary<string, string>
         {
+            { "partitioner", "murmur2_random" },
             { "dotnet.producer.delivery.report.fields", "timestamp,status" }
         };
     }
