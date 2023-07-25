@@ -24,9 +24,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Confluent.Kafka" Version="2.1.1"/>
-        <PackageReference Include="Confluent.SchemaRegistry.Serdes.Avro" Version="2.1.1"/>
-        <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="6.0.1"/>
+        <PackageReference Include="Confluent.Kafka" Version="2.2.0"/>
+        <PackageReference Include="Confluent.SchemaRegistry.Serdes.Avro" Version="2.2.0"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="6.0.2"/>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0"/>
     </ItemGroup>
 
