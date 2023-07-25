@@ -44,7 +44,7 @@ public class ProducerService
 
     public ProducerWithToken CreateProducer(CreateProducerRequest request, string owner)
     {
-        var wrapper = _provider.CreateProducer(request.Name, request.Config,
+        var wrapper = _provider.CreateProducer(request.Name, request.Config, request.KeyType, request.ValueType,
             TimeSpan.FromMilliseconds(request.ExpirationTimeoutMs), owner);
         return MapProducerWithToken(wrapper);
     }

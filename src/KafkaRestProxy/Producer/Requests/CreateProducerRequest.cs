@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.ComponentModel.DataAnnotations;
+using SergeSavel.KafkaRestProxy.Common.Contract;
 
 namespace SergeSavel.KafkaRestProxy.Producer.Requests;
 
@@ -23,4 +24,7 @@ public class CreateProducerRequest
     [Required] public Dictionary<string, string> Config { get; init; }
 
     [Required] [Range(1000, 86400000)] public int ExpirationTimeoutMs { get; init; }
+
+    public KeyValueType? KeyType { get; init; }
+    public KeyValueType? ValueType { get; init; }
 }

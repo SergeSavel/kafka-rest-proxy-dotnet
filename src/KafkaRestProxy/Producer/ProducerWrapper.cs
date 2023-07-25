@@ -59,16 +59,21 @@ public class ProducerWrapper : ClientWrapper
         }
     }
 
+    public KeyValueType? KeyType { get; init; }
+    public KeyValueType? ValueType { get; init; }
+
     public async Task<DeliveryResult> ProduceAsync(string topic, int? partition, IMessage message)
     {
         var kafkaHeaders = Map(message.Headers);
 
+        var keyType = KeyType ?? message.KeyType;
         var keyContext = new SerializationContext(MessageComponentType.Key, topic, kafkaHeaders);
-        var keyBytes = await SerializeAsync(keyContext, message.Key, message.KeyType, message.KeySchema)
+        var keyBytes = await SerializeAsync(keyContext, message.Key, keyType, message.KeySchema)
             .ConfigureAwait(false);
 
+        var valueType = ValueType ?? message.ValueType;
         var valueContext = new SerializationContext(MessageComponentType.Value, topic, kafkaHeaders);
-        var valueBytes = await SerializeAsync(valueContext, message.Value, message.ValueType, message.ValueSchema)
+        var valueBytes = await SerializeAsync(valueContext, message.Value, valueType, message.ValueSchema)
             .ConfigureAwait(false);
 
         var kafkaMessage = new Message<byte[], byte[]>

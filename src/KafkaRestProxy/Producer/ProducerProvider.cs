@@ -15,6 +15,7 @@
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
 using SergeSavel.KafkaRestProxy.Common;
+using SergeSavel.KafkaRestProxy.Common.Contract;
 using SergeSavel.KafkaRestProxy.SchemaRegistry;
 
 namespace SergeSavel.KafkaRestProxy.Producer;
@@ -45,12 +46,14 @@ public class ProducerProvider : ClientProvider<ProducerWrapper>
     }
 
     public ProducerWrapper CreateProducer(string name, IEnumerable<KeyValuePair<string, string>> config,
-        TimeSpan expirationTimeout, string owner = null)
+        KeyValueType? keyType, KeyValueType? valueType, TimeSpan expirationTimeout, string owner = null)
     {
         var effectiveConfig = EffectiveConfig(_defaultConfig, config);
 
         var wrapper = new ProducerWrapper(name, effectiveConfig, _schemaRegistryService.Client, expirationTimeout)
         {
+            KeyType = keyType,
+            ValueType = valueType,
             Owner = owner
         };
 
