@@ -17,6 +17,7 @@ namespace SergeSavel.KafkaRestProxy.Common;
 public abstract class ClientWrapper : IDisposable
 {
     private readonly TimeSpan _expirationTimeout;
+    private static readonly Random XRandom = new();
 
     protected ClientWrapper(string name, IDictionary<string, string> config, TimeSpan expirationTimeout)
     {
@@ -32,7 +33,7 @@ public abstract class ClientWrapper : IDisposable
     public DateTime ExpiresAt { get; private set; }
     public bool IsExpired => DateTime.Now >= ExpiresAt;
     public string User { get; }
-    public string Token { get; } = Guid.NewGuid().ToString();
+    public string Token { get; } = GenerateToken();
 
     public abstract void Dispose();
 
@@ -45,5 +46,16 @@ public abstract class ClientWrapper : IDisposable
     {
         if (!config.TryGetValue("sasl.username", out var username)) return null;
         return username;
+    }
+    
+    private static string GenerateToken()
+    {
+        const int length = 8;
+        var chars = new char[length];
+        for (var i = 0; i < length; i++)
+        {
+            chars[i] = (char)XRandom.Next('A', 'A' + 26);
+        }
+        return new string(chars);
     }
 }
