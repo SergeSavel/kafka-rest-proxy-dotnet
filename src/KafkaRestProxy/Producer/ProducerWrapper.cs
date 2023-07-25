@@ -124,7 +124,7 @@ public class ProducerWrapper : ClientWrapper
                 GenericRecord genericRecord;
                 try
                 {
-                    genericRecord = stringData.AsGenericRecord(schema, _schemaCache);
+                    genericRecord = stringData.AsAvroGenericRecord(schema, _schemaCache);
                 }
                 catch (Exception e)
                 {

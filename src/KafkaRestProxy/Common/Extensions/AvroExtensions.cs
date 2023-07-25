@@ -464,7 +464,7 @@ public static class AvroExtensions
 
     #region Serialization
 
-    public static GenericRecord AsGenericRecord(this string xmlString, string schemaString,
+    public static GenericRecord AsAvroGenericRecord(this string xmlString, string schemaString,
         ConcurrentDictionary<string, RecordSchema> schemaCache)
     {
         if (string.IsNullOrEmpty(xmlString))
