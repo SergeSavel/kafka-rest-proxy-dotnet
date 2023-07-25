@@ -18,10 +18,8 @@ namespace SergeSavel.KafkaRestProxy.Producer.Contract;
 
 public interface IMessage
 {
-    [Obsolete] KeyValueType KeyType { get; }
     string KeySchema { get; }
     string Key { get; }
-    [Obsolete] KeyValueType ValueType { get; }
     string ValueSchema { get; }
     string Value { get; }
     IDictionary<string, string> Headers { get; }

@@ -41,10 +41,15 @@ public class ProducerWrapper : ClientWrapper
     private readonly SemaphoreSlim _semaphore = new(1);
     private AvroSerializer<GenericRecord> _avroSerializer;
 
-    public ProducerWrapper(string name, IDictionary<string, string> config,
+    public KeyValueType KeyType { get; }
+    public KeyValueType ValueType { get; }
+    
+    public ProducerWrapper(string name, IDictionary<string, string> config, KeyValueType keyType, KeyValueType valueType,
         ISchemaRegistryClient schemaRegistryClient, TimeSpan expirationTimeout) : base(name, config,
         expirationTimeout)
     {
+        KeyType = keyType;
+        ValueType = valueType;
         _schemaRegistryClient = schemaRegistryClient;
         try
         {
@@ -58,22 +63,17 @@ public class ProducerWrapper : ClientWrapper
             throw new ClientConfigException(e);
         }
     }
-
-    public KeyValueType? KeyType { get; init; }
-    public KeyValueType? ValueType { get; init; }
-
+    
     public async Task<DeliveryResult> ProduceAsync(string topic, int? partition, IMessage message)
     {
         var kafkaHeaders = Map(message.Headers);
 
-        var keyType = KeyType ?? message.KeyType;
         var keyContext = new SerializationContext(MessageComponentType.Key, topic, kafkaHeaders);
-        var keyBytes = await SerializeAsync(keyContext, message.Key, keyType, message.KeySchema)
+        var keyBytes = await SerializeAsync(keyContext, message.Key, KeyType, message.KeySchema)
             .ConfigureAwait(false);
 
-        var valueType = ValueType ?? message.ValueType;
         var valueContext = new SerializationContext(MessageComponentType.Value, topic, kafkaHeaders);
-        var valueBytes = await SerializeAsync(valueContext, message.Value, valueType, message.ValueSchema)
+        var valueBytes = await SerializeAsync(valueContext, message.Value, ValueType, message.ValueSchema)
             .ConfigureAwait(false);
 
         var kafkaMessage = new Message<byte[], byte[]>

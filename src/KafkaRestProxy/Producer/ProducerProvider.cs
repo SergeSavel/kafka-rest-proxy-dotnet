@@ -47,14 +47,12 @@ public class ProducerProvider : ClientProvider<ProducerWrapper>
     }
 
     public ProducerWrapper CreateProducer(string name, IEnumerable<KeyValuePair<string, string>> config,
-        KeyValueType? keyType, KeyValueType? valueType, TimeSpan expirationTimeout, string owner = null)
+        KeyValueType keyType, KeyValueType valueType, TimeSpan expirationTimeout, string owner = null)
     {
         var effectiveConfig = EffectiveConfig(_defaultConfig, config);
 
-        var wrapper = new ProducerWrapper(name, effectiveConfig, _schemaRegistryService.Client, expirationTimeout)
+        var wrapper = new ProducerWrapper(name, effectiveConfig, keyType, valueType, _schemaRegistryService.Client, expirationTimeout)
         {
-            KeyType = keyType,
-            ValueType = valueType,
             Owner = owner
         };
 
