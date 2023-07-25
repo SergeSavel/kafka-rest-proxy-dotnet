@@ -77,7 +77,7 @@ public class ConsumerService
 
     public ConsumerMessage Consume(Guid consumerId, string token, TimeSpan timeout)
     {
-        var eventId = new EventId(Thread.CurrentThread.ManagedThreadId);
+        var eventId = new EventId(Environment.CurrentManagedThreadId);
 
         var wrapper = _provider.GetItem(consumerId, token);
         wrapper.UpdateExpiration();
@@ -140,7 +140,7 @@ public class ConsumerService
             ValueType = Enum.GetName(source.ValueType),
             ExpiresAt = source.ExpiresAt,
             Owner = source.Owner,
-            Token = source.Token
+            Token = source.Token,
         };
     }
 }
