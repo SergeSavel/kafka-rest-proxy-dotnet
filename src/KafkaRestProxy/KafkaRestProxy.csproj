@@ -6,8 +6,8 @@
         <Company>Serge Savel</Company>
         <Nullable>disable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <AssemblyVersion>3.2</AssemblyVersion>
-        <FileVersion>3.2.0</FileVersion>
+        <AssemblyVersion>3.3</AssemblyVersion>
+        <FileVersion>3.3.0</FileVersion>
         <Product>Kafka REST Proxy</Product>
         <Title>Kafka REST Proxy</Title>
         <Authors>Sergey Savelev</Authors>
@@ -15,7 +15,7 @@
         <Copyright>Sergey Savelev</Copyright>
         <PackageLicenseUrl>https://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/SergeSavel/kafka-rest-proxy-dotnet</RepositoryUrl>
-        <PackageVersion>3.1.7</PackageVersion>
+        <PackageVersion>3.3.0</PackageVersion>
     </PropertyGroup>
 
     <PropertyGroup>
