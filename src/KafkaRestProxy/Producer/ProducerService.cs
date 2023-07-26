@@ -69,6 +69,8 @@ public class ProducerService
         {
             Id = source.Id,
             Name = source.Name,
+            KeyType = Enum.GetName(source.KeyType),
+            ValueType = Enum.GetName(source.ValueType),
             User = source.User,
             ExpiresAt = source.ExpiresAt,
             Owner = source.Owner
@@ -81,6 +83,8 @@ public class ProducerService
         {
             Id = source.Id,
             Name = source.Name,
+            KeyType = Enum.GetName(source.KeyType),
+            ValueType = Enum.GetName(source.ValueType),
             User = source.User,
             ExpiresAt = source.ExpiresAt,
             Owner = source.Owner,

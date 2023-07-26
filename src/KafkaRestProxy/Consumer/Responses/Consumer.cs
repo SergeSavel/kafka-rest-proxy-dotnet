@@ -18,9 +18,9 @@ public class Consumer
 {
     public Guid Id { get; init; }
     public string Name { get; init; }
-    public string User { get; init; }
-    public DateTime ExpiresAt { get; init; }
     public string KeyType { get; init; }
     public string ValueType { get; init; }
+    public string User { get; init; }
+    public DateTime ExpiresAt { get; init; }
     public string Owner { get; init; }
 }
