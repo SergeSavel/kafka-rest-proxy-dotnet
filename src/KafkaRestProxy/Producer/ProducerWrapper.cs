@@ -68,7 +68,7 @@ public class ProducerWrapper : ClientWrapper
 
     public Task SetSchemaAsync(string type, string schemaString)
     {
-        if (type.StartsWith("Avro", StringComparison.OrdinalIgnoreCase))
+        if (type.StartsWith("AVRO", StringComparison.OrdinalIgnoreCase))
         {
             RecordSchema schema;
             try
