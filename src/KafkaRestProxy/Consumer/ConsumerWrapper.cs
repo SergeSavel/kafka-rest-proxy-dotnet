@@ -233,7 +233,7 @@ public class ConsumerWrapper : ClientWrapper
             KeyValueType.Ignore => StringDeserializers.Ignore,
             KeyValueType.Bytes => StringDeserializers.Base64,
             KeyValueType.String => StringDeserializers.Utf8,
-            KeyValueType.AvroAsXml => GetAvroDeserializer(),
+            KeyValueType.Avro => GetAvroDeserializer(),
             _ => throw new ArgumentException($"Unexpected key/value type: {keyValueType}", nameof(keyValueType))
         };
     }

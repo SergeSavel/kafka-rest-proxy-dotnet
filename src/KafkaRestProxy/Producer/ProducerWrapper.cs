@@ -146,7 +146,7 @@ public class ProducerWrapper : ClientWrapper
                 result = Serializers.ByteArray.Serialize(data, serializationContext);
                 break;
             }
-            case KeyValueType.AvroAsXml:
+            case KeyValueType.Avro:
             {
                 GenericRecord genericRecord;
                 try

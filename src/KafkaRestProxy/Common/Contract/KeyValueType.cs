@@ -20,5 +20,5 @@ public enum KeyValueType
     Ignore,
     Bytes,
     String,
-    AvroAsXml
+    Avro
 }
