@@ -86,6 +86,30 @@ public class ProducerController : ControllerBase
         return NoContent();
     }
 
+    /// <summary>Add/replace schema.</summary>
+    /// <param name="producerId">Producer instance Id.</param>
+    /// <param name="token">Security token obtained while creating current instance.</param>
+    /// <param name="type">Schema type.</param>
+    /// <param name="schema">Schema string.</param>
+    /// <response code="200">Schema added successfully.</response>
+    /// <response code="400">An error occured during schema parsing.</response>
+    /// <response code="403">Invalid token.</response>
+    /// <response code="404">Instance not found.</response>
+    /// <response code="500">An error occured during schema parsing.</response>
+    [HttpPut("{producerId:guid}/schemas")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> SetSchemaAsync(Guid producerId, [Required] string token, [Required] string type,
+        [FromBody] string schema)
+    {
+        await _service.SetSchemaAsync(producerId, token, type, schema)
+            .ConfigureAwait(false);
+        return Ok();
+    }
+
     /// <summary>Post new message.</summary>
     /// <param name="producerId">Producer instance Id.</param>
     /// <param name="token">Security token obtained while creating current instance.</param>

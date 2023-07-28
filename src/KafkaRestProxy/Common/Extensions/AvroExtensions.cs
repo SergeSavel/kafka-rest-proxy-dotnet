@@ -464,7 +464,7 @@ public static class AvroExtensions
 
     #region Serialization
 
-    public static GenericRecord AsAvroGenericRecord(this string xmlString, string schemaString,
+    public static GenericRecord AsAvroGenericRecord(this string xmlString,
         ConcurrentDictionary<string, RecordSchema> schemaCache)
     {
         if (string.IsNullOrEmpty(xmlString))
@@ -482,7 +482,7 @@ public static class AvroExtensions
         RecordSchema schema;
         try
         {
-            schema = GetSchema(rootElement, schemaString, schemaCache);
+            schema = GetSchema(rootElement, schemaCache);
         }
         catch (Exception e)
         {
@@ -502,8 +502,7 @@ public static class AvroExtensions
         return result;
     }
 
-    private static RecordSchema GetSchema(XElement rootElement, string schemaString,
-        ConcurrentDictionary<string, RecordSchema> schemaCache)
+    private static RecordSchema GetSchema(XElement rootElement, ConcurrentDictionary<string, RecordSchema> schemaCache)
     {
         var schemaName = rootElement.Attribute(XName)?.Value;
         if (string.IsNullOrWhiteSpace(schemaName))
@@ -515,26 +514,8 @@ public static class AvroExtensions
             (string.IsNullOrWhiteSpace(schemaNamespace) ? schemaName : schemaNamespace + "." + schemaName)
             .ToUpperInvariant();
 
-        RecordSchema schema;
-
-        if (schemaString == null)
-        {
-            if (!schemaCache.TryGetValue(schemaFullName, out schema))
-                throw new SerializationException("Schema isn't found in local cache.");
-        }
-        else
-        {
-            try
-            {
-                schema = (RecordSchema)Schema.Parse(schemaString);
-            }
-            catch (SchemaParseException e)
-            {
-                throw new SerializationException("An error occured while parsing schema: " + e.Message);
-            }
-
-            schemaCache.AddOrUpdate(schemaFullName, _ => schema, (_, _) => schema);
-        }
+        if (!schemaCache.TryGetValue(schemaFullName, out var schema))
+            throw new SerializationException("Schema isn't found in local cache.");
 
         return schema;
     }

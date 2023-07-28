@@ -27,24 +27,23 @@ using SergeSavel.KafkaRestProxy.Producer.Contract;
 using SergeSavel.KafkaRestProxy.Producer.Exceptions;
 using SergeSavel.KafkaRestProxy.Producer.Responses;
 using KafkaException = Confluent.Kafka.KafkaException;
+using Schema = Avro.Schema;
 
 namespace SergeSavel.KafkaRestProxy.Producer;
 
 public class ProducerWrapper : ClientWrapper
 {
     private static readonly ISerializer<byte[]> XSerializer = new RawSerializer();
+    private readonly ConcurrentDictionary<string, RecordSchema> _avroSchemaCache = new();
     private readonly IProducer<byte[], byte[]> _producer;
-    private readonly ConcurrentDictionary<string, RecordSchema> _schemaCache = new();
 
     private readonly ISchemaRegistryClient _schemaRegistryClient;
 
     private readonly SemaphoreSlim _semaphore = new(1);
     private AvroSerializer<GenericRecord> _avroSerializer;
 
-    public KeyValueType KeyType { get; }
-    public KeyValueType ValueType { get; }
-    
-    public ProducerWrapper(string name, IDictionary<string, string> config, KeyValueType keyType, KeyValueType valueType,
+    public ProducerWrapper(string name, IDictionary<string, string> config, KeyValueType keyType,
+        KeyValueType valueType,
         ISchemaRegistryClient schemaRegistryClient, TimeSpan expirationTimeout) : base(name, config,
         expirationTimeout)
     {
@@ -63,17 +62,45 @@ public class ProducerWrapper : ClientWrapper
             throw new ClientConfigException(e);
         }
     }
-    
+
+    public KeyValueType KeyType { get; }
+    public KeyValueType ValueType { get; }
+
+    public Task SetSchemaAsync(string type, string schemaString)
+    {
+        if (type.StartsWith("Avro", StringComparison.OrdinalIgnoreCase))
+        {
+            RecordSchema schema;
+            try
+            {
+                schema = (RecordSchema)Schema.Parse(schemaString);
+            }
+            catch (SchemaParseException e)
+            {
+                throw new SerializationException("An error occured while parsing schema", e);
+            }
+
+            var schemaFullName = schema.Fullname.ToUpperInvariant();
+            _avroSchemaCache.AddOrUpdate(schemaFullName, _ => schema, (_, _) => schema);
+        }
+        else
+        {
+            throw new SerializationException($"Invalid schema type: '{type}'.") { StatusCode = 400 };
+        }
+
+        return Task.CompletedTask;
+    }
+
     public async Task<DeliveryResult> ProduceAsync(string topic, int? partition, IMessage message)
     {
         var kafkaHeaders = Map(message.Headers);
 
         var keyContext = new SerializationContext(MessageComponentType.Key, topic, kafkaHeaders);
-        var keyBytes = await SerializeAsync(keyContext, message.Key, KeyType, message.KeySchema)
+        var keyBytes = await SerializeAsync(keyContext, message.Key, KeyType)
             .ConfigureAwait(false);
 
         var valueContext = new SerializationContext(MessageComponentType.Value, topic, kafkaHeaders);
-        var valueBytes = await SerializeAsync(valueContext, message.Value, ValueType, message.ValueSchema)
+        var valueBytes = await SerializeAsync(valueContext, message.Value, ValueType)
             .ConfigureAwait(false);
 
         var kafkaMessage = new Message<byte[], byte[]>
@@ -102,7 +129,7 @@ public class ProducerWrapper : ClientWrapper
     }
 
     private async Task<byte[]> SerializeAsync(SerializationContext serializationContext, string stringData,
-        KeyValueType dataType, string schema)
+        KeyValueType dataType)
     {
         byte[] result;
         switch (dataType)
@@ -124,7 +151,7 @@ public class ProducerWrapper : ClientWrapper
                 GenericRecord genericRecord;
                 try
                 {
-                    genericRecord = stringData.AsAvroGenericRecord(schema, _schemaCache);
+                    genericRecord = stringData.AsAvroGenericRecord(_avroSchemaCache);
                 }
                 catch (Exception e)
                 {
