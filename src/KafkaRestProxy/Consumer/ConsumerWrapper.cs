@@ -1,11 +1,11 @@
-﻿// Copyright 2021 Sergey Savelev
-//
+﻿// Copyright 2023 Sergey Savelev
+// 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -36,9 +36,6 @@ public class ConsumerWrapper : ClientWrapper
     private readonly SemaphoreSlim _semaphore = new(1);
     private IDeserializer<string> _avroDeserializer;
 
-    public KeyValueType KeyType { get; }
-    public KeyValueType ValueType { get; }
-    
     public ConsumerWrapper(string name, IDictionary<string, string> config, KeyValueType keyType,
         KeyValueType valueType, ISchemaRegistryClient schemaRegistryClient, TimeSpan expirationTimeout) : base(name,
         config, expirationTimeout)
@@ -60,7 +57,10 @@ public class ConsumerWrapper : ClientWrapper
             throw new ClientConfigException(e);
         }
     }
-    
+
+    public KeyValueType KeyType { get; }
+    public KeyValueType ValueType { get; }
+
     public ICollection<TopicPartition> GetAssignment()
     {
         return _consumer.Assignment
@@ -258,7 +258,7 @@ public class ConsumerWrapper : ClientWrapper
 
         return _avroDeserializer;
     }
-    
+
     private static TopicPartition Map(Confluent.Kafka.TopicPartition source)
     {
         return new TopicPartition
