@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.ComponentModel.DataAnnotations;
+using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SergeSavel.KafkaRestProxy.Producer.Requests;
@@ -89,24 +90,24 @@ public class ProducerController : ControllerBase
     /// <summary>Add/replace schema.</summary>
     /// <param name="producerId">Producer instance Id.</param>
     /// <param name="token">Security token obtained while creating current instance.</param>
-    /// <param name="type">Schema type.</param>
-    /// <param name="schema">Schema string.</param>
     /// <response code="200">Schema added successfully.</response>
     /// <response code="400">An error occured during schema parsing.</response>
     /// <response code="403">Invalid token.</response>
     /// <response code="404">Instance not found.</response>
     /// <response code="500">An error occured during schema parsing.</response>
     [HttpPut("{producerId:guid}/schemas")]
+    [Consumes("text/plain; charset=utf-8")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status415UnsupportedMediaType)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> SetSchemaAsync(Guid producerId, [Required] string token, [Required] string type,
-        [FromBody] string schema)
+    public async Task<IActionResult> SetSchemaAsync(Guid producerId, [Required] string token)
     {
-        await _service.SetSchemaAsync(producerId, token, type, schema)
-            .ConfigureAwait(false);
+        using var reader = new StreamReader(Request.Body, Encoding.UTF8);
+        var schema = await reader.ReadToEndAsync();
+        await _service.SetSchemaAsync(producerId, token, schema).ConfigureAwait(false);
         return Ok();
     }
 

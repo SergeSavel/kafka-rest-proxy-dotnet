@@ -324,8 +324,7 @@ public static class AvroExtensions
         parent.Add(element);
     }
 
-    private static void AddEnum(XContainer parent, GenericEnum value, string name = null,
-        string nspace = null)
+    private static void AddEnum(XContainer parent, GenericEnum value, string name = null, string nspace = null)
     {
         var element = new XElement(XEnum);
 
@@ -343,6 +342,8 @@ public static class AvroExtensions
     private static void AddArray(XContainer parent, Array value, Schema schema, string name = null)
     {
         var arraySchema = GetEffectiveSchema<ArraySchema>(schema);
+        if (arraySchema == null)
+            throw new DeserializationException("Array schema not found.");
 
         var element = new XElement(XArray);
 
@@ -354,10 +355,12 @@ public static class AvroExtensions
         parent.Add(element);
     }
 
-    private static void AddMap(XContainer parent, IDictionary<string, object> value, Schema schema,
-        string name = null)
+    private static void AddMap(XContainer parent, IDictionary<string, object> value, Schema schema, string name = null)
     {
         var mapSchema = GetEffectiveSchema<MapSchema>(schema);
+        if (mapSchema == null)
+            throw new DeserializationException("Array schema not found.");
+
         var element = new XElement(XMap);
 
         if (name != null)
@@ -374,8 +377,7 @@ public static class AvroExtensions
         parent.Add(element);
     }
 
-    private static void AddFixed(XContainer parent, GenericFixed value, string name = null,
-        string nspace = null)
+    private static void AddFixed(XContainer parent, GenericFixed value, string name = null, string nspace = null)
     {
         var element = new XElement(XFixed);
 
@@ -385,14 +387,12 @@ public static class AvroExtensions
         if (nspace != null)
             element.SetAttributeValue(XNamespace, nspace);
 
-        //element.Value = BitConverter.ToString(value.Value).Replace("-", string.Empty).ToLowerInvariant();
         element.Value = Convert.ToBase64String(value.Value);
 
         parent.Add(element);
     }
 
-    private static void AddDecimal(XContainer parent, AvroDecimal value, string name = null,
-        string nspace = null)
+    private static void AddDecimal(XContainer parent, AvroDecimal value, string name = null, string nspace = null)
     {
         var element = new XElement(XDecimal);
 
@@ -408,8 +408,7 @@ public static class AvroExtensions
         parent.Add(element);
     }
 
-    private static void AddUuid(XContainer parent, Guid value, string name = null,
-        string nspace = null)
+    private static void AddUuid(XContainer parent, Guid value, string name = null, string nspace = null)
     {
         var element = new XElement(XUuid);
 
@@ -428,6 +427,8 @@ public static class AvroExtensions
         string nspace = null)
     {
         var logicalSchema = GetEffectiveSchema<LogicalSchema>(schema);
+        if (logicalSchema == null)
+            throw new DeserializationException("Logical schema not found.");
 
         var element = new XElement(logicalSchema.LogicalTypeName); // ???
 
@@ -446,6 +447,8 @@ public static class AvroExtensions
         string nspace = null)
     {
         var logicalSchema = GetEffectiveSchema<LogicalSchema>(schema);
+        if (logicalSchema == null)
+            throw new DeserializationException("Logical schema not found.");
 
         var element = new XElement(logicalSchema.LogicalTypeName); // ???
 
@@ -532,8 +535,8 @@ public static class AvroExtensions
             LongString => XmlConvert.ToInt64(element.Value),
             FloatString => XmlConvert.ToSingle(element.Value),
             DoubleString => XmlConvert.ToDouble(element.Value),
-            BytesString => Convert.FromBase64String(element.Value),
-            StringString => element.Value,
+            BytesString => ParseBytes(element, schema),
+            StringString => ParseString(element, schema),
             RecordString => ParseRecord(element, schema),
             EnumString => ParseEnum(element, schema),
             ArrayString => ParseArray(element, schema),
@@ -550,92 +553,149 @@ public static class AvroExtensions
         };
     }
 
+    private static object ParseBytes(XElement element, Schema schema)
+    {
+        var bytesSchema = GetEffectiveSchema<PrimitiveSchema>(schema, Schema.Type.Bytes);
+        if (bytesSchema != null) return Convert.FromBase64String(element.Value);
+
+        var fixedSchema = GetEffectiveSchema<FixedSchema>(schema, Schema.Type.Fixed);
+        if (fixedSchema != null) return new GenericFixed(fixedSchema, Convert.FromBase64String(element.Value));
+
+        throw new SerializationException(
+            $"Cannot infer bytes schema from schema '{schema}'.");
+    }
+
+    private static object ParseString(XElement element, Schema schema)
+    {
+        var stringSchema = GetEffectiveSchema<PrimitiveSchema>(schema, Schema.Type.String);
+        if (stringSchema != null) return element.Value;
+
+        var enumSchema = GetEffectiveSchema<EnumSchema>(schema, Schema.Type.Enumeration);
+        if (enumSchema != null) return new GenericEnum(enumSchema, element.Value);
+
+        throw new SerializationException(
+            $"Cannot infer string schema from schema '{schema}'.");
+    }
+
     private static GenericRecord ParseRecord(XContainer element, Schema schema)
     {
-        var effectiveSchema = GetEffectiveSchema<RecordSchema>(schema);
-        var record = new GenericRecord(effectiveSchema);
-
-        foreach (var childElement in element.Elements())
+        var recordSchema = GetEffectiveSchema<RecordSchema>(schema, Schema.Type.Record);
+        if (recordSchema != null)
         {
-            var fieldName = childElement.Attribute(XName)?.Value;
-            if (string.IsNullOrWhiteSpace(fieldName))
-                throw new SerializationException("Element doesn't have a name.");
+            var record = new GenericRecord(recordSchema);
 
-            if (!effectiveSchema.TryGetField(fieldName, out var field))
-                if (!effectiveSchema.TryGetFieldAlias(fieldName, out field))
-                    throw new SerializationException(
-                        $"Field '{fieldName}' not found in schema '{effectiveSchema.SchemaName}'.");
+            foreach (var childElement in element.Elements())
+            {
+                var fieldName = childElement.Attribute(XName)?.Value;
+                if (string.IsNullOrWhiteSpace(fieldName))
+                    throw new SerializationException("Element doesn't have a name.");
 
-            try
-            {
-                record.Add(field.Pos, ParseValue(childElement, field.Schema));
+                if (!recordSchema.TryGetField(fieldName, out var field))
+                    if (!recordSchema.TryGetFieldAlias(fieldName, out field))
+                        throw new SerializationException(
+                            $"Field '{fieldName}' not found in schema '{recordSchema.SchemaName}'.");
+
+                try
+                {
+                    var value = ParseValue(childElement, field.Schema);
+                    record.Add(field.Pos, value);
+                }
+                catch (Exception e)
+                {
+                    throw new SerializationException($"Cannot parse record field '{fieldName}'.", e);
+                }
             }
-            catch (Exception e)
-            {
-                throw new SerializationException($"Cannot parse record field '{fieldName}'.", e);
-            }
+
+            return record;
         }
 
-        return record;
+        throw new SerializationException(
+            $"Cannot infer record schema from schema '{schema}'.");
     }
 
     private static GenericEnum ParseEnum(XElement element, Schema schema)
     {
-        var effectiveSchema = GetEffectiveSchema<EnumSchema>(schema);
-        return new GenericEnum(effectiveSchema, element.Value);
+        var enumSchema = GetEffectiveSchema<EnumSchema>(schema, Schema.Type.Enumeration);
+        if (enumSchema != null) return new GenericEnum(enumSchema, element.Value);
+
+        throw new SerializationException(
+            $"Cannot infer enum schema from schema '{schema}'.");
     }
 
     private static Array ParseArray(XContainer element, Schema schema)
     {
-        var effectiveSchema = GetEffectiveSchema<ArraySchema>(schema);
-        var list = new ArrayList();
-
-        foreach (var childElement in element.Elements())
-            list.Add(ParseValue(childElement, effectiveSchema.ItemSchema));
-
-        return list.ToArray();
-    }
-
-    private static IDictionary<string, object> ParseMap(XElement element, Schema schema)
-    {
-        var effectiveSchema = GetEffectiveSchema<MapSchema>(schema);
-        var map = new Dictionary<string, object>();
-
-        foreach (var childElement in element.Elements())
+        var arraySchema = GetEffectiveSchema<ArraySchema>(schema, Schema.Type.Array);
+        if (arraySchema != null)
         {
-            var keyAttribute = childElement.Attribute(XKey);
-            if (keyAttribute == null)
-                throw new SerializationException("Map item element doesn't have a 'key' attribute.");
-
-            map.Add(keyAttribute.Value,
-                ParseValue(childElement.Elements().First(), effectiveSchema.ValueSchema));
+            var list = new ArrayList();
+            foreach (var childElement in element.Elements())
+                list.Add(ParseValue(childElement, arraySchema.ItemSchema));
+            return list.ToArray();
         }
 
-        return map;
+        throw new SerializationException(
+            $"Cannot infer array schema from schema '{schema}'.");
+    }
+
+    private static IDictionary<string, object> ParseMap(XContainer element, Schema schema)
+    {
+        var mapSchema = GetEffectiveSchema<MapSchema>(schema, Schema.Type.Map);
+        if (mapSchema != null)
+        {
+            var map = new Dictionary<string, object>();
+            foreach (var childElement in element.Elements())
+            {
+                var keyAttribute = childElement.Attribute(XKey);
+                if (keyAttribute == null)
+                    throw new SerializationException("Map item element doesn't have a 'key' attribute.");
+
+                map.Add(keyAttribute.Value,
+                    ParseValue(childElement.Elements().First(), mapSchema.ValueSchema));
+            }
+
+            return map;
+        }
+
+        throw new SerializationException(
+            $"Cannot infer map schema from schema '{schema}'.");
     }
 
     private static GenericFixed ParseFixed(XElement element, Schema schema)
     {
-        var effectiveSchema = GetEffectiveSchema<FixedSchema>(schema);
-        //return new GenericFixed(effectiveSchema, Convert.FromHexString(element.Value));
-        return new GenericFixed(effectiveSchema, Convert.FromBase64String(element.Value));
+        var fixedSchema = GetEffectiveSchema<FixedSchema>(schema, Schema.Type.Fixed);
+        if (fixedSchema != null) return new GenericFixed(fixedSchema, Convert.FromBase64String(element.Value));
+
+        throw new SerializationException(
+            $"Cannot infer fixed schema from schema '{schema}'.");
     }
 
-    private static AvroDecimal ParseDecimal(XElement element, Schema schema)
+    private static object ParseDecimal(XElement element, Schema schema)
     {
-        var effectiveSchema = GetEffectiveSchema<LogicalSchema>(schema);
-        var targetScale = GetScalePropertyValueFromSchema(effectiveSchema);
+        var decimalSchema = GetLogicalSchema(schema, DecimalString);
+        if (decimalSchema != null)
+        {
+            var targetScale = GetScalePropertyValueFromSchema(decimalSchema);
 
-        var value = XmlConvert.ToDecimal(element.Value);
+            var decimalValue = XmlConvert.ToDecimal(element.Value);
 
-        var actualScale = value.GetScale();
-        if (targetScale > actualScale)
-            value = decimal.Multiply(value, XScales[targetScale - actualScale]);
+            var actualScale = decimalValue.GetScale();
+            if (targetScale > actualScale)
+                decimalValue = decimal.Multiply(decimalValue, XScales[targetScale - actualScale]);
 
-        return new AvroDecimal(value);
+            return new AvroDecimal(decimalValue);
+        }
+
+        var longSchema = GetEffectiveSchema<PrimitiveSchema>(schema, Schema.Type.Long);
+        if (longSchema != null) return XmlConvert.ToInt64(element.Value);
+
+        var intSchema = GetEffectiveSchema<PrimitiveSchema>(schema, Schema.Type.Int);
+        if (intSchema != null) return XmlConvert.ToInt32(element.Value);
+
+        throw new SerializationException(
+            $"Cannot infer logical schema ('{DecimalString}') from schema '{schema}'.");
     }
 
-    private static int GetScalePropertyValueFromSchema(Schema schema, int defaultVal = 0)
+    private static int GetScalePropertyValueFromSchema(LogicalSchema schema, int defaultVal = 0)
     {
         var scaleVal = schema.GetProperty("scale");
 
@@ -644,72 +704,187 @@ public static class AvroExtensions
 
     private static Guid ParseUuid(XElement element, Schema schema)
     {
-        var unused = GetEffectiveSchema<LogicalSchema>(schema);
-        return Guid.Parse(element.Value);
+        var uuidSchema = GetLogicalSchema(schema, UuidString);
+        if (uuidSchema != null) return Guid.Parse(element.Value);
+
+        throw new SerializationException(
+            $"Cannot infer logical schema ('{UuidString}') from schema '{schema}'.");
     }
 
     private static DateTime ParseDate(XElement element, Schema schema)
     {
-        var unused = GetEffectiveSchema<LogicalSchema>(schema);
-        var value = XmlConvert.ToDateTime(element.Value, XmlDateTimeSerializationMode.Unspecified);
-        return value;
+        var dateSchema = GetLogicalSchema(schema, DateString);
+        if (dateSchema != null)
+        {
+            var value = XmlConvert.ToDateTime(element.Value, XmlDateTimeSerializationMode.Unspecified);
+            return value;
+        }
+
+        var timestampMillisSchema = GetLogicalSchema(schema, TimestampMillisString);
+        if (timestampMillisSchema != null)
+        {
+            var value = XmlConvert.ToDateTime(element.Value, XmlDateTimeSerializationMode.Utc);
+            return value;
+        }
+
+        var timestampMicrosSchema = GetLogicalSchema(schema, TimestampMicrosString);
+        if (timestampMicrosSchema != null)
+        {
+            var value = XmlConvert.ToDateTime(element.Value, XmlDateTimeSerializationMode.Utc);
+            return value;
+        }
+
+        throw new SerializationException(
+            $"Cannot infer logical schema ('{DateString}') from schema '{schema}'.");
     }
 
     private static DateTime ParseTimestampMillis(XElement element, Schema schema)
     {
-        var unused = GetEffectiveSchema<LogicalSchema>(schema);
-        var value = XmlConvert.ToDateTime(element.Value, XmlDateTimeSerializationMode.Utc);
-        return value;
+        var timestampMillisSchema = GetLogicalSchema(schema, TimestampMillisString);
+        if (timestampMillisSchema != null)
+        {
+            var value = XmlConvert.ToDateTime(element.Value, XmlDateTimeSerializationMode.Utc);
+            return value;
+        }
+
+        var timestampMicrosSchema = GetLogicalSchema(schema, TimestampMicrosString);
+        if (timestampMicrosSchema != null)
+        {
+            var value = XmlConvert.ToDateTime(element.Value, XmlDateTimeSerializationMode.Utc);
+            return value;
+        }
+
+        var dateSchema = GetLogicalSchema(schema, DateString);
+        if (dateSchema != null)
+        {
+            var value = XmlConvert.ToDateTime(element.Value, XmlDateTimeSerializationMode.Unspecified);
+            if (value is { Hour: 0, Minute: 0, Second: 0, Millisecond: 0 })
+                return value;
+        }
+
+        throw new SerializationException(
+            $"Cannot infer logical schema ('{TimestampMillisString}') from schema '{schema}'.");
     }
 
     private static DateTime ParseTimestampMicros(XElement element, Schema schema)
     {
-        var unused = GetEffectiveSchema<LogicalSchema>(schema);
-        var value = XmlConvert.ToDateTime(element.Value, XmlDateTimeSerializationMode.Utc);
-        return value;
+        var timestampMicrosSchema = GetLogicalSchema(schema, TimestampMicrosString);
+        if (timestampMicrosSchema != null)
+        {
+            var value = XmlConvert.ToDateTime(element.Value, XmlDateTimeSerializationMode.Utc);
+            return value;
+        }
+
+        throw new SerializationException(
+            $"Cannot infer logical schema ('{TimestampMicrosString}') from schema '{schema}'.");
     }
 
     private static TimeSpan ParseTimeMillis(XElement element, Schema schema)
     {
-        var unused = GetEffectiveSchema<LogicalSchema>(schema);
-        var value = XmlConvert.ToTimeSpan(element.Value);
-        return value;
+        var timeMillisSchema = GetLogicalSchema(schema, TimeMillisString);
+        if (timeMillisSchema != null)
+        {
+            var value = XmlConvert.ToTimeSpan(element.Value);
+            return value;
+        }
+
+        var timeMicrosSchema = GetLogicalSchema(schema, TimeMicrosString);
+        if (timeMicrosSchema != null)
+        {
+            var value = XmlConvert.ToTimeSpan(element.Value);
+            return value;
+        }
+
+        throw new SerializationException(
+            $"Cannot infer logical schema ('{TimeMillisString}') from schema '{schema}'.");
     }
 
     private static TimeSpan ParseTimeMicros(XElement element, Schema schema)
     {
-        var unused = GetEffectiveSchema<LogicalSchema>(schema);
-        var value = XmlConvert.ToTimeSpan(element.Value);
-        return value;
+        var timeMicrosSchema = GetLogicalSchema(schema, TimeMicrosString);
+        if (timeMicrosSchema != null)
+        {
+            var value = XmlConvert.ToTimeSpan(element.Value);
+            return value;
+        }
+
+        throw new SerializationException(
+            $"Cannot infer logical schema ('{TimeMicrosString}') from schema '{schema}'.");
     }
 
     private static T GetEffectiveSchema<T>(Schema schema) where T : Schema
     {
         switch (schema)
         {
-            case T matchedSchema:
-                return matchedSchema;
+            case T typedSchema:
+                return typedSchema;
             case UnionSchema unionSchema:
             {
                 T result = null;
-
                 foreach (var innerSchema in unionSchema.Schemas)
-                    if (innerSchema is T matchedSchema)
+                    if (innerSchema is T typedSchema)
                     {
                         if (result != null)
                             throw new SerializationException(
-                                $"Schema '{typeof(T).Name}' presented in union more than once.");
-                        result = matchedSchema;
+                                $"Schema '{typeof(T)}' is presented in union more than once.");
+                        result = typedSchema;
                     }
-
-                if (result == null)
-                    throw new SerializationException($"Schema '{typeof(T).Name}' not included in union.");
 
                 return result;
             }
             default:
-                throw new SerializationException(
-                    $"Cannot convert schema '{schema.GetType()}' to '{typeof(T)}'.");
+                return null;
+        }
+    }
+
+    private static T GetEffectiveSchema<T>(Schema schema, Schema.Type tag) where T : Schema
+    {
+        switch (schema)
+        {
+            case T typedSchema:
+                return typedSchema.Tag == tag ? typedSchema : null;
+            case UnionSchema unionSchema:
+            {
+                T result = null;
+                foreach (var innerSchema in unionSchema.Schemas)
+                    if (innerSchema is T typedSchema && tag == typedSchema.Tag)
+                    {
+                        if (result != null)
+                            throw new SerializationException(
+                                $"Schema '{typeof(T)}({tag})' is presented in union more than once.");
+                        result = typedSchema;
+                    }
+
+                return result;
+            }
+            default:
+                return null;
+        }
+    }
+
+    private static LogicalSchema GetLogicalSchema(Schema schema, string logicalTypeName)
+    {
+        switch (schema)
+        {
+            case LogicalSchema logicalSchema:
+                return logicalSchema.LogicalTypeName.Equals(logicalTypeName) ? logicalSchema : null;
+            case UnionSchema unionSchema:
+            {
+                LogicalSchema result = null;
+                foreach (var innerSchema in unionSchema.Schemas)
+                    if (innerSchema is LogicalSchema logicalSchema &&
+                        logicalSchema.LogicalTypeName.Equals(logicalTypeName))
+                    {
+                        if (result != null)
+                            throw new SerializationException(
+                                $"Schema '{typeof(LogicalSchema)}({logicalTypeName})' is presented in union more than once.");
+                        result = logicalSchema;
+                    }
+
+                return result;
+            }
+            default:
+                return null;
         }
     }
 

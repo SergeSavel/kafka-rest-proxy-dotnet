@@ -66,9 +66,9 @@ public class ProducerWrapper : ClientWrapper
     public KeyValueType KeyType { get; }
     public KeyValueType ValueType { get; }
 
-    public Task SetSchemaAsync(string type, string schemaString)
+    public Task SetSchemaAsync(string schemaString)
     {
-        if (type.StartsWith("AVRO", StringComparison.OrdinalIgnoreCase))
+        if (KeyType == KeyValueType.Avro || ValueType == KeyValueType.Avro)
         {
             RecordSchema schema;
             try
@@ -85,7 +85,7 @@ public class ProducerWrapper : ClientWrapper
         }
         else
         {
-            throw new SerializationException($"Invalid schema type: '{type}'.") { StatusCode = 400 };
+            throw new SerializationException("Schemas not supported for this producer.") { StatusCode = 400 };
         }
 
         return Task.CompletedTask;

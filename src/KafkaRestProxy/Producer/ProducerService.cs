@@ -55,11 +55,11 @@ public class ProducerService
         _provider.RemoveItem(wrapper.Id);
     }
 
-    public async Task SetSchemaAsync(Guid producerId, string token, string type, string schema)
+    public async Task SetSchemaAsync(Guid producerId, string token, string schema)
     {
         var wrapper = _provider.GetItem(producerId, token);
         wrapper.UpdateExpiration();
-        await wrapper.SetSchemaAsync(type, schema).ConfigureAwait(false);
+        await wrapper.SetSchemaAsync(schema).ConfigureAwait(false);
     }
 
     public async Task<DeliveryResult> ProduceAsync(Guid producerId, string token, string topic, int? partition,
