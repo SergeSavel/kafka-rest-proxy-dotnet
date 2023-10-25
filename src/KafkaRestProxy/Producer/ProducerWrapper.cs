@@ -19,6 +19,7 @@ using Avro.Generic;
 using Confluent.Kafka;
 using Confluent.SchemaRegistry;
 using Confluent.SchemaRegistry.Serdes;
+using Newtonsoft.Json;
 using SergeSavel.KafkaRestProxy.Common;
 using SergeSavel.KafkaRestProxy.Common.Contract;
 using SergeSavel.KafkaRestProxy.Common.Exceptions;
@@ -76,6 +77,10 @@ public class ProducerWrapper : ClientWrapper
                 schema = (RecordSchema)Schema.Parse(schemaString);
             }
             catch (SchemaParseException e)
+            {
+                throw new SerializationException("An error occured while parsing schema", e);
+            }
+            catch (JsonException e)
             {
                 throw new SerializationException("An error occured while parsing schema", e);
             }
