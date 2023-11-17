@@ -78,6 +78,7 @@ public class AdminClientController : ControllerBase
     /// <response code="204">Instance successfully removed.</response>
     /// <response code="403">Invalid token.</response>
     /// <response code="404">Instance not found.</response>
+    /// <response code="500">Returns error details.</response>
     [HttpDelete("{clientId:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
