@@ -59,6 +59,12 @@ public class ConsumerService
         _logger.LogDebug("Removed consumer '{Id}' ('{Name}')", wrapper.Id, wrapper.Name);
     }
 
+    public void TouchConsumer(Guid producerId, string token)
+    {
+        var wrapper = _provider.GetItem(producerId, token);
+        wrapper.UpdateExpiration();
+    }
+
     public ICollection<TopicPartition> GetConsumerAssignment(Guid consumerId, string token)
     {
         var wrapper = _provider.GetItem(consumerId, token);

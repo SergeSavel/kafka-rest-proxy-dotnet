@@ -87,6 +87,24 @@ public class ConsumerController : ControllerBase
         return NoContent();
     }
 
+    /// <summary>Touch consumer.</summary>
+    /// <param name="consumerId">Consumer instance Id.</param>
+    /// <param name="token">Security token obtained while creating current instance.</param>
+    /// <response code="204">Consumer touched.</response>
+    /// <response code="403">Invalid token.</response>
+    /// <response code="404">Instance not found.</response>
+    [HttpGet("{consumerId:guid}/touch")]
+    [HttpPost("{consumerId:guid}/touch")]
+    [HttpPut("{consumerId:guid}/touch")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public IActionResult TouchConsumer(Guid consumerId, [Required] string token)
+    {
+        _service.TouchConsumer(consumerId, token);
+        return NoContent();
+    }
+
     /// <summary>
     ///     Sets the current set of assigned partitions
     ///     (the set of partitions the consumer will consume from).

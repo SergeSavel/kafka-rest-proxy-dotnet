@@ -78,7 +78,6 @@ public class AdminClientController : ControllerBase
     /// <response code="204">Instance successfully removed.</response>
     /// <response code="403">Invalid token.</response>
     /// <response code="404">Instance not found.</response>
-    /// <response code="500">Returns error details.</response>
     [HttpDelete("{clientId:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -86,6 +85,24 @@ public class AdminClientController : ControllerBase
     public IActionResult RemoveClient(Guid clientId, [Required] string token)
     {
         _service.RemoveClient(clientId, token);
+        return NoContent();
+    }
+
+    /// <summary>Touch client (update expiration).</summary>
+    /// <param name="clientId">Admin client instance Id.</param>
+    /// <param name="token">Security token obtained while creating current instance.</param>
+    /// <response code="204">Client touched.</response>
+    /// <response code="403">Invalid token.</response>
+    /// <response code="404">Instance not found.</response>
+    [HttpGet("{clientId:guid}/touch")]
+    [HttpPost("{clientId:guid}/touch")]
+    [HttpPut("{clientId:guid}/touch")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public IActionResult TouchClient(Guid clientId, [Required] string token)
+    {
+        _service.TouchClient(clientId, token);
         return NoContent();
     }
 

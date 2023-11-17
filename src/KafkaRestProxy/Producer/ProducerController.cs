@@ -87,6 +87,24 @@ public class ProducerController : ControllerBase
         return NoContent();
     }
 
+    /// <summary>Touch producer (update expiration).</summary>
+    /// <param name="producerId">Producer instance Id.</param>
+    /// <param name="token">Security token obtained while creating current instance.</param>
+    /// <response code="204">Producer touched.</response>
+    /// <response code="403">Invalid token.</response>
+    /// <response code="404">Instance not found.</response>
+    [HttpGet("{producerId:guid}/touch")]
+    [HttpPost("{producerId:guid}/touch")]
+    [HttpPut("{producerId:guid}/touch")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public IActionResult TouchProducer(Guid producerId, [Required] string token)
+    {
+        _service.TouchProducer(producerId, token);
+        return NoContent();
+    }
+
     /// <summary>Add/replace schema.</summary>
     /// <param name="producerId">Producer instance Id.</param>
     /// <param name="token">Security token obtained while creating current instance.</param>

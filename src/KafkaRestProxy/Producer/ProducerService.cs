@@ -55,6 +55,12 @@ public class ProducerService
         _provider.RemoveItem(wrapper.Id);
     }
 
+    public void TouchProducer(Guid producerId, string token)
+    {
+        var wrapper = _provider.GetItem(producerId, token);
+        wrapper.UpdateExpiration();
+    }
+
     public async Task SetSchemaAsync(Guid producerId, string token, string schema)
     {
         var wrapper = _provider.GetItem(producerId, token);

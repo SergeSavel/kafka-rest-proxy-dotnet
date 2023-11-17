@@ -56,6 +56,12 @@ public class AdminClientService
         _provider.RemoveItem(wrapper.Id);
     }
 
+    public void TouchClient(Guid producerId, string token)
+    {
+        var wrapper = _provider.GetItem(producerId, token);
+        wrapper.UpdateExpiration();
+    }
+
     public Metadata GetMetadata(Guid clientId, string token, TimeSpan timeout)
     {
         var wrapper = _provider.GetItem(clientId, token);
