@@ -1,0 +1,13 @@
+﻿<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="Publish to folder (Self-Contained/win-x64)" type="DotNetFolderPublish"
+                   factoryName="Publish to folder">
+        <riderPublish configuration="Release" delete_existing_files="true" platform="Any CPU" runtime="win-x64"
+                      self_contained="true" target_folder="../../../publish/self-contained/win-x64"
+                      target_framework="net6.0" trim_unused_assemblies="true" uuid_high="-5173708265016505185"
+                      uuid_low="-8512941129915963748"/>
+        <method v="2">
+            <option name="CleanSolution" enabled="true"/>
+            <option name="Build Solution" enabled="true"/>
+        </method>
+    </configuration>
+</component>
