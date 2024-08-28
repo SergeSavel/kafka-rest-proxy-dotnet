@@ -26,6 +26,7 @@
     <ItemGroup>
         <PackageReference Include="Confluent.Kafka" Version="2.5.2"/>
         <PackageReference Include="Confluent.SchemaRegistry.Serdes.Avro" Version="2.5.2"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="8.0.0"/>
         <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="8.0.0"/>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.7.3"/>
     </ItemGroup>

@@ -15,6 +15,7 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.Hosting.Systemd;
 using Microsoft.Extensions.Hosting.WindowsServices;
 using Microsoft.OpenApi.Models;
 using SergeSavel.KafkaRestProxy.AdminClient;
@@ -29,12 +30,15 @@ using SergeSavel.KafkaRestProxy.SchemaRegistry;
 var webAppOptions = new WebApplicationOptions
 {
     Args = args,
-    ContentRootPath = WindowsServiceHelpers.IsWindowsService() ? AppContext.BaseDirectory : default
+    ContentRootPath = WindowsServiceHelpers.IsWindowsService() || SystemdHelpers.IsSystemdService()
+        ? AppContext.BaseDirectory
+        : default
 };
 
 var builder = WebApplication.CreateBuilder(webAppOptions);
 
 builder.Host.UseWindowsService();
+builder.Host.UseSystemd();
 
 builder.Services.Configure<IISServerOptions>(options => { options.MaxRequestBodySize = int.MaxValue; });
 builder.Services.Configure<KestrelServerOptions>(options => { options.Limits.MaxRequestBodySize = int.MaxValue; });
