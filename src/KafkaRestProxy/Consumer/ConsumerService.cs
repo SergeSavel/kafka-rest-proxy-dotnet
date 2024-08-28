@@ -146,7 +146,7 @@ public class ConsumerService
             ValueType = Enum.GetName(source.ValueType),
             ExpiresAt = source.ExpiresAt,
             Owner = source.Owner,
-            Token = source.Token,
+            Token = source.Token
         };
     }
 }

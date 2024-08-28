@@ -52,10 +52,7 @@ public abstract class ClientWrapper : IDisposable
     {
         const int length = 8;
         var chars = new char[length];
-        for (var i = 0; i < length; i++)
-        {
-            chars[i] = (char)XRandom.Next('A', 'A' + 26);
-        }
+        for (var i = 0; i < length; i++) chars[i] = (char)XRandom.Next('A', 'A' + 26);
 
         return new string(chars);
     }
