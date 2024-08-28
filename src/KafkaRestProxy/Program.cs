@@ -56,16 +56,15 @@ builder.Services.AddControllers(options => options.Filters.Add(new HttpResponseE
     });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
+builder.Services.AddSwaggerGen(options =>
 {
-    c.SwaggerDoc("v5", new OpenApiInfo { Title = "KafkaRestProxy", Version = "v5" });
+    options.SwaggerDoc("v5", new OpenApiInfo { Title = "KafkaRestProxy", Version = "v5" });
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    c.IncludeXmlComments(xmlPath);
+    options.IncludeXmlComments(xmlPath);
 });
 
 builder.Services.AddHealthChecks();
-
 builder.Services.AddCommon(builder.Configuration);
 builder.Services.AddProxy(builder.Configuration);
 builder.Services.AddAdminClient(builder.Configuration);
@@ -85,7 +84,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseRouting();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
