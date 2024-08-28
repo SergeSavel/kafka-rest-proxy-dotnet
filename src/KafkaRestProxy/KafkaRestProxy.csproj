@@ -1,13 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>SergeSavel.KafkaRestProxy</RootNamespace>
         <Company>Serge Savel</Company>
-        <Nullable>disable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <AssemblyVersion>4.1</AssemblyVersion>
-        <FileVersion>4.1.0</FileVersion>
+        <AssemblyVersion>5.0</AssemblyVersion>
+        <FileVersion>5.0.0</FileVersion>
         <Product>Kafka REST Proxy</Product>
         <Title>Kafka REST Proxy</Title>
         <Authors>Sergey Savelev</Authors>
@@ -15,7 +15,7 @@
         <Copyright>Sergey Savelev</Copyright>
         <PackageLicenseUrl>https://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/SergeSavel/kafka-rest-proxy-dotnet</RepositoryUrl>
-        <PackageVersion>4.1.0</PackageVersion>
+        <PackageVersion>5.0.0</PackageVersion>
     </PropertyGroup>
 
     <PropertyGroup>
