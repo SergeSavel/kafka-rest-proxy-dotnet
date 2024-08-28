@@ -32,7 +32,7 @@ public class BasicAuthHandler : AuthenticationHandler<AuthenticationSchemeOption
     private string _failureMessage;
 
     public BasicAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options, ILoggerFactory logger,
-        UrlEncoder encoder, ISystemClock clock, UserService userService) : base(options, logger, encoder, clock)
+        UrlEncoder encoder, UserService userService) : base(options, logger, encoder)
     {
         _userService = userService;
     }
