@@ -52,7 +52,6 @@ public class ProducerService
     public void RemoveProducer(Guid producerId, string token)
     {
         var wrapper = _provider.GetItem(producerId, token);
-        if (wrapper == null) return;
         _provider.RemoveItem(wrapper.Id);
     }
 
